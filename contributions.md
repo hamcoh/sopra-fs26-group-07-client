@@ -34,7 +34,7 @@ reason).
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **@supermqx**      | [25.3.2026]   | [https://github.com/hamcoh/sopra-fs26-group-07-server/commit/ba0a5e0] Finalized the backend data model for hamcoh/sopra-fs26-group-07-server#98 by refining the `Submission` / `ExecutionResult` persistence model and automating `submittedAt`. | Establishes the persistence foundation for run-code and final-submission features and supports later execution handling and result feedback. |
+| **@supermqx**      | 25.3.2026   | https://github.com/hamcoh/sopra-fs26-group-07-server/commit/ba0a5e0 | Finalized the backend data model for hamcoh/sopra-fs26-group-07-server#98 by refining the `Submission` / `ExecutionResult` persistence model and automating `submittedAt`. | Establishes the persistence foundation for run-code and final-submission features and supports later execution handling and result feedback. |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
