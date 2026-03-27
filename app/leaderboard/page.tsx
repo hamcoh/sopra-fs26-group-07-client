@@ -47,7 +47,7 @@ const Dashboard: React.FC = () => {
   const handleLogout = (): void => {
     // Clear token using the returned function 'clear' from the hook
     clearToken();
-    router.push("/login");
+    router.push("/");
   };
 
   useEffect(() => {

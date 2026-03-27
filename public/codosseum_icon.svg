@@ -1,0 +1,28 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Codosseum icon</title>
+  <desc id="desc">Minimal icon combining coding brackets with a stylized colosseum in blue and purple.</desc>
+  <defs>
+    <style>
+      .blue { fill: #4A7DE8; }
+      .purple { fill: #8B5CF6; }
+      .purple-dark { fill: #5B2DBF; }
+    </style>
+  </defs>
+
+  <path class="blue" d="M145 122C151 116 160 116 166 122L195 151C201 157 201 166 195 172L166 201C160 207 151 207 145 201C139 195 139 186 145 180L165 161L145 143C139 137 139 128 145 122Z"/>
+  <path class="blue" d="M367 122C373 128 373 137 367 143L347 161L367 180C373 186 373 195 367 201C361 207 352 207 346 201L317 172C311 166 311 157 317 151L346 122C352 116 361 116 367 122Z"/>
+  <path class="blue" d="M277 87C284 89 288 96 286 103L257 205C255 212 248 216 241 214C234 212 230 205 232 198L261 96C263 89 270 85 277 87Z"/>
+
+  <rect x="132" y="236" width="248" height="26" rx="8" class="purple"/>
+  <path class="purple" d="M100 278C100 261 113 248 130 248H382C399 248 412 261 412 278V378H100V278Z"/>
+
+  <g class="purple-dark">
+    <rect x="126" y="289" width="22" height="68" rx="5"/>
+    <rect x="164" y="289" width="22" height="68" rx="5"/>
+    <rect x="202" y="289" width="22" height="68" rx="5"/>
+    <rect x="240" y="289" width="22" height="82" rx="5"/>
+    <rect x="278" y="289" width="22" height="68" rx="5"/>
+    <rect x="316" y="289" width="22" height="68" rx="5"/>
+    <rect x="354" y="289" width="22" height="68" rx="5"/>
+  </g>
+</svg>
