@@ -33,10 +33,11 @@ export default function RegisterPage() {
       });
 
       if (loginRes.token) {
-        localStorage.setItem("token", loginRes.token);
+        localStorage.setItem("token", JSON.stringify(loginRes.token));
+        localStorage.setItem("userId", JSON.stringify(String(loginRes.id)));
+        localStorage.setItem("username", JSON.stringify(loginRes.username ?? ""));
       }
-      localStorage.setItem("userId", String(loginRes.id)|| "");
-      localStorage.setItem("username", loginRes.username || "");
+      
 
       router.push("/menu");
     } catch (error) {

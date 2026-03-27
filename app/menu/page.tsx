@@ -12,8 +12,8 @@ import ProfileButton from "@/components/ProfileButton";
 
 export default function MenuPage() {
   const router = useRouter();
-  const { value: token } = useLocalStorage<string>("token", "");
-  const { value: username } = useLocalStorage<string>("username", "Player");
+  const { value: token } = useLocalStorage("token", "");
+  const { value: username } = useLocalStorage("username", "Player");
 
   useEffect(() => {
     if (token === "" ) return;
@@ -47,23 +47,23 @@ export default function MenuPage() {
       {/* Cards */}
       <div className={styles.cards}>
 
-        <div className={styles.card} onClick={() => router.push("/create-session")}>
+        <div className={styles.card} onClick={() => router.push("/create-room")}>
           <div className={`${styles.iconBox} ${styles.iconBlue}`}>
             <PlusOutlined style={{ fontSize: 28, color: "white" }} />
           </div>
-          <h2 className={styles.cardTitle}>Create Session</h2>
+          <h2 className={styles.cardTitle}>Create Room</h2>
           <p className={styles.cardDesc}>
             Start a new coding battle and invite others to join your arena
           </p>
         </div>
 
-        <div className={styles.card} onClick={() => router.push("/join-session")}>
+        <div className={styles.card} onClick={() => router.push("/join-room")}>
           <div className={`${styles.iconBox} ${styles.iconPink}`}>
             <TeamOutlined style={{ fontSize: 28, color: "white" }} />
           </div>
-          <h2 className={styles.cardTitle}>Join Session</h2>
+          <h2 className={styles.cardTitle}>Join Room</h2>
           <p className={styles.cardDesc}>
-            Enter a session code and join an existing battle arena
+            Enter a room code and join an existing battle arena
           </p>
         </div>
 

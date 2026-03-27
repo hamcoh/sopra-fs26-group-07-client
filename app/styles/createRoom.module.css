@@ -1,0 +1,187 @@
+.pageBackground {
+    min-height: 100vh;
+    background-color: #eef1f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 620px;
+    gap: 24px;
+  }
+  
+  /* Back Button */
+  .backButton {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #4b5563;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+  
+  .backButton:hover {
+    background: #e2e6f0;
+    color: #1a1a2e;
+  }
+  
+  /* Logo */
+  .logoArea {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  
+  .logoTexts {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .logoTitle {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0;
+    line-height: 1.1;
+  }
+  
+  .logoSubtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+  }
+  
+  /* Card */
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 36px 40px;
+    width: 100%;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+  
+  .divider {
+    border: none;
+    border-top: 1px solid #f0f0f0;
+    margin: 24px 0;
+  }
+  
+  /* Section */
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .sectionTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .iconBlue   { color: #4361ee; font-size: 18px; }
+  .iconPurple { color: #8b5cf6; font-size: 18px; }
+  .iconOrange { color: #f97316; font-size: 18px; }
+  
+  /* Options Row */
+  .optionsRow {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  /* Unified Option Card — horizontal layout for all three */
+  .optionCard {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 24px;
+    border-radius: 14px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    cursor: default;
+    flex: 1;
+  }
+  
+  .optionName {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 4px 0;
+  }
+  
+  .optionDesc {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+  }
+  
+  /* Selected states */
+  .selectedBlue   { border-color: #4361ee; background: #eef1fd; }
+  .selectedPurple { border-color: #8b5cf6; background: #f5f0ff; }
+  .selectedOrange { border-color: #f97316; background: #fff7ed; }
+  
+  /* Difficulty dot */
+  .dotGreen {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #22c55e;
+    display: block;
+    flex-shrink: 0;
+  }
+  
+  /* Game mode trophy icon */
+  .gameModeIcon {
+    font-size: 24px;
+    color: #f97316;
+    flex-shrink: 0;
+  }
+  
+  /* Create Button */
+  .createButton {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4361ee 0%, #8b5cf6 100%);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  
+  .createButton:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+  
+  .createButton:active {
+    transform: translateY(0);
+  }
+  
