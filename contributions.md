@@ -30,14 +30,14 @@ reason).
 
 ---
 
-## Contributions Week 1 - [Begin Date] to [End Date]
+## Contributions Week 1 - 23.03.2026 to 29.03.2026
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
 | **@supermqx**      | 25.3.2026   | https://github.com/hamcoh/sopra-fs26-group-07-server/commit/ba0a5e0 | Finalized the backend data model for hamcoh/sopra-fs26-group-07-server#98 by refining the `Submission` / `ExecutionResult` persistence model and automating `submittedAt`. | Establishes the persistence foundation for run-code and final-submission features and supports later execution handling and result feedback. |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@hamcoh** | 26.03.2026   | https://github.com/hamcoh/sopra-fs26-group-07-server/commit/3cf7030ced9b2bb6b1b9ffc634e8b6c131b7aa9a | Finalized the complete logic for Creating a Game Room, including Endpoint, Method, Database tables and tests | This contribution is relevant because lobby creation is a core backend feature that enables users to start new game sessions. It establishes the foundation for room-based gameplay and ensures the feature is reliable through persistence and test coverage. |
+|                    | 25.03.2026   | https://github.com/hamcoh/sopra-fs26-group-07-server/commit/92de2708495e9581112b885e4349ff66c783f825 | Implemented password change logic in the backend, including validation and automatic session invalidation after the logout and endpoint| This is important for security, as it ensures that sessions are closes immediately after a password change and enforces a consistent authentication lifecycle. |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
