@@ -7,6 +7,7 @@ import { Button, Form, Input } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import CodosseumLogo from "@/components/CodosseumLogo";
+import Link from "next/link";
 
 
 interface FormFieldProps {
@@ -127,9 +128,10 @@ export default function RegisterPage() {
 
         <p className={styles.signUpText}>
           Already have an account?{" "}
-          <a href="/" className={styles.signUpLink}>
+          <Link href="/" className={styles.signUpLink}>
             Sign in
-          </a>
+          </Link>
+
         </p>
       </div>
     </div>

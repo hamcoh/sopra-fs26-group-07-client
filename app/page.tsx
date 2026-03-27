@@ -8,6 +8,7 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import { useEffect } from "react";
+import Link from "next/link";
 
 
 
@@ -109,9 +110,10 @@ export default function Home() {
         </Form>
         <p className={styles.signUpText}>
           Don&apos;t have an account?{" "}
-          <a href="/register" className={styles.signUpLink}>
-            Sign up
-          </a>
+          <Link href="/register" className={styles.signUpLink}>
+           Sign up
+          </Link>
+
         </p>
       </div>
 
