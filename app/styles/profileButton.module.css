@@ -1,0 +1,28 @@
+.profileButton {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #7C3AED 0%, #4361EE 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(123, 79, 240, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    z-index: 100;
+  }
+  
+  .profileButton:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(123, 79, 240, 0.5);
+  }
+  
+  .profileButton:active {
+    transform: scale(0.96);
+  }
+  
