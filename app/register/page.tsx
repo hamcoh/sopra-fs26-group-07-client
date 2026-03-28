@@ -34,7 +34,7 @@ export default function RegisterPage() {
 
       if (loginRes.token) {
         localStorage.setItem("token", JSON.stringify(loginRes.token));
-        localStorage.setItem("userId", JSON.stringify(String(loginRes.id)));
+        localStorage.setItem("userid", JSON.stringify(loginRes.id));
         localStorage.setItem("username", JSON.stringify(loginRes.username ?? ""));
       }
       
