@@ -23,8 +23,8 @@ export class ApiService {
    * @throws ApplicationError if res.ok is false.
    */
   private async processResponse<T>(
-    res: Response,
-    errorMessage: string,
+      res: Response,
+      errorMessage: string,
   ): Promise<T> {
     if (!res.ok) {
       let errorDetail = res.statusText;
@@ -40,19 +40,19 @@ export class ApiService {
       }
       const detailedMessage = `${errorMessage} (${res.status}: ${errorDetail})`;
       const error: ApplicationError = new Error(
-        detailedMessage,
+          detailedMessage,
       ) as ApplicationError;
       error.info = JSON.stringify(
-        { status: res.status, statusText: res.statusText },
-        null,
-        2,
+          { status: res.status, statusText: res.statusText },
+          null,
+          2,
       );
       error.status = res.status;
       throw error;
     }
     return res.headers.get("Content-Type")?.includes("application/json")
-      ? (res.json() as Promise<T>)
-      : Promise.resolve(res as T);
+        ? (res.json() as Promise<T>)
+        : Promise.resolve(res as T);
   }
 
   /**
@@ -67,8 +67,8 @@ export class ApiService {
       headers: this.defaultHeaders,
     });
     return this.processResponse<T>(
-      res,
-      "An error occurred while fetching the data.\n",
+        res,
+        "An error occurred while fetching the data.\n",
     );
   }
 
@@ -86,8 +86,8 @@ export class ApiService {
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
-      res,
-      "An error occurred while posting the data.\n",
+        res,
+        "An error occurred while posting the data.\n",
     );
   }
 
@@ -105,8 +105,8 @@ export class ApiService {
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
-      res,
-      "An error occurred while updating the data.\n",
+        res,
+        "An error occurred while updating the data.\n",
     );
   }
 
@@ -122,8 +122,8 @@ export class ApiService {
       headers: this.defaultHeaders,
     });
     return this.processResponse<T>(
-      res,
-      "An error occurred while deleting the data.\n",
+        res,
+        "An error occurred while deleting the data.\n",
     );
   }
 }
