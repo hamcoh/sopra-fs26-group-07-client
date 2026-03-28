@@ -1,0 +1,168 @@
+.pageBackground {
+    min-height: 100vh;
+    background-color: #eef1f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 780px;
+    gap: 28px;
+  }
+  
+  /* Back Button */
+  .backButton {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #4b5563;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+  
+  .backButton:hover {
+    background: #e2e6f0;
+    color: #1a1a2e;
+  }
+  
+  /* Logo */
+  .logoArea {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  
+  .logoTexts {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .logoTitle {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0;
+    line-height: 1.1;
+  }
+  
+  .logoSubtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+  }
+  
+  /* Podium */
+  .podium {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .podiumPlaceholder {
+    flex: 1;
+  }
+  
+  .podiumCard {
+    flex: 1;
+    background: white;
+    border-radius: 16px;
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    border: 2px solid transparent;
+    transition: transform 0.15s;
+  }
+  
+  .podiumCard:hover {
+    transform: translateY(-2px);
+  }
+  
+  .podiumCardFirst {
+    border-color: #F59E0B;
+    background: #FFFBEB;
+    padding: 32px 20px;
+    box-shadow: 0 4px 24px rgba(245, 158, 11, 0.2);
+  }
+  
+  .podiumUsername {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 6px 0;
+  }
+  
+  .podiumPoints {
+    font-size: 22px;
+    font-weight: 800;
+    color: #4361ee;
+    margin: 0 0 4px 0;
+  }
+  
+  .podiumPointsGold {
+    color: #F97316;
+    font-size: 26px;
+  }
+  
+  .podiumWR {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+  }
+  
+  /* Table */
+  .tableWrapper {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+  }
+  
+  .leaderboardTable :global(.ant-table) {
+    border-radius: 0 !important;
+  }
+  
+  .leaderboardTable :global(.ant-table-thead > tr > th) {
+    background: #4361ee !important;
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    border: none !important;
+    padding: 16px 16px !important;
+  }
+  
+  
+  .leaderboardTable :global(.ant-table-thead > tr > th::before) {
+    display: none !important;
+  }
+  
+  .leaderboardTable :global(.ant-table-tbody > tr > td) {
+    padding: 14px 16px !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+    background: white !important;
+  }
+  
+  .leaderboardTable :global(.ant-table-tbody > tr:hover > td) {
+    background: #f8f9ff !important;
+  }
+  
+  .leaderboardTable :global(.ant-table-tbody > tr:last-child > td) {
+    border-bottom: none !important;
+  }
+  

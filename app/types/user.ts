@@ -4,4 +4,9 @@ export interface User {
   username: string | null;
   token: string | null;
   status: string | null;
+  winCount: number;
+  winRatePercentage: number;
+  totalGamesPlayed: number;
+  totalPoints: number;
+  rank: number;
 }
