@@ -3,23 +3,16 @@ import { ApplicationError } from "@/types/error";
 
 export class ApiService {
   private baseURL: string;
+  private defaultHeaders: HeadersInit;
 
   constructor() {
     this.baseURL = getApiDomain();
-  }
-  private getHeaders(): HeadersInit {
-    const tokenRaw = localStorage.getItem("token");
-    const userIdRaw = localStorage.getItem("userId");
-
-    const token = tokenRaw ? JSON.parse(tokenRaw) : null;
-    const userId = userIdRaw ? JSON.parse(userIdRaw) : null;
-
-    return {
+    this.defaultHeaders = {
       "Content-Type": "application/json",
-      ...(token ? { token } : {}),
-      ...(userId ? { userId: String(userId) } : {}),
+      "Access-Control-Allow-Origin": "*",
     };
   }
+
   /**
    * Helper function to check the response, parse JSON,
    * and throw an error if the response is not OK.
@@ -30,8 +23,8 @@ export class ApiService {
    * @throws ApplicationError if res.ok is false.
    */
   private async processResponse<T>(
-    res: Response,
-    errorMessage: string,
+      res: Response,
+      errorMessage: string,
   ): Promise<T> {
     if (!res.ok) {
       let errorDetail = res.statusText;
@@ -47,19 +40,19 @@ export class ApiService {
       }
       const detailedMessage = `${errorMessage} (${res.status}: ${errorDetail})`;
       const error: ApplicationError = new Error(
-        detailedMessage,
+          detailedMessage,
       ) as ApplicationError;
       error.info = JSON.stringify(
-        { status: res.status, statusText: res.statusText },
-        null,
-        2,
+          { status: res.status, statusText: res.statusText },
+          null,
+          2,
       );
       error.status = res.status;
       throw error;
     }
     return res.headers.get("Content-Type")?.includes("application/json")
-      ? (res.json() as Promise<T>)
-      : Promise.resolve(res as T);
+        ? (res.json() as Promise<T>)
+        : Promise.resolve(res as T);
   }
 
   /**
@@ -71,11 +64,11 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "GET",
-      headers: this.getHeaders(),
+      headers: this.defaultHeaders,
     });
     return this.processResponse<T>(
-      res,
-      "An error occurred while fetching the data.\n",
+        res,
+        "An error occurred while fetching the data.\n",
     );
   }
 
@@ -89,12 +82,12 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "POST",
-      headers: this.getHeaders(),
+      headers: this.defaultHeaders,
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
-      res,
-      "An error occurred while posting the data.\n",
+        res,
+        "An error occurred while posting the data.\n",
     );
   }
 
@@ -108,12 +101,12 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "PUT",
-      headers: this.getHeaders(),
+      headers: this.defaultHeaders,
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
-      res,
-      "An error occurred while updating the data.\n",
+        res,
+        "An error occurred while updating the data.\n",
     );
   }
 
@@ -126,11 +119,11 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "DELETE",
-      headers: this.getHeaders(),
+      headers: this.defaultHeaders,
     });
     return this.processResponse<T>(
-      res,
-      "An error occurred while deleting the data.\n",
+        res,
+        "An error occurred while deleting the data.\n",
     );
   }
 }

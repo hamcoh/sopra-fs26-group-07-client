@@ -194,11 +194,10 @@
     display: block;
     flex-shrink: 0;
   }
-  
-  /* Game mode trophy icon */
+
   .gameModeIcon {
     font-size: 24px;
-    color: #f97316;
+    color: #000000;
     flex-shrink: 0;
   }
   

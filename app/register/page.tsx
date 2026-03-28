@@ -8,7 +8,6 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import Link from "next/link";
-import useLocalStorage from "@/hooks/useLocalStorage";
 
 
 interface FormFieldProps {
@@ -23,9 +22,6 @@ export default function RegisterPage() {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
-  const { value: token, set: setToken } = useLocalStorage("token", "");
-  const { value: userId, set: setUserID } = useLocalStorage("userId", 0);
-  const { value: username, set: setUsername } = useLocalStorage("username", "");
 
   const handleRegister = async (values: FormFieldProps) => {
     try {
@@ -37,9 +33,9 @@ export default function RegisterPage() {
       });
 
       if (loginRes.token) {
-        setToken(loginRes.token);
-        setUserID(loginRes.id);
-        setUsername(loginRes.username);
+        localStorage.setItem("token", JSON.stringify(loginRes.token));
+        localStorage.setItem("userid", JSON.stringify(loginRes.id));
+        localStorage.setItem("username", JSON.stringify(loginRes.username ?? ""));
       }
       
 

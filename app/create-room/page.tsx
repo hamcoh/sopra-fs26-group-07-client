@@ -15,8 +15,7 @@ import ProfileButton from "@/components/ProfileButton";
 import { useEffect } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useState } from "react";
-import { Room } from "@/types/room";
-import {useApi} from "@/hooks/useApi";
+import {getApiDomain} from "@/utils/domain";
 
 const PythonIcon = () => (
   <svg width="45" height="45" viewBox="0 0 256 255" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
@@ -43,13 +42,11 @@ const JavaIcon = () => (
 
 export default function CreateRoomPage() {
   const router = useRouter();
-  const apiService = useApi();
-
   const { value: token } = useLocalStorage("token", "");
   const [language, setLanguage] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [mode, setMode] = useState("");
-
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userid") : null;
   useEffect(() => {
     if (token === "") return;
 
@@ -66,15 +63,23 @@ export default function CreateRoomPage() {
         return;
       }
 
-      const res = await apiService.post<Room>(
-          "/rooms",
-          {
-            gameDifficulty: difficulty,
-            gameLanguage: language,
-            gameMode: mode,
-          }
-      );
-      router.push(`/room/${res.roomId}`);
+      const res = await fetch(`${getApiDomain()}/rooms`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+          userId: userId ?? "",
+        },
+        body: JSON.stringify({
+          gameDifficulty: difficulty,
+          gameLanguage: language,
+          gameMode: mode,
+        }),
+      });
+
+      const data = await res.json();
+
+      router.push(`/room/${data.roomId}`);
     } catch (err) {
       console.error(err);
       alert("Failed to create room");
