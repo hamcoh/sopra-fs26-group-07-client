@@ -1,5 +1,4 @@
 .pageBackground {
-    min-height: 100vh;
     background-color: #eef1f6;
     display: flex;
     flex-direction: column;
@@ -29,7 +28,7 @@
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
-    padding: 6px 10px;
+    padding: 0px 10px;
     border-radius: 8px;
     transition: background 0.15s, color 0.15s;
   }
@@ -81,7 +80,7 @@
   .divider {
     border: none;
     border-top: 1px solid #f0f0f0;
-    margin: 24px 0;
+    margin: 12px 0;
   }
   
   /* Section */
@@ -100,10 +99,21 @@
     align-items: center;
     gap: 8px;
   }
-  
-  .iconBlue   { color: #4361ee; font-size: 18px; }
-  .iconPurple { color: #8b5cf6; font-size: 18px; }
-  .iconOrange { color: #f97316; font-size: 18px; }
+
+.iconBlue {
+  color: #4361ee !important;
+  font-size: 18px;
+}
+
+.iconPurple {
+  color: #8b5cf6 !important;
+  font-size: 18px;
+}
+
+.iconOrange {
+  color: #f97316 !important;
+  font-size: 18px;
+}
   
   /* Options Row */
   .optionsRow {
@@ -117,15 +127,16 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 16px;
-    padding: 18px 24px;
+    gap: 12px;
+    padding: 6px 10px;
     border-radius: 14px;
     border: 2px solid #e5e7eb;
     background: white;
-    cursor: default;
     flex: 1;
+    transition: all 0.2s ease;
+    cursor: pointer;
   }
-  
+
   .optionName {
     font-size: 15px;
     font-weight: 700;
@@ -139,7 +150,27 @@
     margin: 0;
     line-height: 1.5;
   }
-  
+  .optionCard:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+  .blueHover:hover {
+    border-color: #4361ee;
+    background: #eef1fd;
+    box-shadow: 0 10px 25px rgba(67, 97, 238, 0.15);
+    transform: translateY(-3px);
+  }
+  .orangeHover:hover {
+    border-color: #f97316;
+    background: #fff7ed;
+    box-shadow: 0 10px 25px rgba(249, 115, 22, 0.15);
+    transform: translateY(-3px);
+  }
+  .violetHover:hover {
+    border-color: #8b5cf6;
+    background: #f5f0ff;
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
+    transform: translateY(-3px);
+  }
   /* Selected states */
   .selectedBlue   { border-color: #4361ee; background: #eef1fd; }
   .selectedPurple { border-color: #8b5cf6; background: #f5f0ff; }
@@ -151,6 +182,15 @@
     height: 32px;
     border-radius: 50%;
     background: #22c55e;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .dotRed {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ef4444;
     display: block;
     flex-shrink: 0;
   }
@@ -184,4 +224,11 @@
   .createButton:active {
     transform: translateY(0);
   }
-  
+
+  .topRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 60px;
+    width: 100%;
+  }

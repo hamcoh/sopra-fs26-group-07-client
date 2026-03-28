@@ -6,15 +6,20 @@ import {
   TrophyOutlined,
   ThunderboltFilled,
   CodeFilled,
+  ThunderboltOutlined,
+  TrophyFilled
 } from "@ant-design/icons";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import styles from "@/styles/createRoom.module.css";
 import ProfileButton from "@/components/ProfileButton";
 import { useEffect } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import { useState } from "react";
+import { Room } from "@/types/room";
+import {useApi} from "@/hooks/useApi";
 
 const PythonIcon = () => (
-  <svg width="36" height="36" viewBox="0 0 256 255" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+  <svg width="45" height="45" viewBox="0 0 256 255" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
     <defs>
       <linearGradient id="pyBlue" x1="12%" y1="12%" x2="79%" y2="78%">
         <stop offset="0" stopColor="#387EB8" />
@@ -29,38 +34,71 @@ const PythonIcon = () => (
     <path fill="url(#pyYellow)" d="M128.757 254.126c64.832 0 60.784-28.115 60.784-28.115l-.072-29.127H127.6v-8.745h86.441s41.486 4.705 41.486-60.712c0-65.416-36.21-63.096-36.21-63.096h-21.61v30.355s1.165 36.21-35.632 36.21h-61.362s-34.475-.557-34.475 33.32v56.013s-5.235 33.897 62.518 33.897zm34.114-19.586a11.12 11.12 0 0 1-11.13-11.13 11.12 11.12 0 0 1 11.13-11.13 11.12 11.12 0 0 1 11.13 11.13 11.12 11.12 0 0 1-11.13 11.13z"/>
   </svg>
 );
+const JavaIcon = () => (
+    <svg
+        width="60" height="60" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+      <path fill="#0074BD" d="M47.617 98.12s-4.767 2.774 3.397 3.71c9.892 1.13 14.947.968 25.845-1.092 0 0 2.871 1.795 6.873 3.351-24.439 10.47-55.308-.607-36.115-5.969zm-2.988-13.665s-5.348 3.959 2.823 4.805c10.567 1.091 18.91 1.18 33.354-1.6 0 0 1.993 2.025 5.132 3.131-29.542 8.64-62.446.68-41.309-6.336z"></path><path fill="#EA2D2E" d="M69.802 61.271c6.025 6.935-1.58 13.17-1.58 13.17s15.289-7.891 8.269-17.777c-6.559-9.215-11.587-13.792 15.635-29.58 0 .001-42.731 10.67-22.324 34.187z"></path><path fill="#0074BD" d="M102.123 108.229s3.529 2.91-3.888 5.159c-14.102 4.272-58.706 5.56-71.094.171-4.451-1.938 3.899-4.625 6.526-5.192 2.739-.593 4.303-.485 4.303-.485-4.953-3.487-32.013 6.85-13.743 9.815 49.821 8.076 90.817-3.637 77.896-9.468zM49.912 70.294s-22.686 5.389-8.033 7.348c6.188.828 18.518.638 30.011-.326 9.39-.789 18.813-2.474 18.813-2.474s-3.308 1.419-5.704 3.053c-23.042 6.061-67.544 3.238-54.731-2.958 10.832-5.239 19.644-4.643 19.644-4.643zm40.697 22.747c23.421-12.167 12.591-23.86 5.032-22.285-1.848.385-2.677.72-2.677.72s.688-1.079 2-1.543c14.953-5.255 26.451 15.503-4.823 23.725 0-.002.359-.327.468-.617z"></path><path fill="#EA2D2E" d="M76.491 1.587S89.459 14.563 64.188 34.51c-20.266 16.006-4.621 25.13-.007 35.559-11.831-10.673-20.509-20.07-14.688-28.815C58.041 28.42 81.722 22.195 76.491 1.587z"></path><path fill="#0074BD" d="M52.214 126.021c22.476 1.437 57-.8 57.817-11.436 0 0-1.571 4.032-18.577 7.231-19.186 3.612-42.854 3.191-56.887.874 0 .001 2.875 2.381 17.647 3.331z"></path>
+    </svg>
+);
 
 export default function CreateRoomPage() {
-    const router = useRouter();
-    const { value: token } = useLocalStorage("token", "");
-  
-  
-    useEffect(() => {
-      if (token === "" ) return;
-      if (!token) {
-        router.push("/");
-        alert("You must be logged in to access the menu.");
+  const router = useRouter();
+  const apiService = useApi();
+
+  const { value: token } = useLocalStorage("token", "");
+  const [language, setLanguage] = useState("");
+  const [difficulty, setDifficulty] = useState("");
+  const [mode, setMode] = useState("");
+
+  useEffect(() => {
+    if (token === "") return;
+
+    if (!token) {
+      router.push("/");
+      alert("You must be logged in to access the menu.");
+    }
+  }, [token, router]);
+
+  const handleCreateRoom = async () => {
+    try {
+      if (!language || !difficulty || !mode) {
+        alert("Please select all options");
         return;
       }
+
+      const res = await apiService.post<Room>(
+          "/rooms",
+          {
+            gameDifficulty: difficulty,
+            gameLanguage: language,
+            gameMode: mode,
+          }
+      );
+      router.push(`/room/${res.roomId}`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create room");
+    }
+  };
   
-  
-    }, [router]);
+
 
   return (
+
     <div className={styles.pageBackground}>
       <div className={styles.content}>
         <ProfileButton />
-
+        <div className={styles.topRow}>
         <button className={styles.backButton} onClick={() => router.push("/menu")}>
           <ArrowLeftOutlined /> Back
         </button>
-
         <div className={styles.logoArea}>
           <CodosseumLogo size={100} />
           <div className={styles.logoTexts}>
             <h1 className={styles.logoTitle}>Create Room</h1>
             <p className={styles.logoSubtitle}>Configure your battle arena</p>
           </div>
+        </div>
         </div>
 
         <div className={styles.card}>
@@ -71,14 +109,32 @@ export default function CreateRoomPage() {
               <CodeFilled className={styles.iconBlue} />
               Programming Language
             </h3>
-            <div className={styles.optionsRow}>
-              <div className={`${styles.optionCard} ${styles.selectedBlue}`}>
+            <div className={styles.optionsRow} >
+              <div
+                  className={`${styles.optionCard} ${styles.blueHover}  ${
+                      language === "python" ? styles.selectedBlue : ""
+                  }`}
+                  onClick={() => setLanguage("python")}
+              >
                 <PythonIcon />
                 <div>
                   <p className={styles.optionName}>Python</p>
                   <p className={styles.optionDesc}>Problems will have to be solved in Python</p>
                 </div>
               </div>
+              <div
+                  className={`${styles.optionCard} ${styles.blueHover} ${
+                      language === "java" ? styles.selectedBlue : ""
+                  }`}
+                  onClick={() => setLanguage("java")}
+              >
+                <JavaIcon />
+
+                <div>
+                <p className={styles.optionName}>Java</p>
+                <p className={styles.optionDesc}>Problems will have to be solved in Java</p>
+              </div>
+            </div>
             </div>
           </section>
 
@@ -87,15 +143,31 @@ export default function CreateRoomPage() {
           {/* Difficulty */}
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>
-              <TrophyOutlined className={styles.iconPurple} />
+              <TrophyFilled className={styles.iconPurple} />
               Difficulty
             </h3>
             <div className={styles.optionsRow}>
-              <div className={`${styles.optionCard} ${styles.selectedPurple}`}>
-                <span className={styles.dotGreen} />
+              <div
+                  className={`${styles.optionCard} ${styles.violetHover} ${
+                      difficulty === "easy" ? styles.selectedPurple : ""
+                  }`}
+                  onClick={() => setDifficulty("easy")}
+              >                <span className={styles.dotGreen} />
                 <div>
                   <p className={styles.optionName}>Easy</p>
                   <p className={styles.optionDesc}>Difficulty level of the Info1 course</p>
+                </div>
+              </div>
+              <div
+                  className={`${styles.optionCard} ${styles.violetHover} ${
+                      difficulty === "hard" ? styles.selectedPurple : ""
+                  }`}
+                  onClick={() => setDifficulty("hard")}
+              >
+                <span className={styles.dotRed} />
+                <div>
+                  <p className={styles.optionName}>Hard</p>
+                  <p className={styles.optionDesc}>Harder difficulty</p>
                 </div>
               </div>
             </div>
@@ -110,11 +182,28 @@ export default function CreateRoomPage() {
               Game Mode
             </h3>
             <div className={styles.optionsRow}>
-              <div className={`${styles.optionCard} ${styles.selectedOrange}`}>
+              <div
+                  className={`${styles.optionCard} ${styles.orangeHover} ${
+                      mode === "race" ? styles.selectedOrange : ""
+                  }`}
+                  onClick={() => setMode("race")}
+              >
                 <TrophyOutlined className={styles.gameModeIcon} />
                 <div>
                   <p className={styles.optionName}>Race</p>
-                  <p className={styles.optionDesc}>First to player solve all the problem wins the round</p>
+                  <p className={styles.optionDesc}>Game has tasks-limit. Be the fastest and most precise player!</p>
+                </div>
+              </div>
+              <div
+                  className={`${styles.optionCard} ${styles.orangeHover} ${
+                      mode === "sprint" ? styles.selectedOrange : ""
+                  }`}
+                  onClick={() => setMode("sprint")}
+              >
+                <ThunderboltOutlined className={styles.gameModeIcon} />
+                <div>
+                  <p className={styles.optionName}>Sprint</p>
+                  <p className={styles.optionDesc}>Game has time-limit. Solve as many problems as possible!</p>
                 </div>
               </div>
             </div>
@@ -122,8 +211,11 @@ export default function CreateRoomPage() {
 
           <hr className={styles.divider} />
 
-          <button className={styles.createButton}>
-            Create Lobby
+          <button
+              className={styles.createButton}
+              onClick={handleCreateRoom}
+          >
+            Create Room
           </button>
 
         </div>

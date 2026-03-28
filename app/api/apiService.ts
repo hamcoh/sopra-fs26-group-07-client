@@ -3,16 +3,23 @@ import { ApplicationError } from "@/types/error";
 
 export class ApiService {
   private baseURL: string;
-  private defaultHeaders: HeadersInit;
 
   constructor() {
     this.baseURL = getApiDomain();
-    this.defaultHeaders = {
+  }
+  private getHeaders(): HeadersInit {
+    const tokenRaw = localStorage.getItem("token");
+    const userIdRaw = localStorage.getItem("userId");
+
+    const token = tokenRaw ? JSON.parse(tokenRaw) : null;
+    const userId = userIdRaw ? JSON.parse(userIdRaw) : null;
+
+    return {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
+      ...(token ? { token } : {}),
+      ...(userId ? { userId: String(userId) } : {}),
     };
   }
-
   /**
    * Helper function to check the response, parse JSON,
    * and throw an error if the response is not OK.
@@ -64,7 +71,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "GET",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
     });
     return this.processResponse<T>(
       res,
@@ -82,7 +89,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "POST",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
@@ -101,7 +108,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "PUT",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
@@ -119,7 +126,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "DELETE",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
     });
     return this.processResponse<T>(
       res,
