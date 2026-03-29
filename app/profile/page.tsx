@@ -184,7 +184,7 @@ export default function OwnProfilePage() {
               <div className={styles.optionsRow}>
                 <div
                     className={`${styles.optionCard} ${styles.blueHover}`}
-                    onClick={() => router.push("/change-password")}
+                    onClick={() => router.push("/changepassword")}
                 >
                   <div className={styles.icon}>
                     <LockOutlined/>
