@@ -65,7 +65,11 @@ export default function LeaderboardPage() {
   }, [token]);
 
   const top3 = users.slice(0, 3);
-  const podiumOrder = [top3[1], top3[0], top3[2]];
+  const podiumOrder = [
+    top3[1] ?? null,
+    top3[0] ?? null,
+    top3[2] ?? null,
+  ];
   const podiumRanks = [2, 1, 3];
 
   const columns: TableProps<User>["columns"] = [
@@ -184,7 +188,7 @@ export default function LeaderboardPage() {
           <div className={styles.podium}>
             {podiumOrder.map((user, i) => {
               const rank = podiumRanks[i];
-              if (!user) return <div key={i} className={styles.podiumPlaceholder} />;
+              if (!user) return <div key={`podium-empty-${rank}`} className={styles.podiumPlaceholder} />;
               return (
                 <div
                   key={user.id}
@@ -210,7 +214,16 @@ export default function LeaderboardPage() {
             rowKey="id"
             pagination={false}
             onRow={(row) => ({
-              onClick: () => router.push(`/users/${row.id}`),
+              onClick: () => {
+                console.log("CLICKED ROW:", row);
+                console.log("ROW ID:", row.id);
+                console.log("CURRENT USER ID:", currentUserId);
+                if (String(row.id) === String(currentUserId)) {
+                  router.push("/profile");
+                } else {
+                  router.push(`/users/${String(row.id)}`);
+                }
+              },
               style: { cursor: "pointer" },
             })}
           />
