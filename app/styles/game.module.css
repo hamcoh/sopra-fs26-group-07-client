@@ -1,0 +1,477 @@
+.pageBackground {
+    background-color: #eef1f6;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.topRow {
+    width: 100%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2px 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+    gap: 285px;
+}
+
+.content {
+    display: flex;
+    flex: 1;
+    gap: 24px;
+    width: 100%;
+    padding: 30px;
+    box-sizing: border-box;
+    align-items: stretch;
+    overflow: hidden;
+}
+
+.logoArea {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logoTexts {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.logoTitle {
+    font-size:25px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0;
+    line-height: 1;
+}
+
+.logoSubtitle {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+    font-weight: 500;
+}
+
+.card {
+    flex: 1;
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.divider {
+    border: none;
+    border-top: 2px solid #f0f0f0;
+    margin: 12px -24px;
+    width: calc(100% + 48px);
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sectionTitle {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+}
+
+.problemDescription {
+    font-size: 15px;
+    font-weight: 500;
+    color: dimgray;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.problemTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+}
+
+.editorContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.outputBox {
+    flex: 1;
+    background: #111;
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    font-family: monospace;
+    overflow: auto;
+}
+
+.editorBox {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    position: relative;
+    background: white;
+    overflow: hidden;
+}
+
+.editorBox :global(.cm-editor) {
+    height: 100%;
+    max-height: 100%;
+    outline: none !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.editorBox :global(.cm-scroller) {
+    flex: 1;
+    overflow: auto !important;
+    font-family: 'Fira Code', 'JetBrains Mono', monospace !important;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+.editorBox :global(.cm-content),
+.editorBox :global(.cm-line) {
+    font-family: 'Fira Code', 'JetBrains Mono', monospace !important;
+    padding: 0 4px !important;
+    min-height: 100%;
+
+}
+
+.editorBox :global(.cm-gutters) {
+    background-color: #ffffff !important;
+    border-right: 1px solid #f0f0f0 !important;
+    color: #a1a1a1 !important;
+    font-family: monospace;
+    min-width: 40px;
+}
+
+.editorBox :global(.cm-activeLine) {
+    background-color: #f8fafc !important;
+}
+
+.editorBox :global(.cm-focused) {
+    outline: none !important;
+}
+
+.runButton, .submitButton {
+    width: 100px;
+    height: 40px;
+    padding: 0 16px 0 12px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    color: #ffffff !important;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.runButton {
+    background-color: #475569;
+    width: 80px;
+}
+
+.submitButton {
+    background-color: #16a34a;
+}
+
+.runButton :global(.anticon) {
+    font-size: 16px;
+}
+
+.runButton:hover {
+    background-color: #334155;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(71, 85, 105, 0.15);
+}
+
+.submitButton:hover {
+    background-color: #15803d;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+    transform: translateY(-1px);
+}
+
+.actionRow {
+    margin: 0 -24px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 12px 20px;
+    background-color: #f8fafc;
+    border-top: 1.5px solid #e2e8f0;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.sessionArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.sessionLabel {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.sessionValue {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+    line-height: 1;
+}
+
+.statsWrapper {
+    flex:1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 20px;
+    align-self: stretch;
+}
+
+.blueValue {
+    color: #3b82f6 !important;
+}
+
+.verticalDivider {
+    width: 1.5px;
+    height: 50px;
+    background-color: #e2e8f0;
+    margin-top: auto;
+    margin-bottom: auto;
+    flex-shrink: 0;
+}
+
+.nameBox {
+    background-color: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 8px 16px;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap:10px;
+}
+
+.nameBox :global(.ant-avatar) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.nameBoxYou {
+    border: 2px solid #3b82f6 !important;
+    background-color: #f0f7ff;
+}
+
+.problemHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.badgeRow {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.difficultyBadge {
+    background-color: #dcfce7;
+    color: #22c55e;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.timerBadge {
+    background-color: #f1f5f9;
+    color: black !important;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 750;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.timerBadge :global(.anticon) {
+    color: #6B7280 !important;
+    font-size: 14px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    filter: drop-shadow(0.5px 0px 0px #6B7280);
+    line-height: 0;
+    transform: translateY(0.5px);
+}
+
+.timerBadge :global(.anticon) svg {
+    display: block;
+}
+
+.exampleCard {
+    background-color: #f8fafc;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 2px solid #e2e8f0;
+
+}
+
+.exampleBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.exampleSubTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+}
+
+.exampleContentBox {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    width: 100%;
+}
+
+.exampleText {
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    color: #4b5563;
+    margin: 0;
+    word-break: break-all;
+}
+
+.outputContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-height: 100%;
+}
+
+.placeholderContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 16px;
+    opacity: 0.35;
+    padding: 30px;
+    min-height: 100%;
+    transform: translateY(-20px);
+}
+
+.terminalIcon {
+    width: 60px;
+    height: 60px;
+    color: #64748b;
+}
+
+.scrollableContent {
+    flex: 1;
+    overflow-y: auto;
+    margin-right: -12px;
+    padding-right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.scrollableContent::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scrollableContent::-webkit-scrollbar-thumb {
+    background-color: #e2e8f0;
+    border-radius: 10px;
+}
+
+.placeholderText {
+    font-size: 15px;
+    font-weight: 500;
+    color: #64748b;
+    margin: 0;
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+}
+
+.languageIndicator {
+    font-size: 13px;
+    font-weight: 600;
+    color: #3b82f6;
+    background-color: #eff6ff;
+    padding: 2px 10px;
+    border-radius: 6px;
+    border: 1px solid #dbeafe;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.outputTitleIcon {
+    width: 18px;
+    height: 18px;
+    color: #1a1a2e;
+    flex-shrink: 0;
+    transform: translateY(1px);
+}
