@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 interface LocalStorage<T> {
   value: T;
+  loading: boolean;
   set: (newVal: T) => void;
   clear: () => void;
 }
@@ -26,10 +27,14 @@ export default function useLocalStorage<T>(
   defaultValue: T,
 ): LocalStorage<T> {
   const [value, setValue] = useState<T>(defaultValue);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // On mount, try to read the stored value
   useEffect(() => {
-    if (typeof window === "undefined") return; // SSR safeguard
+    if (typeof window === "undefined") {
+      setLoading(false);
+      return;
+    } // SSR safeguard
     try {
       const stored = globalThis.localStorage.getItem(key);
       if (stored) {
@@ -37,6 +42,8 @@ export default function useLocalStorage<T>(
       }
     } catch (error) {
       console.error(`Error reading localStorage key "${key}":`, error);
+    } finally {
+      setLoading(false);
     }
   }, [key]);
 
@@ -56,5 +63,5 @@ export default function useLocalStorage<T>(
     }
   };
 
-  return { value, set, clear };
+  return { value, loading, set, clear };
 }
