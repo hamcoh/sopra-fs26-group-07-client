@@ -24,6 +24,7 @@ export default function GamePage() {
   const [code, setCode] = useState(`def solution(input_data):\n    # Write your solution here\n    pass`);
   const [language, setLanguage] = useState("python");
   const { value: userId } = useLocalStorage("userid", "");
+  const { value: storedUsername } = useLocalStorage("username", "Player One");
   const gameSessionId = 123567;
   const [myScore, setMyScore] = useState(150);
   const [opponentScore, setOpponentScore] = useState(180);
@@ -56,24 +57,22 @@ export default function GamePage() {
         if (response.ok) {
           const data = await response.json();
           setProblem({
-            id: data.id || 1, // Wichtig: ID vom Backend nehmen!
-            title: data.title || "Unknown Problem",
-            difficulty: data.difficulty || "Easy",
-            timeLimit: data.timeLimit || "7:00",
-            description: data.description || "",
-            examples: data.examples || []
+            id: data.id ?? 1,
+            title: data.title ?? "Unknown Problem",
+            difficulty: data.difficulty ?? "Easy",
+            timeLimit: data.timeLimit ?? "7:00",
+            description: data.description ?? "",
+            examples: data.examples ?? []
           });
 
-          // Nur setzen, wenn das Backend diese Info liefert,
-          // ansonsten behält React den aktuellen lokalen State
           if(data.totalRounds) setTotalRounds(data.totalRounds);
 
-          // Optional: Code-Editor für das neue Problem zurücksetzen
-          setCode(language === "python"
-              ? "def solution(input_data):\n    # New problem starts here\n    pass"
-              : "public class Main {\n    public static void main(String[] args) {\n        \n    }\n}");
+          const starterCode = language === "python"
+              ? "def solution(input_data):\n    pass"
+              : "public class Main {\n    public static void main(String[] args) {\n    }\n}";
 
-          setOutput(""); // Output der alten Runde löschen
+          setCode(starterCode);
+          setOutput("");
         }
       } catch (error) {
         console.error("Error while loading the problem", error);
@@ -201,7 +200,7 @@ export default function GamePage() {
               </Avatar>
               <div className={styles.sessionArea}>
                 <p className={styles.sessionLabel}>You</p>
-                <h2 className={styles.sessionValue}>Player One</h2>
+                <h2 className={styles.sessionValue}>{storedUsername}</h2>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: 'auto' }}>
                 <TrophyOutlined style={{ color: '#3b82f6', fontSize: '24px' }} />
@@ -272,27 +271,27 @@ export default function GamePage() {
                 </p>
               </section>
 
-            <section className={styles.section}>
-              <h3 className={styles.sectionTitle}>Examples</h3>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>Examples</h3>
 
-              {/* Example 1 */}
-              {problem.examples.map((ex, index) => (
-                  <div key={index} className={styles.exampleCard}>
-                    <div className={styles.exampleBlock}>
-                      <h5 className={styles.exampleSubTitle}>Input:</h5>
-                      <div className={styles.exampleContentBox}>
-                        <p className={styles.exampleText}>{ex.input}</p>
+                {/* Example 1 */}
+                {problem.examples.map((ex, index) => (
+                    <div key={index} className={styles.exampleCard}>
+                      <div className={styles.exampleBlock}>
+                        <h5 className={styles.exampleSubTitle}>Input:</h5>
+                        <div className={styles.exampleContentBox}>
+                          <p className={styles.exampleText}>{ex.input}</p>
+                        </div>
+                      </div>
+                      <div className={styles.exampleBlock}>
+                        <h5 className={styles.exampleSubTitle}>Output:</h5>
+                        <div className={styles.exampleContentBox}>
+                          <p className={styles.exampleText}>{ex.output}</p>
+                        </div>
                       </div>
                     </div>
-                    <div className={styles.exampleBlock}>
-                      <h5 className={styles.exampleSubTitle}>Output:</h5>
-                      <div className={styles.exampleContentBox}>
-                        <p className={styles.exampleText}>{ex.output}</p>
-                      </div>
-                    </div>
-                  </div>
-              ))}
-            </section>
+                ))}
+              </section>
 
             </div>
           </div>
@@ -318,7 +317,7 @@ export default function GamePage() {
                     height="100%"
                     style={{ height: '100%' }}
                     extensions={[
-                        language === 'python' ? python() : java(),
+                      language === 'python' ? python() : java(),
                       indentUnit.of("    ")
                     ]}
                     onChange={(value) => setCode(value)}
