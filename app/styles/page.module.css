@@ -155,3 +155,34 @@
 .textarea::placeholder {
   color: #BDBDBD !important;
 }
+
+.backButton {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #4b5563;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0px 10px;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+  transform: translateY(-50px);
+}
+
+.backButton:hover {
+  background: #e2e6f0;
+  color: #1a1a2e;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 450px;
+}
+
