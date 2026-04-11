@@ -41,7 +41,7 @@ export default function OwnProfilePage() {
     if (tokenLoading || userIdLoading) return;
 
     if (!token || !userId) {
-      messageApi.error("You must be logged in to look at the profile.");
+      messageApi.error("You must be logged in to look at the profile.",4);
       setIsLoading(false);
       setTimeout(() => router.push("/"), 4000);
       return;

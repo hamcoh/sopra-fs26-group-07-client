@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
-import { Table } from "antd";
+import {message, Table} from "antd";
 import type { TableProps } from "antd";
 import { ArrowLeftOutlined, TrophyFilled } from "@ant-design/icons";
 import CodosseumLogo from "@/components/CodosseumLogo";
@@ -35,11 +35,23 @@ const PodiumIcon = ({ rank }: { rank: number }) => {
 export default function LeaderboardPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
-  const { value: token } = useLocalStorage<string>("token", "");
-  const currentUserId = typeof window !== "undefined" ? localStorage.getItem("userid") : null;
+  const { value: token, loading: tokenLoading } = useLocalStorage<string>("token", "");
+  const { value: userId, loading: userIdLoading } = useLocalStorage<string>("userid", "");
+  const [messageApi, contextHolder] = message.useMessage();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (!token) return;
+    if (tokenLoading) return;
+
+    if (!token) {
+      messageApi.error("You must be logged in to look at the leaderboard.",4);
+      setIsLoading(false);
+      setTimeout(() => router.push("/"), 4000);
+      return;
+    }
+
+    setIsAuthorized(true);
 
     const fetchUsers = async () => {
       try {
@@ -56,13 +68,18 @@ export default function LeaderboardPage() {
         setUsers(data);
       } catch (error) {
         if (error instanceof Error) {
-          alert(`Something went wrong:\n${error.message}`);
+          messageApi.error(error.message);
+        } else {
+          messageApi.error("An unknown error occurred");
         }
-      }
-    };
+      } finally
+        {
+          setIsLoading(false);
+        }
+     };
 
     fetchUsers();
-  }, [token]);
+  }, [token, userId, tokenLoading, router, messageApi]);
 
   const top3 = users.slice(0, 3);
   const podiumOrder = [
@@ -100,7 +117,7 @@ export default function LeaderboardPage() {
       render: (username: string, record: User) => (
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontWeight: 600, fontSize: 15 }}>{username}</span>
-          {String(record.id) === String(currentUserId) && (
+          {String(record.id) === String(userId) && (
             <span style={{
               background: "#EEF2FF", color: "#4361EE", fontSize: 11,
               fontWeight: 600, padding: "2px 7px", borderRadius: 6,
@@ -167,7 +184,29 @@ export default function LeaderboardPage() {
     },
   ];
 
+  // Loading-Page
+  const isActuallyLoading = tokenLoading || isLoading;
+
+  if (isActuallyLoading) {
+    return (
+        <div className={styles.pageBackground}>
+          {contextHolder}
+        </div>
+    );
+  }
+
+  // Not-Authorized-Page
+  if (!isAuthorized) {
+    return (
+        <div className={styles.pageBackground}>
+          {contextHolder}
+        </div>
+    );
+  }
+
   return (
+  <>
+    {contextHolder}
     <div className={styles.pageBackground}>
       <div className={styles.content}>
         <ProfileButton />
@@ -217,8 +256,8 @@ export default function LeaderboardPage() {
               onClick: () => {
                 console.log("CLICKED ROW:", row);
                 console.log("ROW ID:", row.id);
-                console.log("CURRENT USER ID:", currentUserId);
-                if (String(row.id) === String(currentUserId)) {
+                console.log("CURRENT USER ID:", userId);
+                if (String(row.id) === String(userId)) {
                   router.push("/profile");
                 } else {
                   router.push(`/users/${String(row.id)}`);
@@ -231,5 +270,6 @@ export default function LeaderboardPage() {
 
       </div>
     </div>
+    </>
   );
 }
