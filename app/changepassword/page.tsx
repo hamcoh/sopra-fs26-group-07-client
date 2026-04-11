@@ -36,7 +36,7 @@ export default function Home() {
     setIsLoading(false);
     setIsAuthorized(true);
 
-  }, [token, tokenLoading, router, messageApi]);
+  }, [tokenLoading, router, messageApi]);
 
   const handlePasswordChange = async (values: PasswordFormValues) => {
     try {

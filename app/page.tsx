@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
-import { Button, Form, Input } from "antd";
+import {Button, Form, Input, message} from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import CodosseumLogo from "@/components/CodosseumLogo";
@@ -27,6 +27,7 @@ export default function Home() {
   const { set: setToken } = useLocalStorage<string>("token", "");
   const { set: setUserId } = useLocalStorage<string>("userid", "");
   const {set: setUserName} = useLocalStorage<string>("username", ""); // we also save the username in local storage to display it in the menu page without an additional api call. This is not strictly necessary but it improves user experience by avoiding a loading state for the username in the menu page. We could also save the whole user object in local storage, but that would be more complex and we only need the username for now, so we save it separately.
+  const [messageApi, contextHolder] = message.useMessage();
 
 
   useEffect(() => {
@@ -45,16 +46,18 @@ export default function Home() {
         setUserName(response.username || "");
       }
       router.push("/menu");
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(`Something went wrong during the login:\n${error.message}`);
+    } catch (err) {
+      if (err instanceof Error) {
+        messageApi.error("Login was not successful. Username/password is wrong");
       } else {
-        console.error("An unknown error occurred during login.");
+        messageApi.error("An unknown error occurred");
       }
     }
   };
 
   return (
+  <>
+    {contextHolder}
     <div className={styles.pageBackground}>
       <div className={styles.logoArea}>
       <CodosseumLogo size={100} />
@@ -142,5 +145,6 @@ export default function Home() {
         </Button>
       </div>
     </div>
+    </>
   );
 }

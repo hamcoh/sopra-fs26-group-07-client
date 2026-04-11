@@ -92,7 +92,7 @@ export default function OwnProfilePage() {
     };
 
     fetchUser();
-  }, [token, userId, tokenLoading, userIdLoading, router]);
+  }, [tokenLoading, userIdLoading, router]);
 
   const handleLogOut = async () => {
     await fetch(`${getApiDomain()}/users/logout/${userId}`, {
