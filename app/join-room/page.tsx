@@ -5,26 +5,57 @@ import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import styles from "@/styles/joinRoom.module.css";
 import ProfileButton from "@/components/ProfileButton";
-import { useEffect } from "react";
+import {useEffect, useState} from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import {message} from "antd";
 
 export default function JoinRoomPage() {
   const router = useRouter();
-  const { value: token } = useLocalStorage("token", "");
+  const { value: token, loading: tokenLoading } = useLocalStorage("token", "");
+  const { value: userId, loading: userIdLoading } = useLocalStorage<string>("userid", "");
 
+  const [messageApi, contextHolder] = message.useMessage();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (token === "" ) return;
+    if (tokenLoading || userIdLoading) return;
+
     if (!token) {
-      router.push("/");
-      alert("You must be logged in to access the menu.");
+      messageApi.error("You must be logged in to join a room",4);
+      setIsLoading(false);
+      setTimeout(() => router.push("/"), 4000);
       return;
     }
 
+    setIsLoading(false);
+    setIsAuthorized(true);
 
-  }, [router]);
+  }, [token, tokenLoading, userIdLoading, router, messageApi]);
+
+  // Loading-Page
+  const isActuallyLoading = tokenLoading || userIdLoading || isLoading;
+
+  if (isActuallyLoading) {
+    return (
+        <div className={styles.pageBackground}>
+          {contextHolder}
+        </div>
+    );
+  }
+
+  // Not-Authorized-Page
+  if (!isAuthorized) {
+    return (
+        <div className={styles.pageBackground}>
+          {contextHolder}
+        </div>
+    );
+  }
 
   return (
+  <>
+    {contextHolder}
     <div className={styles.pageBackground}>
       <div className={styles.content}>
         <ProfileButton />
@@ -65,5 +96,6 @@ export default function JoinRoomPage() {
 
       </div>
     </div>
+    </>
   );
 }

@@ -16,11 +16,12 @@ import { useState } from "react";
 import {getApiDomain} from "@/utils/domain";
 import { useParams } from "next/navigation";
 import ProfileButton from "@/components/ProfileButton";
+import {message} from "antd";
 
 export default function ProfilePage() {
     const router = useRouter();
     const params = useParams();
-    const {value: token} = useLocalStorage("token", "");
+    const { value: token, loading: tokenLoading } = useLocalStorage<string>("token", "");
     const userId = params.id as string;
     const [username, setUsername] = useState("");
     const [joinedDate, setJoinedDate] = useState("");
@@ -30,8 +31,21 @@ export default function ProfilePage() {
         totalGamesPlayed: 0,
         totalPoints: 0,
     });
+    const [messageApi, contextHolder] = message.useMessage();
+    const [isLoading, setIsLoading] = useState(true);
+    const [isAuthorized, setIsAuthorized] = useState(false);
+
     useEffect(() => {
-        if (!token || !userId) return;
+        if (tokenLoading) return;
+
+        if (!token) {
+            messageApi.error("You must be logged in to look at user profiles.",4);
+            setIsLoading(false);
+            setTimeout(() => router.push("/"), 4000);
+            return;
+        }
+
+        setIsAuthorized(true);
 
         const fetchUser = async () => {
             try {
@@ -44,6 +58,11 @@ export default function ProfilePage() {
                 });
 
                 const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message|| "Failed to load user profile data");
+                }
+
                 setUsername(data.username);
                 const date = new Date(data.creationDate);
                 const formatted = date.toLocaleDateString("en-US", {
@@ -59,15 +78,45 @@ export default function ProfilePage() {
                     totalPoints: data.totalPoints ?? 0,
                 });
             } catch (err) {
-                console.error(err);
+                if (err instanceof Error) {
+                    messageApi.error(err.message);
+                } else {
+                    messageApi.error("An unknown error occurred");
+                }
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchUser();
-    }, [token, userId]);
+    }, [token, userId, tokenLoading, router, messageApi]);
+
+    // Loading-Page
+    const isActuallyLoading = tokenLoading || isLoading;
+
+    if (isActuallyLoading) {
+        return (
+            <div className={styles.pageBackground}>
+                {contextHolder}
+            </div>
+        );
+    }
+
+    // Not-Authorized-Page
+    if (!isAuthorized) {
+        return (
+            <div className={styles.pageBackground}>
+                {contextHolder}
+            </div>
+        );
+    }
+
+    // Final UI
     const losses = Math.max(0, stats.totalGamesPlayed - stats.winCount);
 
     return (
+      <>
+        {contextHolder}
         <div className={styles.pageBackground}>
             <div className={styles.content}>
                 <ProfileButton />
@@ -161,5 +210,6 @@ export default function ProfilePage() {
                 </div>
             </div>
         </div>
+        </>
     );
 }
