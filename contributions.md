@@ -51,11 +51,11 @@ reason).
 | **[@clstein](https://github.com/clstein)** | 29.03.2026 | https://github.com/hamcoh/sopra-fs26-group-07-client/commit/ac7e74200e63a19a0382271b6b5872282e658ba0)| Created Change Password UI and password change request handling. | This contribution is relevant because it improves user account management and gives users control over updating their account credentials (password). |
 
 
-## Contributions Week 2 - 30.03.2026 to 05.04.2026
+## Contributions Week 2 - 13.04.2026 to 19.04.2026
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@aldigi27](https://github.com/aldigi27)** | 04.04.2026   | https://github.com/hamcoh/sopra-fs26-group-07-server/commit/229a360e3beb526dbcbdd837de1a74c72b9006b2 (Note: task split across multiple commits) | Added validation logic for game room configuration settings and implement a locking mechanism to prevent changes once a room is configured by the host. | Once a host configures a game room, the settings must be correct and remain unchanged for the whole game. Invalid or mid-game configuration changes could disrupt the experience for all players. |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
