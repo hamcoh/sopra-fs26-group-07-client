@@ -9,22 +9,50 @@ import { PlusOutlined, TeamOutlined, TrophyOutlined } from "@ant-design/icons";
 import styles from "@/styles/menu.module.css";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import ProfileButton from "@/components/ProfileButton";
+import {message} from "antd";
 
 export default function MenuPage() {
   const router = useRouter();
-  const { value: token } = useLocalStorage("token", "");
-  const { value: username } = useLocalStorage("username", "Player");
+  const { value: token, loading: tokenLoading } = useLocalStorage("token", "");
+  const { value: username, loading: usernameLoading } = useLocalStorage("username", "Player");
+  const [messageApi, contextHolder] = message.useMessage();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (token === "" ) return;
+    if (tokenLoading || usernameLoading) return;
+
     if (!token) {
-      router.push("/");
-      alert("You must be logged in to access the menu.");
+      messageApi.error("You must be logged in to look at the menu.",4);
+      setIsLoading(false);
+      setTimeout(() => router.push("/"), 4000);
       return;
     }
 
+    setIsLoading(false);
+    setIsAuthorized(true);
 
-  }, [router]);
+  }, [token, tokenLoading, usernameLoading, router, messageApi]);
+
+  // Loading-Page
+  const isActuallyLoading = tokenLoading || usernameLoading || isLoading;
+
+  if (isActuallyLoading) {
+    return (
+        <div className={styles.pageBackground}>
+          {contextHolder}
+        </div>
+    );
+  }
+
+  // Not-Authorized-Page
+  if (!isAuthorized) {
+    return (
+        <div className={styles.pageBackground}>
+          {contextHolder}
+        </div>
+    );
+  }
 
   return (
     <div className={styles.pageBackground}>

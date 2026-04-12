@@ -17,11 +17,10 @@ import { useEffect } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useState } from "react";
 import {getApiDomain} from "@/utils/domain";
+import {message} from "antd";
 
 export default function OwnProfilePage() {
   const router = useRouter();
-  const {value: token} = useLocalStorage("token", "");
-  const userId = typeof window !== "undefined" ? localStorage.getItem("userid") : null;
   const [username, setUsername] = useState("");
   const [joinedDate, setJoinedDate] = useState("");
   const [stats, setStats] = useState({
@@ -30,8 +29,25 @@ export default function OwnProfilePage() {
     totalGamesPlayed: 0,
     totalPoints: 0,
   });
+
+  const { value: token, loading: tokenLoading, clear: clearToken } = useLocalStorage<string>("token", "");
+  const { value: userId, loading: userIdLoading, clear: clearUserId } = useLocalStorage<string>("userid", "");
+  const { clear: clearUsername } = useLocalStorage<string>("username", "");
+  const [messageApi, contextHolder] = message.useMessage();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
   useEffect(() => {
-    if (!token || !userId) return;
+    if (tokenLoading || userIdLoading) return;
+
+    if (!token || !userId) {
+      messageApi.error("You must be logged in to look at the profile.",4);
+      setIsLoading(false);
+      setTimeout(() => router.push("/"), 4000);
+      return;
+    }
+
+    setIsAuthorized(true);
 
     const fetchUser = async () => {
       try {
@@ -44,6 +60,11 @@ export default function OwnProfilePage() {
         });
 
         const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message|| "Failed to load profile data");
+        }
+
         setUsername(data.username);
         const date = new Date(data.creationDate);
         const formatted = date.toLocaleDateString("en-US", {
@@ -58,14 +79,21 @@ export default function OwnProfilePage() {
           totalGamesPlayed: data.totalGamesPlayed ?? 0,
           totalPoints: data.totalPoints ?? 0,
         });
+
       } catch (err) {
-        console.error(err);
+        if (err instanceof Error) {
+          messageApi.error(err.message);
+        } else {
+          messageApi.error("An unknown error occurred");
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchUser();
-  }, [token, userId]);
-  const losses = Math.max(0, stats.totalGamesPlayed - stats.winCount);
+  }, [tokenLoading, userIdLoading, router]);
+
   const handleLogOut = async () => {
     await fetch(`${getApiDomain()}/users/logout/${userId}`, {
       method: "POST",
@@ -74,14 +102,40 @@ export default function OwnProfilePage() {
         token: token,
       },
     });
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    localStorage.removeItem("userid");
+    clearToken();
+    clearUserId();
+    clearUsername();
     router.push("/");
   };
+
+  // Loading-Page
+  const isActuallyLoading = tokenLoading || userIdLoading || isLoading;
+
+  if (isActuallyLoading) {
+    return (
+        <div className={styles.pageBackground}>
+          {contextHolder}
+        </div>
+    );
+  }
+
+  // Not-Authorized-Page
+  if (!isAuthorized) {
+    return (
+        <div className={styles.pageBackground}>
+          {contextHolder}
+        </div>
+    );
+  }
+
+  // Final UI
+  const losses = Math.max(0, stats.totalGamesPlayed - stats.winCount);
+
   return (
+    <>
+      {contextHolder}
       <div className={styles.pageBackground}>
-        <div className={styles.content}>
+            <div className={styles.content}>
 
           {/* Back-Arrow, Logo and Title of Page */}
           <div className={styles.topRow}>
@@ -232,9 +286,9 @@ export default function OwnProfilePage() {
                 </div>
               </div>
             </section>
-
           </div>
         </div>
       </div>
+    </>
   );
 }

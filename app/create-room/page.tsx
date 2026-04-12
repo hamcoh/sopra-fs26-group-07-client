@@ -13,7 +13,9 @@ import styles from "@/styles/createRoom.module.css";
 import ProfileButton from "@/components/ProfileButton";
 import { useEffect, useState } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { getApiDomain } from "@/utils/domain";
+import { useState } from "react";
+import {getApiDomain} from "@/utils/domain";
+import {message} from "antd";
 
 const PythonIcon = () => (
   <svg width="45" height="45" viewBox="0 0 256 255" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
@@ -34,29 +36,35 @@ const PythonIcon = () => (
 
 export default function CreateRoomPage() {
   const router = useRouter();
-  const { value: token } = useLocalStorage("token", "");
-
-  // Only one option per category — pre-selected by default
-  const [language, setLanguage] = useState("PYTHON");
-  const [difficulty, setDifficulty] = useState("EASY");
-  const [mode, setMode] = useState("RACE");
+  const { value: token, loading: tokenLoading } = useLocalStorage("token", "");
+  const [language, setLanguage] = useState("");
+  const [difficulty, setDifficulty] = useState("");
+  const [mode, setMode] = useState("");
+  const { value: userId, loading: userIdLoading } = useLocalStorage<string>("userid", "");
+  const [messageApi, contextHolder] = message.useMessage();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (token === "") return;
+    if (tokenLoading || userIdLoading) return;
+
     if (!token) {
-      router.push("/");
-      alert("You must be logged in to access the menu.");
+      messageApi.error("You must be logged in to create a room.",4);
+      setIsLoading(false);
+      setTimeout(() => router.push("/"), 4000);
+      return;
     }
-  }, [token, router]);
+
+    setIsLoading(false);
+    setIsAuthorized(true);
+
+  }, [token, tokenLoading, userIdLoading, router, messageApi]);
 
   const handleCreateRoom = async () => {
     try {
-      let userId = "";
-      try {
-        const raw = localStorage.getItem("userid");
-        userId = raw ? JSON.parse(raw) : "";
-      } catch {
-        userId = localStorage.getItem("userid") ?? "";
+      if (!language || !difficulty || !mode) {
+        messageApi.error("Please select all options.",4);
+        return;
       }
 
       const res = await fetch(`${getApiDomain()}/rooms`, {
@@ -75,15 +83,43 @@ export default function CreateRoomPage() {
 
       if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
-      const data = await res.json();
-      router.push(`/rooms/${data.roomId}`);
+      if (!res.ok) {
+        throw new Error(data.message|| "Failed to create a room");
+      }
+
+      router.push(`/room/${data.roomId}`);
     } catch (err) {
-      console.error(err);
-      alert("Failed to create room");
+      if (err instanceof Error) {
+        messageApi.error(err.message);
+      } else {
+        messageApi.error("An unknown error occurred");
+      }
     }
   };
 
+  // Loading-Page
+  const isActuallyLoading = tokenLoading || userIdLoading || isLoading;
+
+  if (isActuallyLoading) {
+    return (
+        <div className={styles.pageBackground}>
+          {contextHolder}
+        </div>
+    );
+  }
+
+  // Not-Authorized-Page
+  if (!isAuthorized) {
+    return (
+        <div className={styles.pageBackground}>
+          {contextHolder}
+        </div>
+    );
+  }
+
   return (
+  <>
+    {contextHolder}
     <div className={styles.pageBackground}>
       <div className={styles.content}>
         <ProfileButton />
@@ -181,5 +217,6 @@ export default function CreateRoomPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { User } from "@/types/user";
-import { Button, Form, Input } from "antd";
+import {Button, Form, Input, message} from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import CodosseumLogo from "@/components/CodosseumLogo";
@@ -13,7 +13,7 @@ import Link from "next/link";
 interface FormFieldProps {
   username: string;
   password: string;
-  biography?: string;
+  bio?: string;
 }
 
 
@@ -22,6 +22,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const handleRegister = async (values: FormFieldProps) => {
     try {
@@ -40,11 +41,11 @@ export default function RegisterPage() {
       
 
       router.push("/menu");
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(`Something went wrong:\n${error.message}`);
+    } catch (err) {
+      if (err instanceof Error) {
+        messageApi.error("Register was not successful");
       } else {
-        console.error("Unknown error");
+        messageApi.error("An unknown error occurred");
       }
     }
   };
