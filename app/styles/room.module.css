@@ -1,0 +1,344 @@
+.pageBackground {
+    min-height: 100vh;
+    background-color: #eef1f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 860px;
+    gap: 24px;
+  }
+  
+  /* Back Button */
+  .backButton {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #4b5563;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+  
+  .backButton:hover {
+    background: #e2e6f0;
+    color: #1a1a2e;
+  }
+  
+  /* Logo */
+  .logoArea {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  
+  .logoTexts {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .logoTitle {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0;
+    line-height: 1.1;
+  }
+  
+  .logoSubtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+  }
+  
+  /* Session Code Badge */
+  .sessionCodeBadge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 15px;
+    color: #374151;
+  }
+  
+  .sessionCodeBadge strong {
+    color: #1a1a2e;
+    letter-spacing: 3px;
+    font-size: 16px;
+  }
+  
+  .copyButton {
+    background: #4361ee;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s;
+    min-width: 36px;
+  }
+  
+  .copyButton:hover {
+    opacity: 0.85;
+  }
+  
+  /* Players Card */
+  .playersCard {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 60px;
+    width: 100%;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+    box-sizing: border-box;
+  }
+  
+  .playersRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  /* Player */
+  .playerSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  
+  .avatarWrapper {
+    position: relative;
+    width: 80px;
+    height: 80px;
+  }
+  
+  .avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .avatarBlue   { background: #3b82f6; }
+  .avatarPurple { background: #8b5cf6; }
+  .avatarEmpty  { background: #f3f4f6; }
+  
+  .crownBadge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #f59e0b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+  }
+  
+  .onlineDot {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #22c55e;
+    border: 2px solid white;
+  }
+  
+  .playerName {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+  }
+  
+  .playerNameMuted {
+    font-size: 18px;
+    font-weight: 600;
+    color: #9ca3af;
+    margin: 0;
+  }
+  
+  .playerRole {
+    font-size: 13px;
+    color: #4361ee;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  /* VS */
+  .vsSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    padding: 0 24px;
+  }
+  
+  .vsCircle {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .vsText {
+    font-size: 22px;
+    font-weight: 900;
+    color: #8b5cf6;
+    letter-spacing: 1px;
+  }
+  
+  /* Divider + Status */
+  .divider {
+    border: none;
+    border-top: 1px solid #f0f0f0;
+    margin: 32px 0 20px 0;
+  }
+  
+  .statusMessage {
+    text-align: center;
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  
+  /* Bottom Row */
+  .bottomRow {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    align-items: stretch;
+  }
+  
+  /* Config Card */
+  .configCard {
+    flex: 1;
+    background: white;
+    border-radius: 20px;
+    padding: 28px 32px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
+  }
+  
+  .configTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .configDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4361ee;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  
+  .configItems {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .configItem {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+  
+  .configLabel {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  
+  .configValue {
+    background: #f8f9ff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a2e;
+    text-align: center;
+  }
+  
+  /* Enter Arena Button */
+  .enterArenaButton {
+    width: 200px;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #4361ee 0%, #8b5cf6 100%);
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 4px 20px rgba(67, 97, 238, 0.3);
+    flex-shrink: 0;
+  }
+  
+  .enterArenaButton:hover:not(:disabled) {
+    opacity: 0.92;
+    transform: translateY(-2px);
+  }
+  
+  .enterArenaButton:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  .enterArenaButton:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  
