@@ -71,7 +71,7 @@ export default function JoinRoomPage() {
           setTimeout(() => {
             client.deactivate();
             router.push(`/rooms/${roomId}`);
-          }, 100);
+          }, 2000);
         },
         onStompError: (frame: IFrame) => {
           console.error("WebSocket error:", frame);
