@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getApiDomain } from "@/utils/domain";
 import { Client, IFrame } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 
 export default function JoinRoomPage() {
   const router = useRouter();
@@ -34,11 +35,9 @@ export default function JoinRoomPage() {
     }
 
     setLoading(true);
-///
-    try {
-      
 
-      // Step 2: join the room via REST
+    try {
+      // Step 1: join the room via REST
       const joinRes = await fetch(`${getApiDomain()}/rooms/players`, {
         method: "POST",
         headers: {
@@ -53,13 +52,9 @@ export default function JoinRoomPage() {
 
       const roomId = (await joinRes.json()).roomId;
 
-      // Step 3: connect via WebSocket, send join notification, then navigate
-      const wsUrl = getApiDomain()
-        .replace("https://", "wss://")
-        .replace("http://", "ws://") + "/ws";
-
+      // Step 2: connect via WebSocket, send join notification, then navigate
       const client = new Client({
-        brokerURL: wsUrl,
+        webSocketFactory: () => new SockJS(`${getApiDomain()}/ws`),
         connectHeaders: { token: token },
         onConnect: () => {
           // publish join message to notify the host

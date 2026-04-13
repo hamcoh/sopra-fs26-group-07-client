@@ -7,6 +7,7 @@ import {
   CopyOutlined, TrophyOutlined, ThunderboltFilled,
 } from "@ant-design/icons";
 import { Client, IMessage, IFrame } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getApiDomain } from "@/utils/domain";
@@ -104,27 +105,21 @@ export default function LobbyPage() {
   useEffect(() => {
     if (!token || !roomId) return;
 
-    const wsUrl = getApiDomain()
-      .replace("https://", "wss://")
-      .replace("http://", "ws://") + "/ws";
-
     const client = new Client({
-      brokerURL: wsUrl,
+      webSocketFactory: () => new SockJS(`${getApiDomain()}/ws`),
       connectHeaders: { token: token },
 
       onConnect: () => {
-        console.log("✅ WebSocket connected!");
+        console.log("WebSocket connected!");
 
-        // NOTE: backend broadcasts to /topic/room/{roomId} (singular), not /topic/rooms/
         client.subscribe(`/topic/room/${roomId}`, async (message: IMessage) => {
-          console.log("📨 Room update received:", message.body);
-          // Re-fetch full room data via REST — the WS payload is just a notification
+          console.log("Room update received:", message.body);
           await fetchRoom();
         });
       },
 
       onStompError: (frame: IFrame) => {
-        console.error("❌ WebSocket error:", frame);
+        console.error("WebSocket error:", frame);
       },
     });
 
