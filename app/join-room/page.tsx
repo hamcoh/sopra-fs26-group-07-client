@@ -34,36 +34,12 @@ export default function JoinRoomPage() {
     }
 
     setLoading(true);
-
+///
     try {
-      // Step 1: get all rooms and find the one matching the join code
-      const roomsRes = await fetch(`${getApiDomain()}/rooms`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "token": token,
-          "userId": String(userId),
-        },
-      });
-
-      if (!roomsRes.ok) throw new Error("Failed to fetch rooms");
-
-      const rooms = await roomsRes.json();
-      const matchedRoom = rooms.find(
-        (r: { roomJoinCode: string; roomId: number }) =>
-          r.roomJoinCode === joinCode.toUpperCase()
-      );
-
-      if (!matchedRoom) {
-        alert("Room not found. Check the session code and try again.");
-        setLoading(false);
-        return;
-      }
-
-      const roomId = matchedRoom.roomId;
+      
 
       // Step 2: join the room via REST
-      const joinRes = await fetch(`${getApiDomain()}/rooms/${roomId}/players`, {
+      const joinRes = await fetch(`${getApiDomain()}/rooms/players`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,6 +50,8 @@ export default function JoinRoomPage() {
       });
 
       if (!joinRes.ok) throw new Error("Failed to join room");
+
+      const roomId = (await joinRes.json()).roomId;
 
       // Step 3: connect via WebSocket, send join notification, then navigate
       const wsUrl = getApiDomain()
