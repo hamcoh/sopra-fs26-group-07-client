@@ -1,8 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import styles from "@/styles/game.module.css";
+import resultStyles from "@/styles/results.module.css";
 import { useEffect, useState } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getApiDomain } from "@/utils/domain";
@@ -20,16 +21,18 @@ import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 
 export default function GamePage() {
+  const router = useRouter();
+
+  // NEEDED FOR API REQUESTS & UI
   const { value: token } = useLocalStorage("token", "");
-  const [code, setCode] = useState(`def solution(input_data):\n    # Write your solution here\n    pass`);
-  const [language, setLanguage] = useState("python");
   const { value: userId } = useLocalStorage("userid", "");
   const { value: storedUsername } = useLocalStorage("username", "Player One");
-  const gameSessionId = 123567;
-  const [myScore, setMyScore] = useState(150);
-  const [opponentScore, setOpponentScore] = useState(180);
-  const [currentRound, setCurrentRound] = useState(1);
-  const [totalRounds, setTotalRounds] = useState(10);
+  const { gameSessionId } = useParams();
+
+  // PLACEHOLDER FOR RENDERING THE PROGRAMMING LANGUAGE ABOVE THE CODE EDITOR
+  const [language, setLanguage] = useState("python");
+
+  // PLACEHOLDER FOR PROBLEM RENDERING (SAMPLE PROBLEM)
   const [problem, setProblem] = useState({
     id: 1,
     title: "Two Sum",
@@ -41,6 +44,19 @@ export default function GamePage() {
       { input: "nums = [3, 2, 4], target = 6", output: "[1, 2]" }
     ]
   });
+
+  // SCORE & ROUND TRACKING (HEADER PART)
+  const [myScore, setMyScore] = useState(150);
+  const [opponentScore, setOpponentScore] = useState(180);
+  const [currentRound, setCurrentRound] = useState(1);
+  const [totalRounds, setTotalRounds] = useState(3);
+
+  // NEEDED FOR GAME RESULT/END UI CONDITIONAL RENDERING
+  const [isGameOver, setIsGameOver] = useState(false);
+
+  // NEEDED FOR EXAMPLE TEXT THAT SHOULD SHOW UP IN THE CODE EDITOR
+  const [code, setCode] = useState(`def solution(input_data):\n    # Write your solution here\n    pass`);
+
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -67,6 +83,7 @@ export default function GamePage() {
 
           if(data.totalRounds) setTotalRounds(data.totalRounds);
 
+          // EVERYTIME A PROBLEM IS SUBMITTED THE CODE WILL BE REPLACED THROUGH THIS:
           const starterCode = language === "python"
               ? "def solution(input_data):\n    pass"
               : "public class Main {\n    public static void main(String[] args) {\n    }\n}";
@@ -85,6 +102,7 @@ export default function GamePage() {
   const [output, setOutput] = useState("");
   const [isRunning, setIsRunning] = useState(false);
 
+  // RUN BUTTON LOGIC
   const handleRun = async () => {
     if (!token || isRunning) return;
 
@@ -102,8 +120,7 @@ export default function GamePage() {
           gameSessionId: gameSessionId,
           problemId: problem.id,
           playerSessionId: Number(userId),
-          code: code,
-          language: language
+          sourceCode: code
         }),
       });
 
@@ -122,6 +139,7 @@ export default function GamePage() {
     }
   };
 
+  // SUBMIT BUTTON LOGIC
   const handleSubmit = async () => {
     if (!token || isRunning) return;
 
@@ -139,8 +157,7 @@ export default function GamePage() {
           gameSessionId: gameSessionId,
           problemId: problem.id,
           playerSessionId: Number(userId),
-          code: code,
-          language: language
+          sourceCode: code
         }),
       });
 
@@ -160,6 +177,104 @@ export default function GamePage() {
       setIsRunning(false);
     }
   };
+
+  {/* GAME-RESULT UI */}
+  if (isGameOver) {
+    return (
+        <div className={resultStyles.pageBackground}>
+          {/* HEADER PART */}
+          <div className={styles.topRow}>
+            <div className={styles.logoArea}>
+              <CodosseumLogo size={100} />
+              <div className={styles.logoTexts}>
+                <h1 className={styles.logoTitle}>Codosseum</h1>
+                <p className={styles.logoSubtitle}>Game Results</p>
+              </div>
+            </div>
+
+            {/* HEADER BUTTONS */}
+              <div className={resultStyles.headerButtons}>
+                <button
+                    className={resultStyles.secondaryButton}
+                    onClick={() => router.push("/menu")}
+                >
+                  Back to Menu
+                </button>
+                <button className={resultStyles.primaryButton}
+                        onClick={() => router.push("/leaderboard")}>
+                  View Leaderboard
+                </button>
+              </div>
+          </div>
+
+          <div className={resultStyles.resultsContent}>
+
+            {/* VICTORY BANNER */}
+            <div className={resultStyles.victoryBanner}>
+              <TrophyOutlined className={resultStyles.trophyIcon} style={{ fontSize: '48px', marginBottom: '10px' }} />
+              <h1 className={resultStyles.victoryTitle}>
+                {myScore > opponentScore ? "Victory!" : "Game Over"}
+              </h1>
+              <p>{myScore > opponentScore ? storedUsername : "CodeMaster"} wins the battle!</p>
+              <span className={resultStyles.sessionText}>Session {gameSessionId}</span>
+            </div>
+
+            {/* PLAYER SCORE BOX (MYSELF) */}
+            <div className={resultStyles.playerScoreBox}>
+              <div className={`${resultStyles.playerCard} ${myScore >= opponentScore ? resultStyles.winnerCard : ""}`}>
+                <div className={resultStyles.cardHeader}>
+                  <strong>{storedUsername} (You)</strong>
+                  {myScore >= opponentScore && <TrophyOutlined style={{ color: '#eab308', fontSize: '24px' }} />}
+                </div>
+                <div className={resultStyles.pointsText}>{myScore} <span className={resultStyles.pointsLabel}>points</span></div>
+              </div>
+
+              {/* OPPONENT SCORE BOX */}
+              <div className={`${resultStyles.playerCard} ${opponentScore > myScore ? resultStyles.winnerCard : ""}`}>
+                <div className={resultStyles.cardHeader}>
+                  <strong>CodeMaster</strong>
+                  {opponentScore > myScore && <TrophyOutlined style={{ color: '#eab308', fontSize: '24px' }}/>}
+                </div>
+                <div className={resultStyles.pointsText}>{opponentScore} <span className={resultStyles.pointsLabel}>points</span></div>
+              </div>
+            </div>
+
+            {/* PROBLEMS THAT WERE SOLVED IN THE SESSION (TODO:SAMPLE SOLUTIONS RENDERING)*/}
+            <div className={resultStyles.problemsSection}>
+              <h2 style={{ marginBottom: '20px' }}>Problems (3)</h2>
+
+              {/* PLACEHOLDER1 PROBLEM */}
+              <div className={resultStyles.problemItem}>
+                <div>
+                  <h3 style={{ margin: 0 }}>Two Sum</h3>
+                  <span className={styles.difficultyBadge}>Easy</span>
+                </div>
+                <div style={{ textAlign: 'right' }}></div>
+              </div>
+
+              {/* PLACEHOLDER2 PROBLEM */}
+              <div className={resultStyles.problemItem}>
+                <div>
+                  <h3 style={{ margin: 0 }}>Reverse Linked List</h3>
+                  <span className={styles.difficultyBadge}>Easy</span>
+                </div>
+                <div style={{ textAlign: 'right' }}></div>
+              </div>
+
+              {/* PLACEHOLDER3 PROBLEM */}
+              <div className={resultStyles.problemItem}>
+                <div>
+                  <h3 style={{ margin: 0 }}>Valid Parenthesis</h3>
+                  <span className={styles.difficultyBadge}>Easy</span>
+                </div>
+                <div style={{ textAlign: 'right' }}></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+    );
+  }
 
   return (
       <div className={styles.pageBackground}>
@@ -350,6 +465,7 @@ export default function GamePage() {
               </div>
             </div>
 
+            {/* OUTPUT RENDERING */}
             <div className={styles.card} style={{ flex: 1 }}>
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>
