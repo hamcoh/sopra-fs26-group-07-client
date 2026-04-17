@@ -17,7 +17,6 @@ interface FormFieldProps {
 }
 
 
-
 export default function RegisterPage() {
   const router = useRouter();
   const apiService = useApi();
@@ -43,7 +42,7 @@ export default function RegisterPage() {
       router.push("/menu");
     } catch (err) {
       if (err instanceof Error) {
-        messageApi.error("Register was not successful");
+        messageApi.error("Register was not successful. Username is already taken.");
       } else {
         messageApi.error("An unknown error occurred");
       }
@@ -51,6 +50,8 @@ export default function RegisterPage() {
   };
 
   return (
+  <>
+    {contextHolder}
     <div className={styles.pageBackground}>
       {/* Logo */}
       <div className={styles.logoArea}>
@@ -106,7 +107,7 @@ export default function RegisterPage() {
           </Form.Item>
 
           <Form.Item
-            name="biography"
+            name="bio"
             label={<span className={styles.fieldLabel}>Biography</span>}
           >
             <Input.TextArea
@@ -137,5 +138,6 @@ export default function RegisterPage() {
         </p>
       </div>
     </div>
+    </>
   );
 }
