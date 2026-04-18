@@ -166,7 +166,7 @@ export default function CreateRoomPage() {
                 <TrophyOutlined className={styles.gameModeIcon} />
                 <div>
                   <p className={styles.optionName}>Race</p>
-                  <p className={styles.optionDesc}>First to solve the problem wins the round</p>
+                  <p className={styles.optionDesc}>First to solve all of the problems wins the game</p>
                 </div>
               </div>
             </div>
