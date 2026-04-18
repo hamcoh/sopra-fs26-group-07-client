@@ -156,7 +156,7 @@ export default function LobbyPage() {
         </button>
 
         <div className={styles.logoArea}>
-          <CodosseumLogo size={52} />
+          <CodosseumLogo size={100} />
           <div className={styles.logoTexts}>
             <h1 className={styles.logoTitle}>Battle Arena</h1>
             <p className={styles.logoSubtitle}>Prepare for combat</p>
@@ -274,13 +274,13 @@ export default function LobbyPage() {
           </div>
 
           <button
-            className={styles.enterArenaButton}
-            disabled={!bothReady}
-            onClick={() => router.push("/arena")}
-          >
-            <ThunderboltFilled style={{ fontSize: 28 }} />
-            <span>Enter Arena</span>
-          </button>
+  className={styles.enterArenaButton}
+  disabled={!bothReady || !isCurrentUserHost}
+  onClick={() => router.push("/arena")}
+>
+  <ThunderboltFilled style={{ fontSize: 28 }} />
+  <span>Enter Arena</span>
+</button>
         </div>
 
       </div>
