@@ -8,7 +8,7 @@ export default function LoadingScreen() {
             <div className={loadingStyles.loaderContent}>
                 <img
                     src="/codosseum_loading.png"
-                    alt="Codosseum Logo"
+                    alt="Codosseum Loading"
                     className={loadingStyles.mainLogo}
                 />
 
@@ -19,7 +19,7 @@ export default function LoadingScreen() {
                         <div className={loadingStyles.loadingProgress}></div>
                     </div>
                     <p className={loadingStyles.gladiatorQuote}>
-                        "Sharpening the blades of logic..."
+                        {"\"Sharpening the blades of logic...\""}
                     </p>
                 </div>
             </div>
