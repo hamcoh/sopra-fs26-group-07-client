@@ -7,6 +7,7 @@ import {
   ThunderboltFilled,
   CodeFilled,
   TrophyFilled,
+  OrderedListOutlined,
 } from "@ant-design/icons";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import styles from "@/styles/createRoom.module.css";
@@ -36,10 +37,10 @@ export default function CreateRoomPage() {
   const router = useRouter();
   const { value: token } = useLocalStorage("token", "");
 
-  // Only one option per category — pre-selected by default
   const [language, setLanguage] = useState("PYTHON");
   const [difficulty, setDifficulty] = useState("EASY");
   const [mode, setMode] = useState("RACE");
+  const [numProblems, setNumProblems] = useState(3);
 
   useEffect(() => {
     if (token === "") return;
@@ -70,6 +71,7 @@ export default function CreateRoomPage() {
           gameDifficulty: difficulty,
           gameLanguage: language,
           gameMode: mode,
+          numOfProblems: numProblems,
         }),
       });
 
@@ -168,6 +170,35 @@ export default function CreateRoomPage() {
                   <p className={styles.optionName}>Race</p>
                   <p className={styles.optionDesc}>First to solve all of the problems wins the game</p>
                 </div>
+              </div>
+            </div>
+          </section>
+
+          <hr className={styles.divider} />
+
+          {/* Number of Problems */}
+          <section className={styles.section}>
+            <h3 className={styles.sectionTitle}>
+              <OrderedListOutlined className={styles.iconBlue} />
+              Number of Problems
+            </h3>
+            <div className={styles.sliderWrapper}>
+              <div className={styles.sliderHeader}>
+                <span className={styles.sliderLabel}>Problems per game</span>
+                <span className={styles.sliderValue}>{numProblems}</span>
+              </div>
+              <input
+                type="range"
+                min={1}
+                max={10}
+                value={numProblems}
+                onChange={(e) => setNumProblems(Number(e.target.value))}
+                className={styles.slider}
+              />
+              <div className={styles.sliderTicks}>
+                <span>1</span>
+                <span>5</span>
+                <span>10</span>
               </div>
             </div>
           </section>
