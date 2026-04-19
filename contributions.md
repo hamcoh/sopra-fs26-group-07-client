@@ -72,9 +72,12 @@ reason).
 
 ---
 
-## Contributions Week 3 - [Begin Date] to [End Date]
+## Contributions Week 3 - 20.4 to 26.4 (is this correct?)
 
-_Continue with the same table format as above._
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **[@supermqx](https://github.com/supermqx)**      |    17.4       |    https://github.com/hamcoh/sopra-fs26-group-07-server/pull/150 (Part 2/2) |Finished implementing judge0| We can now succesfully send user-code to be compiled and tested vs the testcases. Our entire project depends on this|
+| **[@supermqx](https://github.com/supermqx)**      |    19.4      |  https://github.com/hamcoh/sopra-fs26-group-07-server/pull/153 | Structured testcase feedback after compiling the code via judge0, very easy for the frontend display results to the user | We can now show to the user his results after he runs/submits code |
 
 ---
 
