@@ -75,6 +75,9 @@ export default function LobbyPage() {
 
       const data: RoomData = await res.json();
       setRoom(data);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("roomLanguage", (data.gameLanguage ?? "PYTHON").toLowerCase());
+      }
 
       const host = await fetchUsername(data.hostUserId);
       setHostUsername(host);
@@ -92,6 +95,24 @@ export default function LobbyPage() {
       console.error(err);
       alert("Failed to load room");
       router.push("/menu");
+    }
+  };
+
+  const handleStartGame = async () => {
+    try {
+      const res = await fetch(`${getApiDomain()}/rooms/${roomId}/games`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "token": token,
+          "hostId": String(userId),
+        },
+      });
+      if (!res.ok) throw new Error("Failed to start game");
+
+    } catch (err) {
+      console.error(err);
+      alert("Failed to start game");
     }
   };
 
@@ -116,7 +137,23 @@ export default function LobbyPage() {
           console.log("Room update received:", message.body);
           await fetchRoom();
         });
+
+        //listens for the game start. Is personalized so each player receives his own message
+        client.subscribe(`/user/queue/game-start`, (message: IMessage) => {
+          const gameData = JSON.parse(message.body);
+          console.log("Game started:", gameData);
+          const gameLanguage =
+            typeof window !== "undefined"
+              ? (localStorage.getItem("roomLanguage") ?? "python")
+              : "python";
+          localStorage.setItem(
+            "gameRoundData",
+            JSON.stringify({ ...gameData, gameLanguage })
+          );
+          router.push(`/games/${gameData.gameSessionId}`);
+        });
       },
+      
 
       onStompError: (frame: IFrame) => {
         console.error("WebSocket error:", frame);
@@ -276,7 +313,7 @@ export default function LobbyPage() {
           <button
   className={styles.enterArenaButton}
   disabled={!bothReady || !isCurrentUserHost}
-  onClick={() => router.push("/arena")}
+  onClick={handleStartGame}
 >
   <ThunderboltFilled style={{ fontSize: 28 }} />
   <span>Enter Arena</span>
