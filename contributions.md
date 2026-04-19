@@ -72,7 +72,7 @@ reason).
 
 ---
 
-## Contributions Week 3 - 20.4 to 26.4 (is this correct?)
+## Contributions Week 3 - 20.4 to 26.4
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
