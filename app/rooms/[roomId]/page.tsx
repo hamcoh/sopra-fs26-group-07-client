@@ -12,6 +12,7 @@ import CodosseumLogo from "@/components/CodosseumLogo";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getApiDomain } from "@/utils/domain";
 import styles from "@/styles/room.module.css";
+import LoadingScreen from "@/components/LoadingScreen";
 
 interface RoomData {
   roomId: number;
@@ -41,6 +42,7 @@ export default function LobbyPage() {
   const [copied, setCopied] = useState(false);
   const [hostUsername, setHostUsername] = useState<string | null>(null);
   const [player2Username, setPlayer2Username] = useState<string | null>(null);
+  const [isStarting, setIsStarting] = useState(false);
 
   const fetchUsername = async (id: number): Promise<string> => {
     try {
@@ -140,6 +142,7 @@ export default function LobbyPage() {
 
         //listens for the game start. Is personalized so each player receives his own message
         client.subscribe(`/user/queue/game-start`, (message: IMessage) => {
+          setIsStarting(true);
           const gameData = JSON.parse(message.body);
           console.log("Game started:", gameData);
           const gameLanguage =
@@ -150,7 +153,9 @@ export default function LobbyPage() {
             "gameRoundData",
             JSON.stringify({ ...gameData, gameLanguage })
           );
-          router.push(`/games/${gameData.gameSessionId}`);
+          setTimeout(() => {
+            router.push(`/games/${gameData.gameSessionId}`);
+          }, 5000);
         });
       },
       
@@ -170,6 +175,12 @@ export default function LobbyPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (isStarting) {
+    return (
+        <LoadingScreen/>
+    )
+  }
 
   if (!room) {
     return (
