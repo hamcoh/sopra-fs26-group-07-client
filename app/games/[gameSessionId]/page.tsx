@@ -11,13 +11,16 @@ import {
   SendOutlined,
   TrophyOutlined,
   ClockCircleOutlined,
-  UserOutlined
+  UserOutlined,
+  PlayCircleOutlined,
+  LoadingOutlined
 } from "@ant-design/icons";
 import { Avatar } from "antd";
 import CodeMirror from "@uiw/react-codemirror";
 import { indentUnit } from "@codemirror/language";
 import { python } from "@codemirror/lang-python";
 import { java } from "@codemirror/lang-java";
+
 
 interface GameRoundData {
   gameSessionId: number;
@@ -32,6 +35,20 @@ interface GameRoundData {
   outputFormat: string;
   constraints: string;
   gameLanguage: string;
+}
+interface RunTestCase {
+  testCaseId: number;
+  expectedOutput: string;
+  actualOutput: string;
+  result: "PASS" | "FAIL";
+  errorMessage: string | null;
+}
+
+interface ExecutionResult {
+  message?: string;
+  status: "success" | "error" | "info";
+  testCases?: RunTestCase[];
+  summary?: string;
 }
 
 export default function GamePage() {
@@ -67,11 +84,10 @@ export default function GamePage() {
 }`;
 
   const [code, setCode] = useState(pythonStarter);
-  const [submitResult, setSubmitResult] = useState<{
-    message: string;
-    status: "success" | "error" | "info";
-  } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
+  const [runResult, setRunResult] = useState<ExecutionResult | null>(null);
+  const [submitResult, setSubmitResult] = useState<ExecutionResult | null>(null);
 
   // Load problem data from localStorage (saved by lobby page on game-start WS)
   useEffect(() => {
@@ -97,6 +113,93 @@ export default function GamePage() {
       console.error("Failed to parse game data from localStorage", e);
     }
   }, [gameSessionId]);
+
+  // RUN BUTTON LOGIC
+  const handleRun = async () => {
+    if (!token || isRunning || !problem || playerSessionId == null) return;
+
+    setIsRunning(true);
+
+    setRunResult({ message: "Running code against sample cases...", status: "info" });
+
+    try {
+      const response = await fetch(`${getApiDomain()}/games/${gameSessionId}/problems/${problem.id}/runs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "token": token,
+        },
+        body: JSON.stringify({
+          "playerSessionId": playerSessionId,
+          "sourceCode": code
+        }),
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        setRunResult({
+          message: `Error: ${result.message ?? "Run failed"}`,
+          status: "error",
+        });
+        return;
+      }
+
+      setRunResult({
+        status: result.passedTestCases === result.totalTestCases ? "success" : "error",
+        testCases: result.testCases,
+        summary: `${result.passedTestCases}/${result.totalTestCases} tests passed`,
+      });
+    } catch (error) {
+      console.error("Run error:", error);
+      setRunResult({
+        message: "Connection error during execution.",
+        status: "error",
+      });
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  const refreshGameState = async () => {
+    if (!problem || playerSessionId == null) return;
+
+    try {
+      const response = await fetch(
+          `${getApiDomain()}/games/${gameSessionId}/problems/${problem.id}/submission-result?playerSessionId=${playerSessionId}`, {
+            headers: {
+              token: token
+            }
+          }
+      );
+
+      if (response.status === 200) {
+        const updatedGameRound = await response.json();
+
+        console.log("CURRENT:", problem?.id);
+        console.log("FROM API:", updatedGameRound.problem?.id);
+        setProblem({
+          id: updatedGameRound.problemId,
+          title: updatedGameRound.title,
+          description: updatedGameRound.description,
+          inputFormat: updatedGameRound.inputFormat,
+          outputFormat: updatedGameRound.outputFormat,
+          constraints: updatedGameRound.constraints,
+        });
+
+      setSubmitResult(null);
+      setRunResult(null);
+      setCurrentRound((prev) => prev + 1);
+      setMyScore(updatedGameRound.currentScore);
+      const lang = (updatedGameRound.gameLanguage ?? language).toLowerCase();
+      setCode(lang === "java" ? javaStarter : pythonStarter);
+      } else if (response.status === 204) {
+        setIsGameOver(true)
+        console.log("Game over or no new content.");
+      }
+    } catch (error) {
+      console.error("Failed to sync game state:", error);
+    }
+  };
 
   // SUBMIT
   const handleSubmit = async () => {
@@ -131,37 +234,8 @@ export default function GamePage() {
         return;
       }
 
-      const { verdict, passedTestCases, totalTestCases } = result;
+      await refreshGameState();
 
-      if (verdict === "CORRECT_ANSWER") {
-        setMyScore((prev) => prev + 100);
-        setCurrentRound((prev) => prev + 1);
-        setSubmitResult({
-          message: `✓  Correct! All ${totalTestCases} test cases passed. +100 points`,
-          status: "success",
-        });
-        setCode(language === "java" ? javaStarter : pythonStarter);
-      } else if (verdict === "WRONG_ANSWER") {
-        setSubmitResult({
-          message: `✗  Wrong Answer — ${passedTestCases}/${totalTestCases} test cases passed.`,
-          status: "error",
-        });
-      } else if (verdict === "COMPILE_ERROR") {
-        setSubmitResult({
-          message: `✗  Compile Error — make sure your function is named "solve" and has a return statement.`,
-          status: "error",
-        });
-      } else if (verdict === "TIME_LIMIT_EXCEEDED") {
-        setSubmitResult({
-          message: `✗  Time Limit Exceeded — optimise your solution.`,
-          status: "error",
-        });
-      } else {
-        setSubmitResult({
-          message: `Status: ${result.submissionStatus ?? "unknown"} · Verdict: ${verdict ?? "unknown"}`,
-          status: "info",
-        });
-      }
     } catch (error) {
       console.error("Submit error:", error);
       setSubmitResult({ message: "Connection error during submission.", status: "error" });
@@ -211,6 +285,9 @@ export default function GamePage() {
       </div>
     );
   }
+
+  const currentResult = runResult ?? submitResult;
+  const testCases = (currentResult && 'testCases' in currentResult) ? currentResult.testCases : null;
 
   return (
     <div className={styles.pageBackground}>
@@ -268,7 +345,7 @@ export default function GamePage() {
                     </span>
                     <span className={styles.timerBadge}>
                       <ClockCircleOutlined />
-                      Round {currentRound}
+                      5:00
                     </span>
                   </div>
                 </div>
@@ -312,7 +389,11 @@ export default function GamePage() {
         </div>
 
         {/* RIGHT: CODE EDITOR */}
-        <div className={styles.card} style={{ flex: 1, paddingBottom: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px", flex: 1 }}>
+          <div
+              className={styles.card}
+              style={{ flex: 2, paddingBottom: 0, overflow: "hidden" }}
+          >
           <section className={styles.section}>
             <div className={styles.problemHeader}>
               <h3 className={styles.sectionTitle}>Code Editor</h3>
@@ -342,45 +423,122 @@ export default function GamePage() {
               }}
             />
           </div>
-
-          {/* Submit result banner */}
-          {submitResult && (
-            <div
-              style={{
-                padding: "10px 20px",
-                background:
-                  submitResult.status === "success" ? "#f0fdf4"
-                  : submitResult.status === "error" ? "#fef2f2"
-                  : "#f8fafc",
-                borderTop: `1.5px solid ${
-                  submitResult.status === "success" ? "#bbf7d0"
-                  : submitResult.status === "error" ? "#fecaca"
-                  : "#e2e8f0"
-                }`,
-                color:
-                  submitResult.status === "success" ? "#16a34a"
-                  : submitResult.status === "error" ? "#dc2626"
-                  : "#1a1a2e",
-                fontWeight: 600,
-                fontSize: 14,
-                fontFamily: "'Fira Code', monospace",
-              }}
-            >
-              {submitResult.message}
-            </div>
-          )}
-
           <div className={styles.actionRow}>
             <button
-              className={styles.submitButton}
-              onClick={handleSubmit}
-              disabled={isSubmitting || !problem}
+                className={styles.runButton}
+                onClick={handleRun}
+                disabled={isRunning || isSubmitting}
             >
-              <SendOutlined />
-              {isSubmitting ? "Submitting..." : "Submit"}
+              {isRunning ? (
+                  <LoadingOutlined spin />
+              ) : (
+                  <>
+                    <PlayCircleOutlined />
+                    Run
+                  </>
+              )}
+            </button>
+            <button
+                className={styles.submitButton}
+                onClick={handleSubmit}
+                disabled={isRunning || isSubmitting}
+            >
+              {isSubmitting ? (
+                  <LoadingOutlined spin />
+              ) : (
+                  <>
+                    <SendOutlined />
+                    Submit
+                  </>
+              )}
             </button>
           </div>
         </div>
+
+          {/* OUTPUT RENDERING */}
+          <div className={styles.card} style={{ flex: 1 }}>
+            <section className={styles.section}>
+              <h3 className={styles.sectionTitle}>
+                <svg
+                    className={styles.outputTitleIcon}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                >
+                  <polyline points="4 17 10 11 4 5"></polyline>
+                  <line x1="12" y1="19" x2="20" y2="19"></line>
+                </svg>
+                Output
+              </h3>
+            </section>
+            <hr className={styles.divider} />
+
+            <div className={styles.outputContent}>
+              {testCases ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "0 8px 20px 8px" }}>
+
+                    {currentResult?.summary && (
+                        <div style={{
+                          fontWeight: 600,
+                          fontSize: "16px",
+                          color: currentResult.status === "success" ? "#16a34a" : "#dc2626"
+                        }}>
+                          {currentResult.summary}
+                        </div>
+                    )}
+
+                    {testCases.map((t, index) => {
+                      const isPass = t.result === "PASS";
+                      return (
+                          <div
+                              key={t.testCaseId}
+                              style={{
+                                border: `1px solid ${isPass ? "#16a34a" : "#dc2626"}`,
+                                borderRadius: "8px",
+                                padding: "10px",
+                                background: isPass ? "#f0fdf4" : "#fef2f2"
+                              }}
+                          >
+                            <div style={{ fontWeight: 600 }}>
+                              {isPass ? "✅ PASS" : "❌ FAIL"} — Test {index + 1}
+                            </div>
+
+                            <div style={{ marginTop: "6px", fontSize: "13px" }}>
+                              <div><strong>Expected:</strong> {t.expectedOutput}</div>
+                              <div><strong>Actual:</strong> {t.actualOutput}</div>
+                            </div>
+                          </div>
+                      );
+                    })}
+                  </div>
+                ) : currentResult?.message ? (
+                  <pre className={styles.exampleText} style={{ padding: "20px", whiteSpace: "pre-wrap" }}>
+                    {currentResult.message}
+                  </pre>
+                ) : (
+                  <div className={styles.placeholderContainer}>
+                    <svg
+                        className={styles.terminalIcon}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                      <polyline points="4 17 10 11 4 5"></polyline>
+                      <line x1="12" y1="19" x2="20" y2="19"></line>
+                    </svg>
+
+                    <p className={styles.placeholderText}> Run or submit your code to see results </p>
+                  </div>
+              )}
+            </div>
+        </div>
+       </div>
       </div>
     </div>
   );
