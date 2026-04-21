@@ -479,7 +479,7 @@ export default function GamePage() {
               <span style={{ fontWeight: "bold", color: "#94a3b8"}}>VS</span>
 
               {/* OPPONENT */}
-              <div className={styles.nameBox} style={{ border: "4px solid #ef4444"}}>
+              <div className={styles.nameBox} style={{ border: "2px solid #ef4444"}}>
                 <Avatar size="default" style={{ backgroundColor: "#ef4444" }} icon={<UserOutlined />} />
                 <div className={styles.sessionArea}>
                   <p className={styles.sessionLabel}>Opponent</p>
