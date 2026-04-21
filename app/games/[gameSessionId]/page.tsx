@@ -74,7 +74,7 @@ export default function GamePage() {
   const [currentRound, setCurrentRound] = useState(1);
   const [isGameOver, setIsGameOver] = useState(false);
 
-  const pythonStarter = `def solve(*args):
+  const pythonStarter = `def solve(x):
     # Write your solution here
     return None`;
 
