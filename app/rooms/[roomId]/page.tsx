@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {useState, useEffect, useRef} from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
   ArrowLeftOutlined, UserOutlined, CrownFilled,
@@ -43,6 +43,21 @@ export default function LobbyPage() {
   const [hostUsername, setHostUsername] = useState<string | null>(null);
   const [player2Username, setPlayer2Username] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
+  const hostUsernameRef = useRef<string | null>(null);
+  const player2UsernameRef = useRef<string | null>(null);
+  const isHostRef = useRef(false);
+
+  useEffect(() => {
+    hostUsernameRef.current = hostUsername;
+  }, [hostUsername]);
+
+  useEffect(() => {
+    player2UsernameRef.current = player2Username;
+  }, [player2Username]);
+
+  useEffect(() => {
+    isHostRef.current = String(userId) === String(room?.hostUserId);
+  }, [userId, room]);
 
   const fetchUsername = async (id: number): Promise<string> => {
     try {
@@ -145,13 +160,17 @@ export default function LobbyPage() {
           setIsStarting(true);
           const gameData = JSON.parse(message.body);
           console.log("Game started:", gameData);
+          const opponentName =
+              isHostRef.current
+                  ? player2UsernameRef.current
+                  : hostUsernameRef.current;
           const gameLanguage =
             typeof window !== "undefined"
               ? (localStorage.getItem("roomLanguage") ?? "python")
               : "python";
           localStorage.setItem(
             "gameRoundData",
-            JSON.stringify({ ...gameData, gameLanguage })
+            JSON.stringify({ ...gameData, gameLanguage, opponentName: opponentName ?? "Opponent" })
           );
           setTimeout(() => {
             router.push(`/games/${gameData.gameSessionId}`);
