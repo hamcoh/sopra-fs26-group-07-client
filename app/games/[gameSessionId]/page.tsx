@@ -152,19 +152,23 @@ export default function GamePage() {
         console.log("Connected to Game WebSockets as user:", userId);
 
         client.subscribe(
-            `/topic/game/${gameSessionId}/points-update`,
-            (message: IMessage) => {
-              const data = JSON.parse(message.body);
-
-              const incomingSessionId = data.playerSessionId;
-
-              if (Number(incomingSessionId) === playerSessionId) return;
-
+          `/topic/game/${gameSessionId}/points-update`,
+          (message: IMessage) => {
+            const data = JSON.parse(message.body);
+            const incomingSessionId = Number(data.playerSessionId);
+        
+            if (incomingSessionId === playerSessionId) {
+              setPlayers(prev => ({
+                ...prev,
+                [String(userId)]: {
+                  ...prev[String(userId)],
+                  score: data.currentScore,
+                },
+              }));
+            } else {
               setPlayers(prev => {
-
-                const entry = Object.entries(prev).find(([id, p]) => id !== String(userId));
+                const entry = Object.entries(prev).find(([id]) => id !== String(userId));
                 const opponentId = entry ? entry[0] : "opponent";
-
                 return {
                   ...prev,
                   [opponentId]: {
@@ -174,6 +178,7 @@ export default function GamePage() {
                 };
               });
             }
+          }
         );
 
         client.subscribe(`/topic/game/${gameSessionId}/end`, (message: IMessage) => {

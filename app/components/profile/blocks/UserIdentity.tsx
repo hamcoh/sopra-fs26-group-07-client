@@ -1,25 +1,32 @@
-import { CalendarOutlined } from "@ant-design/icons";
+import { CalendarOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import Avatar from "../base/Avatar";
 import styles from "@/styles/profile.module.css";
 
 interface ProfileHeaderProps {
     username: string;
     joinedDate: string;
+    bio?: string | null;
 }
 
-export default function UserIdentity({ username, joinedDate }: ProfileHeaderProps) {
+export default function UserIdentity({ username, joinedDate, bio }: ProfileHeaderProps) {
     return (
-        <div className={styles.profile}>
+        <div className={styles.profile} style={{ height: "auto", minHeight: "120px" }}>
             <Avatar username={username} />
 
             <div className={styles.profileText}>
-        <span className={styles.usernameText}>
-          {username || "???"}
-        </span>
+                <span className={styles.usernameText}>
+                    {username || "???"}
+                </span>
                 <div className={styles.titledescr}>
                     <CalendarOutlined />
                     <span>Joined {joinedDate || "???"}</span>
                 </div>
+                {bio && (
+                    <div className={styles.titledescr} style={{ marginTop: 6, opacity: 0.85 }}>
+                        <InfoCircleOutlined />
+                        <span>{bio}</span>
+                    </div>
+                )}
             </div>
         </div>
     );

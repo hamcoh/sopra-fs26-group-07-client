@@ -6,21 +6,23 @@ interface ProfileNavigationProps {
     onBack: () => void;
     title?: string;
     subtitle?: string;
+    backLabel?: string;
     logoAreaClass?: string;
     useTopRow?: boolean;
 }
 
 export default function ProfileNavigation({
-                                              onBack,
-                                              title = "Profile",
-                                              subtitle = "Your gladiator stats",
-                                              logoAreaClass = styles.logoArea,
-                                              useTopRow = true
-                                          }: ProfileNavigationProps) {
+    onBack,
+    title = "Profile",
+    subtitle = "Your gladiator stats",
+    backLabel = "Back to Menu",
+    logoAreaClass = styles.logoArea,
+    useTopRow = true
+}: ProfileNavigationProps) {
     const Content = (
         <>
             <button className={styles.backButton} onClick={onBack}>
-                <ArrowLeftOutlined /> Back to Menu
+                <ArrowLeftOutlined /> {backLabel}
             </button>
 
             <div className={logoAreaClass}>
@@ -39,4 +41,3 @@ export default function ProfileNavigation({
         Content
     );
 }
-

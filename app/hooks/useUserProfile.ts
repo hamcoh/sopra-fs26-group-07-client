@@ -4,6 +4,7 @@ import {getApiDomain} from "@/utils/domain";
 export function useUserProfile() {
     const [username, setUsername] = useState<string>("");
     const [joinedDate, setJoinedDate] = useState<string>("");
+    const [bio, setBio] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [stats, setStats] = useState({
         winCount: 0,
@@ -37,6 +38,7 @@ export function useUserProfile() {
             if (!res.ok) throw new Error(data.message || "Failed to load profile");
 
             setUsername(data.username);
+            setBio(data.bio ?? null);
             const date = new Date(data.creationDate);
             setJoinedDate(date.toLocaleDateString("en-US", {
                 month: "long", day: "numeric", year: "numeric",
@@ -54,5 +56,5 @@ export function useUserProfile() {
         }
     }, []);
 
-    return {username, joinedDate, stats, isLoading, fetchUser};
+    return { username, joinedDate, bio, stats, isLoading, fetchUser };
 }
