@@ -91,7 +91,11 @@ reason).
 
 ## Contributions Week 4 - [Begin Date] to [End Date]
 
-_Continue with the same table format as above._
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **[@supermqx](https://github.com/supermqx)**      |   21.4      |    https://github.com/hamcoh/sopra-fs26-group-07-server/commit/817b7d56c35af6b1e2914c131501d168ab050e35 | Fix all kinds of weird issues | We had this super weird bug where the code wouldn't compile sometimes and the testcases where not uniform and would say we have incorrect results even though they were almost identical, also the sampleSolution was sometimes outdated. I had to manually check each single problem and its solution during testing. This commit fixes those things. |
+| **[@supermqx](https://github.com/supermqx)** | 23.4 | https://github.com/hamcoh/sopra-fs26-group-07-server/pull/167 | Created the new problem set for java with its solutions | This will be relevant for the Sprint 2  where we support java coding (currently only python) |
+
 
 ---
 
