@@ -13,7 +13,8 @@ import {
   ClockCircleOutlined,
   UserOutlined,
   PlayCircleOutlined,
-  LoadingOutlined
+  LoadingOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 import { Avatar } from "antd";
 import CodeMirror from "@uiw/react-codemirror";
@@ -21,7 +22,7 @@ import { indentUnit } from "@codemirror/language";
 import { python } from "@codemirror/lang-python";
 import { java } from "@codemirror/lang-java";
 import SockJS from "sockjs-client";
-import {Client, IMessage} from "@stomp/stompjs";
+import { Client, IMessage } from "@stomp/stompjs";
 
 interface GameRoundData {
   gameSessionId: number;
@@ -37,7 +38,10 @@ interface GameRoundData {
   constraints: string;
   gameLanguage: string;
   opponentName?: string;
+  endsAt?: string;
+  serverTime?: string;
 }
+
 interface RunTestCase {
   testCaseId: number;
   expectedOutput: string;
@@ -51,6 +55,44 @@ interface ExecutionResult {
   status: "success" | "error" | "info";
   testCases?: RunTestCase[];
   summary?: string;
+}
+
+interface GameSessionSampleSolutionsDTO {
+  problemTitle: string;
+  problemSampleSolution: string;
+}
+
+interface PlayerScoreDTO {
+  playerSessionId: number;
+  userId: number;
+  username: string;
+  score: number;
+}
+
+interface GameEndDTO {
+  gameSessionId: number;
+  gameStatus: string;
+  gameEndReason: string;
+  winnerPlayerId: number;
+  playerScores: PlayerScoreDTO[];
+  gameSessionSampleSolutions: Record<string, GameSessionSampleSolutionsDTO>;
+}
+
+interface PlayerGameSummaryDTO {
+  playerSessionId: number;
+  playerId: number;
+  problemResults: {
+    solvedCorrectly: number[];
+    notSolvedFullyCorrectly: number[];
+  };
+}
+
+const GAME_DURATION_MS = 15 * 60 * 1000;
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
 export default function GamePage() {
@@ -72,7 +114,8 @@ export default function GamePage() {
         const [id] = entry;
         return id !== String(userId);
       })
-      : null;  const opponent = opponentEntry ? opponentEntry[1] : null;
+      : null;
+  const opponent = opponentEntry ? opponentEntry[1] : null;
 
   const myScore = me?.score ?? 0;
 
@@ -87,6 +130,16 @@ export default function GamePage() {
 
   const [currentRound, setCurrentRound] = useState(1);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [gameEndData, setGameEndData] = useState<GameEndDTO | null>(null);
+  const [gameSummary, setGameSummary] = useState<PlayerGameSummaryDTO | null>(null);
+  const [expandedSolutions, setExpandedSolutions] = useState<Set<string>>(new Set());
+
+  // Timer
+  const [gameEndTime, setGameEndTime] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  // Submit toast
+  const [showSubmitToast, setShowSubmitToast] = useState(false);
 
   const pythonStarter = `def solve(x):
     # Write your solution here
@@ -103,6 +156,18 @@ export default function GamePage() {
   const [runResult, setRunResult] = useState<ExecutionResult | null>(null);
   const [submitResult, setSubmitResult] = useState<ExecutionResult | null>(null);
 
+  const toggleSolution = (id: string) => {
+    setExpandedSolutions(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
   // Load problem data from localStorage (saved by lobby page on game-start WS)
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -110,7 +175,6 @@ export default function GamePage() {
     if (!stored) return;
     try {
       const data: GameRoundData = JSON.parse(stored);
-
       setPlayerSessionId(data.playerSessionId);
       const initialPlayers: Record<string, { username: string; score: number }> = {
         [String(data.playerId)]: {
@@ -124,7 +188,6 @@ export default function GamePage() {
           score: 0
         };
       }
-
       setPlayers(initialPlayers);
       const lang = (data.gameLanguage ?? "python").toLowerCase();
       setLanguage(lang);
@@ -137,10 +200,31 @@ export default function GamePage() {
         outputFormat: data.outputFormat ?? "",
         constraints: data.constraints ?? "",
       });
+
+      // Set up game end time from backend endsAt, or fall back to 15min from now
+      if (data.endsAt) {
+        setGameEndTime(new Date(data.endsAt).getTime());
+      } else {
+        setGameEndTime(Date.now() + GAME_DURATION_MS);
+      }
     } catch (e) {
       console.error("Failed to parse game data from localStorage", e);
     }
-  }, [gameSessionId,storedUsername]);
+  }, [gameSessionId, storedUsername]);
+
+  // Countdown tick — runs independently of problem changes
+  useEffect(() => {
+    if (gameEndTime === null) return;
+
+    const tick = () => {
+      const remaining = Math.max(0, Math.floor((gameEndTime - Date.now()) / 1000));
+      setTimeLeft(remaining);
+    };
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [gameEndTime]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !token || !gameSessionId || !userId || userId === "") return;
@@ -152,19 +236,23 @@ export default function GamePage() {
         console.log("Connected to Game WebSockets as user:", userId);
 
         client.subscribe(
-            `/topic/game/${gameSessionId}/points-update`,
-            (message: IMessage) => {
-              const data = JSON.parse(message.body);
+          `/topic/game/${gameSessionId}/points-update`,
+          (message: IMessage) => {
+            const data = JSON.parse(message.body);
+            const incomingSessionId = Number(data.playerSessionId);
 
-              const incomingSessionId = data.playerSessionId;
-
-              if (Number(incomingSessionId) === playerSessionId) return;
-
+            if (incomingSessionId === playerSessionId) {
+              setPlayers(prev => ({
+                ...prev,
+                [String(userId)]: {
+                  ...prev[String(userId)],
+                  score: data.currentScore,
+                },
+              }));
+            } else {
               setPlayers(prev => {
-
-                const entry = Object.entries(prev).find(([id, p]) => id !== String(userId));
+                const entry = Object.entries(prev).find(([id]) => id !== String(userId));
                 const opponentId = entry ? entry[0] : "opponent";
-
                 return {
                   ...prev,
                   [opponentId]: {
@@ -174,17 +262,25 @@ export default function GamePage() {
                 };
               });
             }
+          }
         );
 
         client.subscribe(`/topic/game/${gameSessionId}/end`, (message: IMessage) => {
+          const endData: GameEndDTO = JSON.parse(message.body);
+          setGameEndData(endData);
           setIsGameOver(true);
-          localStorage.removeItem('gameRoundData');
-          localStorage.removeItem('roomLanguage');
+          localStorage.removeItem("gameRoundData");
+          localStorage.removeItem("roomLanguage");
+        });
+
+        client.subscribe(`/user/queue/game-summary`, (message: IMessage) => {
+          const summary: PlayerGameSummaryDTO = JSON.parse(message.body);
+          setGameSummary(summary);
         });
       },
       onStompError: (frame) => {
-        console.error('Broker reported error: ' + frame.headers['message']);
-        console.error('Additional details: ' + frame.body);
+        console.error("Broker reported error: " + frame.headers["message"]);
+        console.error("Additional details: " + frame.body);
       },
     });
 
@@ -202,7 +298,6 @@ export default function GamePage() {
     if (!token || isRunning || !problem || playerSessionId == null) return;
 
     setIsRunning(true);
-
     setRunResult({ message: "Running code against sample cases...", status: "info" });
 
     try {
@@ -249,15 +344,12 @@ export default function GamePage() {
     try {
       const response = await fetch(
           `${getApiDomain()}/games/${gameSessionId}/problems/${problem.id}/submission-result?playerSessionId=${playerSessionId}`, {
-            headers: {
-              token: token
-            }
+            headers: { token: token }
           }
       );
 
       if (response.status === 200) {
         const updatedGameRound = await response.json();
-
         console.log("CURRENT:", problem?.id);
         console.log("FROM API:", updatedGameRound.problem?.id);
         setProblem({
@@ -268,7 +360,6 @@ export default function GamePage() {
           outputFormat: updatedGameRound.outputFormat,
           constraints: updatedGameRound.constraints,
         });
-
         setSubmitResult(null);
         setRunResult(null);
         setCurrentRound((prev) => prev + 1);
@@ -282,7 +373,7 @@ export default function GamePage() {
         const lang = (updatedGameRound.gameLanguage ?? language).toLowerCase();
         setCode(lang === "java" ? javaStarter : pythonStarter);
       } else if (response.status === 204) {
-        setIsGameOver(true)
+        setIsGameOver(true);
         console.log("Game over or no new content.");
       }
     } catch (error) {
@@ -323,6 +414,9 @@ export default function GamePage() {
         return;
       }
 
+      setShowSubmitToast(true);
+      setTimeout(() => setShowSubmitToast(false), 3000);
+
       await refreshGameState();
 
     } catch (error) {
@@ -335,6 +429,9 @@ export default function GamePage() {
 
   // GAME OVER screen
   if (isGameOver) {
+    const solvedCorrectly = gameSummary?.problemResults?.solvedCorrectly ?? [];
+    const notSolved = gameSummary?.problemResults?.notSolvedFullyCorrectly ?? [];
+
     return (
         <div className={resultStyles.pageBackground}>
           <div className={styles.topRow}>
@@ -375,7 +472,6 @@ export default function GamePage() {
               <h1 className={resultStyles.victoryTitle}>
                 {myScore > (opponent?.score ?? 0) ? "Victory!" : myScore === opponent?.score ? "It's a Tie!" : "Defeat!"}
               </h1>
-
               <p>
                 {myScore > (opponent?.score ?? 0)
                     ? `${storedUsername} wins the battle!`
@@ -383,23 +479,18 @@ export default function GamePage() {
                         ? "Great minds think alike!"
                         : `${opponent?.username} takes the win!`}
               </p>
-
               <span className={resultStyles.sessionText}>Session {gameSessionId}</span>
             </div>
 
             <div
                 className={resultStyles.playerScoreBox}
-                style={{
-                  display: "flex",
-                  gap: "20px",
-                  justifyContent: "center",
-                }}
+                style={{ display: "flex", gap: "20px", justifyContent: "center" }}
             >
               <div className={`${resultStyles.playerCard} ${myScore >= (opponent?.score ?? 0) ? resultStyles.winnerCard : ""}`}>
                 <div className={resultStyles.cardHeader}>
                   <strong>{storedUsername} (You)</strong>
                   {myScore >= (opponent?.score ?? 0) && (
-                      <TrophyOutlined style={{ color: '#eab308', fontSize: '24px' }} />
+                      <TrophyOutlined style={{ color: "#eab308", fontSize: "24px" }} />
                   )}
                 </div>
                 <div className={resultStyles.pointsText}>
@@ -411,7 +502,7 @@ export default function GamePage() {
                 <div className={resultStyles.cardHeader}>
                   <strong>{opponent ? opponent.username : "Opponent"}</strong>
                   {opponent && opponent.score >= myScore && (
-                      <TrophyOutlined style={{ color: '#eab308', fontSize: '24px' }} />
+                      <TrophyOutlined style={{ color: "#eab308", fontSize: "24px" }} />
                   )}
                 </div>
                 <div className={resultStyles.pointsText}>
@@ -419,16 +510,109 @@ export default function GamePage() {
                 </div>
               </div>
             </div>
+
+            {/* SAMPLE SOLUTIONS */}
+            {gameEndData?.gameSessionSampleSolutions &&
+              Object.keys(gameEndData.gameSessionSampleSolutions).length > 0 && (
+              <div className={resultStyles.problemsSection}>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1a1a2e", margin: "0 0 20px 0" }}>
+                  Sample Solutions
+                </h2>
+                {Object.entries(gameEndData.gameSessionSampleSolutions).map(([problemId, solution], index) => {
+                  const isExpanded = expandedSolutions.has(problemId);
+                  const pid = Number(problemId);
+                  const isSolved    = solvedCorrectly.includes(pid);
+                  const isIncorrect = !isSolved && notSolved.includes(pid);
+
+                  const borderColor = isSolved ? "#16a34a" : isIncorrect ? "#dc2626" : "#d1d5db";
+                  const bgColor     = isSolved ? "#f0fdf4"  : isIncorrect ? "#fef2f2"  : "#f9fafb";
+                  const badge = isSolved
+                    ? <span style={{ fontSize: 13, fontWeight: 600, color: "#16a34a", background: "#dcfce7", padding: "2px 10px", borderRadius: 6 }}>✓ Correct</span>
+                    : isIncorrect
+                    ? <span style={{ fontSize: 13, fontWeight: 600, color: "#dc2626", background: "#fee2e2", padding: "2px 10px", borderRadius: 6 }}>✗ Incorrect</span>
+                    : <span style={{ fontSize: 13, fontWeight: 600, color: "#6b7280", background: "#f3f4f6", padding: "2px 10px", borderRadius: 6 }}>— Not solved</span>;
+
+                  return (
+                    <div
+                      key={problemId}
+                      className={resultStyles.problemItem}
+                      style={{
+                        flexDirection: "column",
+                        alignItems: "flex-start",
+                        gap: "12px",
+                        cursor: "default",
+                        border: `2px solid ${borderColor}`,
+                        background: bgColor,
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                          <div className={resultStyles.problemIndex}>{index + 1}</div>
+                          <strong style={{ fontSize: "15px", color: "#1a1a2e" }}>{solution.problemTitle}</strong>
+                          {badge}
+                        </div>
+                        <button
+                          className={resultStyles.solutionToggleBtn}
+                          onClick={() => toggleSolution(problemId)}
+                        >
+                          {isExpanded ? "Hide Solution" : "Show Solution"}
+                        </button>
+                      </div>
+                      {isExpanded && (
+                        <pre
+                          className={resultStyles.solutionCode}
+                          style={{ width: "100%", margin: 0, overflowX: "auto", boxSizing: "border-box" }}
+                        >
+                          {solution.problemSampleSolution}
+                        </pre>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
     );
   }
 
   const currentResult = runResult ?? submitResult;
-  const testCases = (currentResult && 'testCases' in currentResult) ? currentResult.testCases : null;
+  const testCases = (currentResult && "testCases" in currentResult) ? currentResult.testCases : null;
+
+  // Timer colour: red under 60s, orange under 5min, default otherwise
+  const timerColor =
+    timeLeft !== null && timeLeft <= 60
+      ? "#dc2626"
+      : timeLeft !== null && timeLeft <= 300
+      ? "#d97706"
+      : undefined;
 
   return (
       <div className={styles.pageBackground}>
+
+        {/* SUBMIT TOAST */}
+        {showSubmitToast && (
+          <div style={{
+            position: "fixed",
+            top: "24px",
+            right: "24px",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            background: "#fff",
+            border: "1.5px solid #16a34a",
+            borderRadius: "10px",
+            padding: "12px 20px",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
+          }}>
+            <CheckCircleOutlined style={{ color: "#16a34a", fontSize: "20px" }} />
+            <div>
+              <div style={{ fontWeight: 700, fontSize: "14px", color: "#15803d" }}>Solution submitted!</div>
+              <div style={{ fontSize: "12px", color: "#6b7280" }}>Moving to the next problem...</div>
+            </div>
+          </div>
+        )}
 
         {/* HEADER */}
         <div className={styles.topRow}>
@@ -461,8 +645,6 @@ export default function GamePage() {
               width: "100%",
               paddingRight: "30px"
             }}>
-
-              {/* YOU (Player One) */}
               <div className={`${styles.nameBox} ${styles.nameBoxYou}`} style={{ display: "flex", alignItems: "center" }}>
                 <Avatar size="default" style={{ backgroundColor: "#3b82f6" }} icon={<UserOutlined />} />
                 <div className={styles.sessionArea}>
@@ -475,11 +657,9 @@ export default function GamePage() {
                 </div>
               </div>
 
-              {/* VS TEXT */}
-              <span style={{ fontWeight: "bold", color: "#94a3b8"}}>VS</span>
+              <span style={{ fontWeight: "bold", color: "#94a3b8" }}>VS</span>
 
-              {/* OPPONENT */}
-              <div className={styles.nameBox} style={{ border: "2px solid #ef4444"}}>
+              <div className={styles.nameBox} style={{ border: "2px solid #ef4444" }}>
                 <Avatar size="default" style={{ backgroundColor: "#ef4444" }} icon={<UserOutlined />} />
                 <div className={styles.sessionArea}>
                   <p className={styles.sessionLabel}>Opponent</p>
@@ -505,13 +685,16 @@ export default function GamePage() {
                     <div className={styles.problemHeader}>
                       <h3 className={styles.problemTitle}>{problem.title}</h3>
                       <div className={styles.badgeRow}>
-                    <span className={styles.languageIndicator}>
-                      {language.charAt(0).toUpperCase() + language.slice(1)}
-                    </span>
-                        <span className={styles.timerBadge}>
-                      <ClockCircleOutlined />
-                      5:00
-                    </span>
+                        <span className={styles.languageIndicator}>
+                          {language.charAt(0).toUpperCase() + language.slice(1)}
+                        </span>
+                        <span
+                          className={styles.timerBadge}
+                          style={timerColor ? { color: timerColor, borderColor: timerColor } : undefined}
+                        >
+                          <ClockCircleOutlined />
+                          {timeLeft !== null ? formatTime(timeLeft) : "15:00"}
+                        </span>
                       </div>
                     </div>
                   </section>
@@ -555,16 +738,13 @@ export default function GamePage() {
 
           {/* RIGHT: CODE EDITOR */}
           <div style={{ display: "flex", flexDirection: "column", gap: "16px", flex: 1 }}>
-            <div
-                className={styles.card}
-                style={{ flex: 2, paddingBottom: 0, overflow: "hidden" }}
-            >
+            <div className={styles.card} style={{ flex: 2, paddingBottom: 0, overflow: "hidden" }}>
               <section className={styles.section}>
                 <div className={styles.problemHeader}>
                   <h3 className={styles.sectionTitle}>Code Editor</h3>
                   <span className={styles.languageIndicator}>
-                {language.charAt(0).toUpperCase() + language.slice(1)}
-              </span>
+                    {language.charAt(0).toUpperCase() + language.slice(1)}
+                  </span>
                 </div>
               </section>
               <hr className={styles.divider} />
@@ -589,33 +769,11 @@ export default function GamePage() {
                 />
               </div>
               <div className={styles.actionRow}>
-                <button
-                    className={styles.runButton}
-                    onClick={handleRun}
-                    disabled={isRunning || isSubmitting}
-                >
-                  {isRunning ? (
-                      <LoadingOutlined spin />
-                  ) : (
-                      <>
-                        <PlayCircleOutlined />
-                        Run
-                      </>
-                  )}
+                <button className={styles.runButton} onClick={handleRun} disabled={isRunning || isSubmitting}>
+                  {isRunning ? <LoadingOutlined spin /> : <><PlayCircleOutlined /> Run</>}
                 </button>
-                <button
-                    className={styles.submitButton}
-                    onClick={handleSubmit}
-                    disabled={isRunning || isSubmitting}
-                >
-                  {isSubmitting ? (
-                      <LoadingOutlined spin />
-                  ) : (
-                      <>
-                        <SendOutlined />
-                        Submit
-                      </>
-                  )}
+                <button className={styles.submitButton} onClick={handleSubmit} disabled={isRunning || isSubmitting}>
+                  {isSubmitting ? <LoadingOutlined spin /> : <><SendOutlined /> Submit</>}
                 </button>
               </div>
             </div>
@@ -624,15 +782,7 @@ export default function GamePage() {
             <div className={styles.card} style={{ flex: 1 }}>
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>
-                  <svg
-                      className={styles.outputTitleIcon}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                  >
+                  <svg className={styles.outputTitleIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="4 17 10 11 4 5"></polyline>
                     <line x1="12" y1="19" x2="20" y2="19"></line>
                   </svg>
@@ -644,33 +794,16 @@ export default function GamePage() {
               <div className={styles.outputContent}>
                 {testCases ? (
                     <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "0 8px 20px 8px" }}>
-
                       {currentResult?.summary && (
-                          <div style={{
-                            fontWeight: 600,
-                            fontSize: "16px",
-                            color: currentResult.status === "success" ? "#16a34a" : "#dc2626"
-                          }}>
+                          <div style={{ fontWeight: 600, fontSize: "16px", color: currentResult.status === "success" ? "#16a34a" : "#dc2626" }}>
                             {currentResult.summary}
                           </div>
                       )}
-
                       {testCases.map((t, index) => {
                         const isPass = t.result === "PASS";
                         return (
-                            <div
-                                key={t.testCaseId}
-                                style={{
-                                  border: `1px solid ${isPass ? "#16a34a" : "#dc2626"}`,
-                                  borderRadius: "8px",
-                                  padding: "10px",
-                                  background: isPass ? "#f0fdf4" : "#fef2f2"
-                                }}
-                            >
-                              <div style={{ fontWeight: 600 }}>
-                                {isPass ? "✅ PASS" : "❌ FAIL"} — Test {index + 1}
-                              </div>
-
+                            <div key={t.testCaseId} style={{ border: `1px solid ${isPass ? "#16a34a" : "#dc2626"}`, borderRadius: "8px", padding: "10px", background: isPass ? "#f0fdf4" : "#fef2f2" }}>
+                              <div style={{ fontWeight: 600 }}>{isPass ? "✅ PASS" : "❌ FAIL"} — Test {index + 1}</div>
                               <div style={{ marginTop: "6px", fontSize: "13px" }}>
                                 <div><strong>Expected:</strong> {t.expectedOutput}</div>
                                 <div><strong>Actual:</strong> {t.actualOutput}</div>
@@ -681,24 +814,15 @@ export default function GamePage() {
                     </div>
                 ) : currentResult?.message ? (
                     <pre className={styles.exampleText} style={{ padding: "20px", whiteSpace: "pre-wrap" }}>
-                    {currentResult.message}
-                  </pre>
+                      {currentResult.message}
+                    </pre>
                 ) : (
                     <div className={styles.placeholderContainer}>
-                      <svg
-                          className={styles.terminalIcon}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                      >
+                      <svg className={styles.terminalIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="4 17 10 11 4 5"></polyline>
                         <line x1="12" y1="19" x2="20" y2="19"></line>
                       </svg>
-
-                      <p className={styles.placeholderText}> Run or submit your code to see results </p>
+                      <p className={styles.placeholderText}>Run or submit your code to see results</p>
                     </div>
                 )}
               </div>

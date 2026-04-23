@@ -18,7 +18,7 @@ export default function ProfilePage() {
     const userId = params.id as string;
     const [messageApi, contextHolder] = message.useMessage();
     const { token, isLoading: authLoading, handleLogOut } = useAuth();
-    const { username, joinedDate, stats, isLoading: profileLoading, fetchUser } = useUserProfile();
+    const { username, joinedDate, bio, stats, isLoading: profileLoading, fetchUser } = useUserProfile();
 
     useEffect(() => {
         if (authLoading) return;
@@ -35,7 +35,6 @@ export default function ProfilePage() {
             });
     }, [authLoading, token, userId]);
 
-    // Loading-Page
     const isActuallyLoading = authLoading || profileLoading || (token && !username);
 
     if (isActuallyLoading) {
@@ -46,7 +45,6 @@ export default function ProfilePage() {
         );
     }
 
-    // Final UI
     const losses = Math.max(0, stats.totalGamesPlayed - stats.winCount);
 
     return (
@@ -57,13 +55,14 @@ export default function ProfilePage() {
                 <ProfileButton />
 
                 <ProfileHeader
-                    onBack={() => router.push("/menu")}
+                    onBack={() => router.push("/leaderboard")}
+                    backLabel="Back to Leaderboard"
                     subtitle="Gladiator stats"
                     logoAreaClass={styles.logoArea2}
                     useTopRow={false}
                 />
 
-                <UserIdentity username={username} joinedDate={joinedDate} />
+                <UserIdentity username={username} joinedDate={joinedDate} bio={bio} />
 
                 <StatGroup stats={stats} losses={losses} />
 
