@@ -174,7 +174,7 @@ export default function LobbyPage() {
           );
           setTimeout(() => {
             router.push(`/games/${gameData.gameSessionId}`);
-          }, 5000);
+          }, 3000);
         });
       },
       

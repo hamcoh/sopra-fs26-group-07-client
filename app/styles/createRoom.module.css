@@ -302,10 +302,26 @@
 }
 
 .sliderTicks {
-  display: flex;
-  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  height: 16px;
   font-size: 11px;
   color: #9ca3af;
   font-weight: 500;
-  padding: 0 2px;
+}
+
+.sliderTicks span:nth-child(1) {
+  position: absolute;
+  left: 0;
+}
+
+.sliderTicks span:nth-child(2) {
+  position: absolute;
+  left: calc(44.44% + 1px);
+  transform: translateX(-50%);
+}
+
+.sliderTicks span:nth-child(3) {
+  position: absolute;
+  right: 0;
 }

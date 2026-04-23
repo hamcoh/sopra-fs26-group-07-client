@@ -262,3 +262,22 @@
     transform: translateY(1px);
     box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
 }
+
+.solutionToggleBtn {
+    background: #ede9fe;
+    color: #7c3aed;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.solutionToggleBtn:hover {
+    background: #ddd6fe;
+    transform: translateY(-1px);
+}
