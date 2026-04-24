@@ -15,6 +15,7 @@ import ProfileButton from "@/components/ProfileButton";
 import { useEffect, useState } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getApiDomain } from "@/utils/domain";
+import {message} from "antd";
 
 const PythonIcon = () => (
   <svg width="45" height="45" viewBox="0 0 256 255" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
@@ -35,20 +36,30 @@ const PythonIcon = () => (
 
 export default function CreateRoomPage() {
   const router = useRouter();
-  const { value: token } = useLocalStorage("token", "");
+  const { value: token, loading: tokenLoading } = useLocalStorage("token", "");
 
   const [language, setLanguage] = useState("PYTHON");
   const [difficulty, setDifficulty] = useState("EASY");
   const [mode, setMode] = useState("RACE");
   const [numProblems, setNumProblems] = useState(3);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
+
 
   useEffect(() => {
-    if (token === "") return;
+    if (tokenLoading) return;
+
     if (!token) {
-      router.push("/");
-      alert("You must be logged in to access the menu.");
+      messageApi.error("You must be logged in to create a room.", 4);
+      setIsLoading(false);
+      setTimeout(() => router.push("/"), 4000);
+      return;
     }
-  }, [token, router]);
+
+    setIsLoading(false);
+    setIsAuthorized(true);
+  }, [token, tokenLoading, router, messageApi]);
 
   const handleCreateRoom = async () => {
     try {
@@ -85,7 +96,19 @@ export default function CreateRoomPage() {
     }
   };
 
+  const isActuallyLoading = tokenLoading || isLoading;
+
+  if (isActuallyLoading) {
+    return <div className={styles.pageBackground}>{contextHolder}</div>;
+  }
+
+  if (!isAuthorized) {
+    return <div className={styles.pageBackground}>{contextHolder}</div>;
+  }
+
   return (
+   <>
+     {contextHolder}
     <div className={styles.pageBackground}>
       <div className={styles.content}>
         <ProfileButton />
@@ -212,5 +235,6 @@ export default function CreateRoomPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
