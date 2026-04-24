@@ -1,11 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { UserOutlined } from "@ant-design/icons";
 import styles from "@/styles/profileButton.module.css";
+import CodosseumAvatar from "@/components/CodosseumAvatar";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 const ProfileButton: React.FC = () => {
   const router = useRouter();
+
+  const { value: avatarId } = useLocalStorage("avatarId", "1");
 
   return (
     <button
@@ -13,7 +16,10 @@ const ProfileButton: React.FC = () => {
       onClick={() => router.push("/profile")}
       aria-label="Go to profile"
     >
-      <UserOutlined style={{ fontSize: 20 }} />
+      <CodosseumAvatar
+          id={Number(avatarId) || 1}
+          backgroundColor="transparent"
+      />
     </button>
   );
 };
