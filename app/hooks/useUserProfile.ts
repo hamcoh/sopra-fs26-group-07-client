@@ -46,7 +46,7 @@ export function useUserProfile() {
             }));
             setStats({
                 winCount: data.winCount ?? 0,
-                winRatePercentage: data.winRatePercentage ?? 0,
+                winRatePercentage: Math.round(data.winRatePercentage ?? 0),
                 totalGamesPlayed: data.totalGamesPlayed ?? 0,
                 totalPoints: data.totalPoints ?? 0,
             });
