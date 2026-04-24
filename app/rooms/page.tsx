@@ -13,6 +13,7 @@ import ProfileButton from "@/components/ProfileButton";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getApiDomain } from "@/utils/domain";
 import styles from "@/styles/rooms.module.css";
+import {message} from "antd";
 
 interface RoomData {
   roomId: number;
@@ -30,22 +31,29 @@ const formatEnum = (value: string) =>
 
 export default function RoomsPage() {
   const router = useRouter();
-  const { value: token } = useLocalStorage("token", "");
+  const { value: token, loading: tokenLoading } = useLocalStorage("token", "");
   const { value: username } = useLocalStorage("username", "Player");
   const { value: userId } = useLocalStorage("userid", "");
 
   const [rooms, setRooms] = useState<RoomData[]>([]);
   const [loading, setLoading] = useState(true);
   const [joiningRoomId, setJoiningRoomId] = useState<number | null>(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
-    if (token === "") return;
+    if (tokenLoading) return;
+
     if (!token) {
-      router.push("/");
+      messageApi.error("You must be logged in to look at the rooms.", 4);
+      setLoading(false);
+      setTimeout(() => router.push("/"), 4000);
       return;
     }
-    fetchRooms();
-  }, [token]);
+    setLoading(false);
+    setIsAuthorized(true);
+    fetchRooms()
+  }, [token, tokenLoading, router, messageApi]);
 
   const fetchRooms = async () => {
     setLoading(true);
@@ -116,7 +124,19 @@ export default function RoomsPage() {
     }
   };
 
+  const isActuallyLoading = tokenLoading || loading;
+
+  if (isActuallyLoading) {
+    return <div className={styles.pageBackground}>{contextHolder}</div>;
+  }
+
+  if (!isAuthorized) {
+    return <div className={styles.pageBackground}>{contextHolder}</div>;
+  }
+
   return (
+    <>
+      {contextHolder}
     <div className={styles.pageBackground}>
       <div className={styles.content}>
         <ProfileButton />
@@ -193,5 +213,6 @@ export default function RoomsPage() {
 
       </div>
     </div>
+    </>
   );
 }
