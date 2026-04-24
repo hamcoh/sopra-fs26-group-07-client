@@ -1,17 +1,23 @@
 import { CalendarOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import Avatar from "../base/Avatar";
+import CodosseumAvatar from "@/components/CodosseumAvatar";
 import styles from "@/styles/profile.module.css";
 
 interface ProfileHeaderProps {
     username: string;
     joinedDate: string;
     bio?: string | null;
+    avatarId: number;
 }
 
-export default function UserIdentity({ username, joinedDate, bio }: ProfileHeaderProps) {
+export default function UserIdentity({ username, joinedDate, bio, avatarId, }: ProfileHeaderProps) {
     return (
         <div className={styles.profile} style={{ height: "auto", minHeight: "120px" }}>
-            <Avatar username={username} />
+            <CodosseumAvatar
+                id={avatarId}
+                size={75}
+                backgroundColor="#ffffff"
+            />
 
             <div className={styles.profileText}>
                 <span className={styles.usernameText}>

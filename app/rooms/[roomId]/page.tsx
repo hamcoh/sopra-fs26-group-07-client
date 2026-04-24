@@ -13,6 +13,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { getApiDomain } from "@/utils/domain";
 import styles from "@/styles/room.module.css";
 import LoadingScreen from "@/components/LoadingScreen";
+import CodosseumAvatar from "@/components/CodosseumAvatar";
 
 interface RoomData {
   roomId: number;
@@ -43,6 +44,12 @@ export default function LobbyPage() {
   const [hostUsername, setHostUsername] = useState<string | null>(null);
   const [player2Username, setPlayer2Username] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
+
+  const [hostAvatarId, setHostAvatarId] = useState<number | null>(null);
+  const hostAvatarIdRef = useRef<number | null>(null);
+  const [player2AvatarId, setPlayer2AvatarId] = useState<number | null>(null);
+  const player2AvatarIdRef = useRef<number | null>(null);
+
   const hostUsernameRef = useRef<string | null>(null);
   const player2UsernameRef = useRef<string | null>(null);
   const isHostRef = useRef(false);
@@ -59,16 +66,30 @@ export default function LobbyPage() {
     isHostRef.current = String(userId) === String(room?.hostUserId);
   }, [userId, room]);
 
-  const fetchUsername = async (id: number): Promise<string> => {
+  useEffect(() => {
+    hostAvatarIdRef.current = hostAvatarId;
+  }, [hostAvatarId]);
+
+  useEffect(() => {
+    player2AvatarIdRef.current = player2AvatarId;
+  }, [player2AvatarId]);
+
+  const fetchUsername = async (
+      id: number
+  ): Promise<{ username: string; avatarId: number }> => {
     try {
       const res = await fetch(`${getApiDomain()}/users/${id}`, {
         headers: { "token": token },
       });
-      if (!res.ok) return "Player";
+      if (!res.ok) return { username: "Player", avatarId: 1 };
+
       const data = await res.json();
-      return data.username ?? "Player";
+      return {
+        username: data.username ?? "Player",
+        avatarId: data.avatarId ?? 1,
+      };
     } catch {
-      return "Player";
+      return { username: "Player", avatarId: 1 };
     }
   };
 
@@ -97,15 +118,17 @@ export default function LobbyPage() {
       }
 
       const host = await fetchUsername(data.hostUserId);
-      setHostUsername(host);
+      setHostUsername(host.username);
+      setHostAvatarId(host.avatarId);
 
       if (data.currentNumPlayers >= 2) {
         const p2Id = data.playerIds.find(
           (id) => String(id) !== String(data.hostUserId)
         );
         if (p2Id) {
-          const p2Name = await fetchUsername(p2Id);
-          setPlayer2Username(p2Name);
+          const p2 = await fetchUsername(p2Id);
+          setPlayer2Username(p2.username);
+          setPlayer2AvatarId(p2.avatarId);
         }
       }
     } catch (err) {
@@ -160,17 +183,27 @@ export default function LobbyPage() {
           setIsStarting(true);
           const gameData = JSON.parse(message.body);
           console.log("Game started:", gameData);
-          const opponentName =
-              isHostRef.current
+          const isHost = isHostRef.current;
+
+          const opponentName = isHost
                   ? player2UsernameRef.current
                   : hostUsernameRef.current;
+
+          const opponentAvatarId = isHost
+              ? player2AvatarIdRef.current
+              : hostAvatarIdRef.current;
+
+          const playerAvatarId = isHost
+              ? hostAvatarIdRef.current
+              : player2AvatarIdRef.current;
+
           const gameLanguage =
             typeof window !== "undefined"
               ? (localStorage.getItem("roomLanguage") ?? "python")
               : "python";
           localStorage.setItem(
             "gameRoundData",
-            JSON.stringify({ ...gameData, gameLanguage, opponentName: opponentName ?? "Opponent" })
+            JSON.stringify({ ...gameData, gameLanguage, opponentName: opponentName ?? "Opponent", opponentAvatarId: opponentAvatarId ?? 1, playerAvatarId: playerAvatarId ?? 1, })
           );
           setTimeout(() => {
             router.push(`/games/${gameData.gameSessionId}`);
@@ -244,7 +277,7 @@ export default function LobbyPage() {
             <div className={styles.playerSection}>
               <div className={styles.avatarWrapper}>
                 <div className={`${styles.avatar} ${styles.avatarBlue}`}>
-                  <UserOutlined style={{ fontSize: 32, color: "white" }} />
+                  <CodosseumAvatar id={hostAvatarId ?? 1} size={64} variant="room"/>
                 </div>
                 <div className={styles.crownBadge}>
                   <CrownFilled style={{ color: "white", fontSize: 11 }} />
@@ -277,7 +310,7 @@ export default function LobbyPage() {
                 <>
                   <div className={styles.avatarWrapper}>
                     <div className={`${styles.avatar} ${styles.avatarPurple}`}>
-                      <UserOutlined style={{ fontSize: 32, color: "white" }} />
+                      <CodosseumAvatar id={player2AvatarId ?? 1} size={64} variant="room"/>
                     </div>
                     <div className={styles.onlineDot} />
                   </div>

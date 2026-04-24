@@ -18,7 +18,7 @@ export default function ProfilePage() {
     const userId = params.id as string;
     const [messageApi, contextHolder] = message.useMessage();
     const { token, isLoading: authLoading, handleLogOut } = useAuth();
-    const { username, joinedDate, bio, stats, isLoading: profileLoading, fetchUser } = useUserProfile();
+    const { username, joinedDate, bio, stats, isLoading: profileLoading, avatarId, fetchUser } = useUserProfile();
 
     useEffect(() => {
         if (authLoading) return;
@@ -62,7 +62,7 @@ export default function ProfilePage() {
                     useTopRow={false}
                 />
 
-                <UserIdentity username={username} joinedDate={joinedDate} bio={bio} />
+                <UserIdentity username={username} joinedDate={joinedDate} bio={bio} avatarId={avatarId} />
 
                 <StatGroup stats={stats} losses={losses} />
 

@@ -27,6 +27,7 @@ export default function Home() {
   const { set: setToken } = useLocalStorage<string>("token", "");
   const { set: setUserId } = useLocalStorage<string>("userid", "");
   const {set: setUserName} = useLocalStorage<string>("username", ""); // we also save the username in local storage to display it in the menu page without an additional api call. This is not strictly necessary but it improves user experience by avoiding a loading state for the username in the menu page. We could also save the whole user object in local storage, but that would be more complex and we only need the username for now, so we save it separately.
+  const {set: setAvatar} = useLocalStorage<string>("avatarId", "");
   const [messageApi, contextHolder] = message.useMessage();
 
 
@@ -44,6 +45,7 @@ export default function Home() {
         setToken(response.token);
         setUserId(response.id || "");
         setUserName(response.username || "");
+        setAvatar(response.avatarId ?? "");
       }
       router.push("/menu");
     } catch (err) {
