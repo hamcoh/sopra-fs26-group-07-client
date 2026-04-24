@@ -10,23 +10,32 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { getApiDomain } from "@/utils/domain";
 import { Client, IFrame } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import {message} from "antd";
 
 export default function JoinRoomPage() {
   const router = useRouter();
-  const { value: token } = useLocalStorage("token", "");
+  const { value: token, loading: tokenLoading } = useLocalStorage("token", "");
   const { value: username } = useLocalStorage("username", "Player");
   const { value: userId } = useLocalStorage("userid", "");
 
   const [joinCode, setJoinCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
-    if (token === "") return;
+    if (tokenLoading) return;
+
     if (!token) {
-      router.push("/");
-      alert("You must be logged in to access the menu.");
+      messageApi.error("You must be logged in to join a room.", 4);
+      setLoading(false);
+      setTimeout(() => router.push("/"), 4000);
+      return;
     }
-  }, [router, token]);
+
+    setLoading(false);
+    setIsAuthorized(true);
+  }, [token, tokenLoading, router, messageApi]);
 
   const handleJoin = async () => {
     if (joinCode.length !== 6) {
@@ -83,7 +92,19 @@ export default function JoinRoomPage() {
     }
   };
 
+  const isActuallyLoading = tokenLoading || loading;
+
+  if (isActuallyLoading) {
+    return <div className={styles.pageBackground}>{contextHolder}</div>;
+  }
+
+  if (!isAuthorized) {
+    return <div className={styles.pageBackground}>{contextHolder}</div>;
+  }
+
   return (
+    <>
+      {contextHolder}
     <div className={styles.pageBackground}>
       <div className={styles.content}>
         <ProfileButton />
@@ -132,5 +153,6 @@ export default function JoinRoomPage() {
 
       </div>
     </div>
+    </>
   );
 }
