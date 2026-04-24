@@ -14,7 +14,7 @@ import {useAuth} from "@/hooks/useAuth";
 export default function OwnProfilePage() {
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
-  const { username, joinedDate, bio, stats, isLoading: profileLoading, fetchUser } = useUserProfile();
+  const { username, joinedDate, bio, stats, isLoading: profileLoading, avatarId, fetchUser } = useUserProfile();
   const { token, userId, isLoading: authLoading, isLoggingOut, handleLogOut } = useAuth();
 
     useEffect(() => {
@@ -57,7 +57,7 @@ export default function OwnProfilePage() {
 
           <ProfileHeader onBack={() => router.push("/menu")} />
 
-          <UserIdentity username={username} joinedDate={joinedDate} bio={bio} />
+          <UserIdentity username={username} joinedDate={joinedDate} bio={bio} avatarId={avatarId} />
 
           <StatGroup stats={stats} losses={losses} />
 

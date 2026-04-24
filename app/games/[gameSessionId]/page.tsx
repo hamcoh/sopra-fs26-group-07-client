@@ -23,6 +23,7 @@ import { python } from "@codemirror/lang-python";
 import { java } from "@codemirror/lang-java";
 import SockJS from "sockjs-client";
 import { Client, IMessage } from "@stomp/stompjs";
+import CodosseumAvatar from "@/components/CodosseumAvatar";
 
 interface GameRoundData {
   gameSessionId: number;
@@ -37,7 +38,11 @@ interface GameRoundData {
   outputFormat: string;
   constraints: string;
   gameLanguage: string;
+
   opponentName?: string;
+  playerAvatarId?: number;
+  opponentAvatarId?: number;
+
   endsAt?: string;
   serverTime?: string;
 }
@@ -108,6 +113,7 @@ export default function GamePage() {
 
   const me = players[String(userId)];
   const allPlayers = Object.entries(players);
+  const { value: storedAvatarId } = useLocalStorage("avatarId", "1");
 
   const opponentEntry = userId
       ? allPlayers.find((entry): entry is [string, { username: string; score: number }] => {
@@ -118,6 +124,9 @@ export default function GamePage() {
   const opponent = opponentEntry ? opponentEntry[1] : null;
 
   const myScore = me?.score ?? 0;
+
+  const [playerAvatarId, setPlayerAvatarId] = useState<number>(1);
+  const [opponentAvatarId, setOpponentAvatarId] = useState<number>(2);
 
   const [problem, setProblem] = useState<{
     id: number;
@@ -200,6 +209,9 @@ export default function GamePage() {
         outputFormat: data.outputFormat ?? "",
         constraints: data.constraints ?? "",
       });
+
+      setPlayerAvatarId(data.playerAvatarId ?? 1);
+      setOpponentAvatarId(data.opponentAvatarId ?? 2);
 
       // Set up game end time from backend endsAt, or fall back to 15min from now
       if (data.endsAt) {
@@ -646,7 +658,7 @@ export default function GamePage() {
               paddingRight: "30px"
             }}>
               <div className={`${styles.nameBox} ${styles.nameBoxYou}`} style={{ display: "flex", alignItems: "center" }}>
-                <Avatar size="default" style={{ backgroundColor: "#3b82f6" }} icon={<UserOutlined />} />
+                <CodosseumAvatar id={Number(storedAvatarId)} />
                 <div className={styles.sessionArea}>
                   <p className={styles.sessionLabel}>You</p>
                   <h2 className={styles.sessionValue}>{storedUsername}</h2>
@@ -660,7 +672,7 @@ export default function GamePage() {
               <span style={{ fontWeight: "bold", color: "#94a3b8" }}>VS</span>
 
               <div className={styles.nameBox} style={{ border: "2px solid #ef4444" }}>
-                <Avatar size="default" style={{ backgroundColor: "#ef4444" }} icon={<UserOutlined />} />
+                <CodosseumAvatar id={opponentAvatarId} size={50} backgroundColor="#ef4444" />
                 <div className={styles.sessionArea}>
                   <p className={styles.sessionLabel}>Opponent</p>
                   <h2 className={styles.sessionValue}>{opponent ? opponent.username : "Waiting..."}</h2>

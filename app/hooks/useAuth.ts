@@ -8,6 +8,7 @@ export function useAuth() {
     const { value: token, loading: tokenLoading, clear: clearToken } = useLocalStorage<string>("token", "");
     const { value: userId, loading: userIdLoading, clear: clearUserId } = useLocalStorage<string>("userid", "");
     const { clear: clearUsername } = useLocalStorage<string>("username", "");
+    const { clear: clearAvatarId } = useLocalStorage<string>("avatarId", "");
 
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -29,6 +30,7 @@ export function useAuth() {
         clearToken();
         clearUserId();
         clearUsername();
+        clearAvatarId();
 
         setTimeout(() => {
             router.push("/");

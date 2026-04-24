@@ -12,6 +12,7 @@ export function useUserProfile() {
         totalGamesPlayed: 0,
         totalPoints: 0,
     });
+    const [avatarId, setAvatarId] = useState<number>(1);
 
     const fetchUser = useCallback(async (userId: string, token: string, onAuthError?: () => void) => {
         if (!token) {
@@ -49,6 +50,7 @@ export function useUserProfile() {
                 totalGamesPlayed: data.totalGamesPlayed ?? 0,
                 totalPoints: data.totalPoints ?? 0,
             });
+            setAvatarId(data.avatarId ?? 1);
         } catch (err) {
             throw err;
         } finally {
@@ -56,5 +58,5 @@ export function useUserProfile() {
         }
     }, []);
 
-    return { username, joinedDate, bio, stats, isLoading, fetchUser };
+    return { username, joinedDate, bio, avatarId, stats, isLoading, fetchUser };
 }
