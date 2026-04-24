@@ -328,7 +328,10 @@ export default function GamePage() {
 
       if (!response.ok) {
         setRunResult({
-          message: `Error: ${result.message ?? "Run failed"}`,
+          message:
+              response.status === 429
+                  ? "Too many requests. Please wait a moment before trying again."
+                  : `Error: ${result.message ?? "Run failed"}`,
           status: "error",
         });
         return;
