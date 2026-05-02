@@ -7,21 +7,22 @@ import styles from "@/styles/page.module.css";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import {getApiDomain} from "@/utils/domain";
 import {useEffect, useState} from "react";
+import type { NamePath } from "antd/es/form/interface";
 
-
+type PasswordFormValues = {
+  password: string;
+  confirm: string;
+};
 
 export default function Home() {
   const router = useRouter();
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<PasswordFormValues>();
   const { value: userId, loading: userIdLoading, clear: clearUserId } = useLocalStorage<string>("userid", "");
   const { value: token, loading: tokenLoading, clear: clearToken } = useLocalStorage("token", "");
   const { clear: clearUsername } = useLocalStorage("username", "Player");
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
-  type PasswordFormValues = {
-    password: string;
-  };
 
   useEffect(() => {
     if (tokenLoading || userIdLoading) return;
@@ -55,6 +56,9 @@ export default function Home() {
       if (!res.ok) {
         throw new Error("Failed to update password");
       }
+
+      messageApi.success("Password updated! Please log in again.", 3);
+
       clearToken()
       clearUsername();
       clearUserId();
@@ -89,55 +93,78 @@ export default function Home() {
   }
 
   return (
-  <>
-    {contextHolder}
-    <div className={styles.pageBackground}>
-      <div className={styles.contentWrapper}>
-      <button className={styles.backButton} onClick={() => router.push("/menu")}>
-        <ArrowLeftOutlined/> Back to Menu
-      </button>
-      <div className={styles.logoArea}>
-      <CodosseumLogo size={100} />
-        <div className={styles.logoTexts}>
-          <h1 className={styles.logoTitle}>Change Password</h1>
-          <p className={styles.logoSubtitle}>Update your account password</p>
-        </div>
-      </div>
+      <>
+        {contextHolder}
+        <div className={styles.pageBackground}>
+          <div className={styles.contentWrapper}>
+            <button className={styles.backButton} onClick={() => router.push("/profile")}>
+              <ArrowLeftOutlined/> Back to Profile
+            </button>
+            <div className={styles.logoArea}>
+              <CodosseumLogo size={100} />
+              <div className={styles.logoTexts}>
+                <h1 className={styles.logoTitle}>Change Password</h1>
+                <p className={styles.logoSubtitle}>Update your account password</p>
+              </div>
+            </div>
 
-      <div className={styles.card}>
-        <Form
-          form={form}
-          name="PasswordChange"
-          onFinish={handlePasswordChange}
-          layout="vertical"
-          requiredMark={false}
-        >
-          <Form.Item
-            name="password"
-            label={<span className={styles.fieldLabel}><span className={styles.requiredStar}>*</span> New Password</span>}
-            rules={[{ required: true, message: "Please input your new password!" }]}
-          >
-            <Input.Password
-              prefix={<LockOutlined style={{ color: "#BDBDBD" }} />}
-              placeholder="Enter new password"
-              size="large"
-              className={styles.input}
-            />
-          </Form.Item>
-          <Form.Item style={{ marginBottom: 0, marginTop: 8 }}>
-            <Button
-              htmlType="submit"
-              block
-              size="large"
-              className={styles.signInButton}
-            >
-              Change password
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
-    </div>
-    </div>
-    </>
+            <div className={styles.card}>
+              <Form<PasswordFormValues>
+                  form={form}
+                  name="PasswordChange"
+                  onFinish={handlePasswordChange}
+                  layout="vertical"
+                  requiredMark={false}
+              >
+                <Form.Item
+                    name="password"
+                    label={<span className={styles.fieldLabel}><span className={styles.requiredStar}>*</span> New Password</span>}
+                    rules={[{ required: true, message: "Please input your new password!" }]}
+                >
+                  <Input.Password
+                      prefix={<LockOutlined style={{ color: "#BDBDBD" }} />}
+                      placeholder="Enter new password"
+                      size="large"
+                      className={styles.input}
+                  />
+                </Form.Item>
+                <Form.Item
+                    name="confirm"
+                    label="Confirm Password"
+                    dependencies={['password'] as NamePath<PasswordFormValues>[]}
+                    rules={[
+                      { required: true, message: "Please confirm your password!" },
+                      ({ getFieldsValue }) => ({
+                        validator(_, value) {
+                          if (!value || getFieldsValue().password === value) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(new Error("The two passwords do not match!"));
+                        },
+                      }),
+                    ]}
+                >
+                  <Input.Password
+                      prefix={<LockOutlined style={{ color: "#BDBDBD" }} />}
+                      placeholder="Repeat your password"
+                      size="large"
+                      className={styles.input}
+                  />
+                </Form.Item>
+                <Form.Item style={{ marginBottom: 0, marginTop: 35 }}>
+                  <Button
+                      htmlType="submit"
+                      block
+                      size="large"
+                      className={styles.signInButton}
+                  >
+                    Change password
+                  </Button>
+                </Form.Item>
+              </Form>
+            </div>
+          </div>
+        </div>
+      </>
   );
 }
