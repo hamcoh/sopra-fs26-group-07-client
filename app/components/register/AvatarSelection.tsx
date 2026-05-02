@@ -9,15 +9,24 @@ interface AvatarSelectionProps {
     onSelect: (id: number) => void;
     onBack: () => void;
     isLoading: boolean;
+    title?: string;
+    submitText?: string;
+    showBackDetails?: boolean;
 }
 
-const AvatarSelection = ({ onSelect, onBack, isLoading }: AvatarSelectionProps) => {
+const AvatarSelection = ({
+                             onSelect,
+                             onBack,
+                             isLoading,
+                             title = "Choose Your Avatar",
+                             submitText = "Complete Registration",
+                             showBackDetails = true
+                         }: AvatarSelectionProps) => {
     const [selectedId, setSelectedId] = useState<number | null>(null);
-    const avatarIds = Array.from({ length: 9 }, (_, i) => i + 1);
 
     return (
         <div style={{ textAlign: "center" }}>
-            <h2> Choose Your Avatar</h2>
+            <h2>{title}</h2>
             <Text type="secondary" style={{ display: "block", marginBottom: 20 }}>
                 Select a gladiator to represent you
             </Text>
@@ -54,16 +63,18 @@ const AvatarSelection = ({ onSelect, onBack, isLoading }: AvatarSelectionProps) 
                     style={{ height: '50px', fontSize: '1.1rem' }}
                     className ={styles.signInButton}
                 >
-                    Complete Registration
+                    {submitText}
                 </Button>
 
-                <Button
-                    type="link"
-                    onClick={onBack}
-                    disabled={isLoading}
-                >
-                    Go back to details
-                </Button>
+                {showBackDetails && (
+                    <Button
+                        type="link"
+                        onClick={onBack}
+                        disabled={isLoading}
+                    >
+                        Go back to details
+                    </Button>
+                )}
             </div>
         </div>
     );

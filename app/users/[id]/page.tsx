@@ -62,7 +62,7 @@ export default function ProfilePage() {
                     useTopRow={false}
                 />
 
-                <UserIdentity username={username} joinedDate={joinedDate} bio={bio} avatarId={avatarId} />
+                <UserIdentity username={username} joinedDate={joinedDate} bio={bio} avatarId={avatarId} isEditable={false}  />
 
                 <StatGroup stats={stats} losses={losses} />
 
