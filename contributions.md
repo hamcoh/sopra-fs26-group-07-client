@@ -108,10 +108,20 @@ reason).
 
 ---
 
-## Contributions Week 5 - [Begin Date] to [End Date]
+## Contributions Week 5 - 27.04.26 to 03.05.26
 
-_Continue with the same table format as above._
+**NOTE**: For the week following the M3 submission, we were instructed not to push changes to the main branch while the applications are still under assessment. Accordingly, all development was carried out in separate feature branches. We will provide references either to the corresponding pull requests or directly to the relevant commits within those branches.
 
+As some work was done in parallel on related features, there may be merge conflicts when integrating these branches into the main branch. These will be resolved carefully once updates to the main branch are permitted.
+
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| name      | date   | link to commit | description | relevance |
+| name      | date   | link to commit | description | relevance |
+| name      | date   | link to commit | description | relevance |
+| name      | date   | link to commit | description | relevance |
+| name      | date   | link to commit | description | relevance |
+| name      | date   | link to commit | description | relevance |
 ---
 
 ## Contributions Week 6 - [Begin Date] to [End Date]
