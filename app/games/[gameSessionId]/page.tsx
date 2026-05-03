@@ -24,6 +24,7 @@ import { java } from "@codemirror/lang-java";
 import SockJS from "sockjs-client";
 import { Client, IMessage } from "@stomp/stompjs";
 import CodosseumAvatar from "@/components/CodosseumAvatar";
+import SkipButton from "@/components/SkipButton";
 
 interface GameRoundData {
   gameSessionId: number;
@@ -45,6 +46,8 @@ interface GameRoundData {
 
   endsAt?: string;
   serverTime?: string;
+
+  maxSkips?: number;
 }
 
 interface RunTestCase {
@@ -143,6 +146,12 @@ export default function GamePage() {
   const [gameSummary, setGameSummary] = useState<PlayerGameSummaryDTO | null>(null);
   const [expandedSolutions, setExpandedSolutions] = useState<Set<string>>(new Set());
 
+  const [skipState, setSkipState] = useState({
+    used: 0,
+    max: null as number | null,
+  });
+  const [isSkipping, setIsSkipping] = useState(false);
+
   // Timer
   const [gameEndTime, setGameEndTime] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -200,6 +209,12 @@ export default function GamePage() {
         };
       }
       setPlayers(initialPlayers);
+
+      setSkipState({
+        used: data.numOfSkippedProblems ?? 0,
+        max: data.maxSkips ?? null,
+      });
+
       const lang = (data.gameLanguage ?? "python").toLowerCase();
       setLanguage(lang);
       setCode(lang === "java" ? javaStarter : pythonStarter);
@@ -362,6 +377,58 @@ export default function GamePage() {
       });
     } finally {
       setIsRunning(false);
+    }
+  };
+
+  const handleSkip = async () => {
+    if (!token || !gameSessionId || !problem || !playerSessionId || isSkipping) return;
+
+    setIsSkipping(true);
+
+    try {
+      const res = await fetch(
+          `${getApiDomain()}/games/${gameSessionId}/problems/${problem.id}/skips`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              token: token,
+            },
+            body: JSON.stringify({ playerSessionId }),
+          }
+      );
+
+      if (res.status === 204) return;
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? "Skip failed");
+      }
+
+      const nextRound = await res.json();
+
+      setSkipState((prev) => ({
+        ...prev,
+        used: nextRound.numOfSkippedProblems,
+      }));
+
+      setProblem({
+        id: nextRound.problemId,
+        title: nextRound.title,
+        description: nextRound.description,
+        inputFormat: nextRound.inputFormat,
+        outputFormat: nextRound.outputFormat,
+        constraints: nextRound.constraints,
+      });
+
+      setCurrentRound((prev) => prev + 1);
+
+      setCode(language === "java" ? javaStarter : pythonStarter);
+
+    } catch (err) {
+      console.error("Skip error:", err);
+    } finally {
+      setIsSkipping(false);
     }
   };
 
@@ -802,6 +869,16 @@ export default function GamePage() {
                 <button className={styles.submitButton} onClick={handleSubmit} disabled={isRunning || isSubmitting}>
                   {isSubmitting ? <LoadingOutlined spin /> : <><SendOutlined /> Submit</>}
                 </button>
+                <div style={{ marginLeft: "auto" }}>
+                  <SkipButton
+                      onClick={handleSkip}
+                      disabled={isRunning || isSubmitting}
+                      isLoading={isSkipping}
+                      used={skipState.used}
+                      max={skipState.max}
+                  />
+                </div>
+
               </div>
             </div>
 
