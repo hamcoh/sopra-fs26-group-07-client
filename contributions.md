@@ -116,9 +116,9 @@ As some work was done in parallel on related features, there may be merge confli
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| name      | date   | link to commit | description | relevance |
-| name      | date   | link to commit | description | relevance |
-| name      | date   | link to commit | description | relevance |
+| **[hamcoh](https://github.com/hamcoh)** | 02.05.2026 | [Issue 187](https://github.com/hamcoh/sopra-fs26-group-07-server/commit/67135c796c43f85155768e47a39f273d25aa8412) [2nd Commit](https://github.com/hamcoh/sopra-fs26-group-07-server/commit/163ef40422cf5fdd5dd2c285ca84550066417e66) | Implemented the skip button. | Users can now skip a problem and advance to the next one if they are stuck on one. How to adjust it to another gamemode (e.g. skip problem but get another new one instead) needs to be discussed in group. |
+| **[hamcoh](https://github.com/hamcoh)** | 02.05.2026 | [Issue 200](https://github.com/hamcoh/sopra-fs26-group-07-server/commit/b5a43b1def1e40012cedc2479de28f0a05c8ed40)| Passwords are hashed with salt. | Its a security feature, to prevent passwords being displayed as plaintext in the DB. Its a standard nowdays and I was very interested in implementing it and also doing research in different hashing methods and finding out why e.g. plain SHA256 is not suitable for password hashing. |
+| **[hamcoh](https://github.com/hamcoh)** | 03.05.2026| [Issue 182, 183](https://github.com/hamcoh/sopra-fs26-group-07-server/commit/30c9d3aa085e104bc01e2104655d6e86339ba0fe)| Implemented endpoint and service for changing the avatar. | Its a nice feature for players since personalization is an important part of the user experience. |
 | name      | date   | link to commit | description | relevance |
 | name      | date   | link to commit | description | relevance |
 | name      | date   | link to commit | description | relevance |
