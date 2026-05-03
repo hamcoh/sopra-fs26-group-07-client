@@ -30,6 +30,22 @@ interface RoomData {
 const formatEnum = (value: string) =>
   value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 
+const fadeOutAudio = (audio: HTMLAudioElement, durationMs: number, onComplete?: () => void) => {
+  const steps = 30;
+  const stepTime = durationMs / steps;
+  const volumeStep = audio.volume / steps;
+  const interval = setInterval(() => {
+    if (audio.volume > volumeStep) {
+      audio.volume = Math.max(0, audio.volume - volumeStep);
+    } else {
+      audio.volume = 0;
+      audio.pause();
+      clearInterval(interval);
+      onComplete?.();
+    }
+  }, stepTime);
+};
+
 export default function LobbyPage() {
   const router = useRouter();
   const params = useParams();
@@ -53,6 +69,7 @@ export default function LobbyPage() {
   const hostUsernameRef = useRef<string | null>(null);
   const player2UsernameRef = useRef<string | null>(null);
   const isHostRef = useRef(false);
+  const lobbyAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     hostUsernameRef.current = hostUsername;
@@ -73,6 +90,25 @@ export default function LobbyPage() {
   useEffect(() => {
     player2AvatarIdRef.current = player2AvatarId;
   }, [player2AvatarId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const audio = new Audio("/sounds/LobbyTheme.mp3");
+    audio.loop = true;
+    audio.volume = 0.4;
+    lobbyAudioRef.current = audio;
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        const unlock = () => { audio.play(); };
+        document.addEventListener("click", unlock, { once: true });
+      });
+    }
+    return () => {
+      audio.pause();
+      audio.src = "";
+    };
+  }, []);
 
   const fetchUsername = async (
       id: number
@@ -182,6 +218,14 @@ export default function LobbyPage() {
         client.subscribe(`/user/queue/game-start`, (message: IMessage) => {
           setIsStarting(true);
           const gameData = JSON.parse(message.body);
+
+          if (lobbyAudioRef.current) {
+            fadeOutAudio(lobbyAudioRef.current, 200, () => {
+              const drums = new Audio("/sounds/DrumGameStart.mp3");
+              drums.volume = 0.8;
+              drums.play().catch(console.error);
+            });
+          }
           console.log("Game started:", gameData);
           const isHost = isHostRef.current;
 

@@ -4,7 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import styles from "@/styles/game.module.css";
 import resultStyles from "@/styles/results.module.css";
-import { useEffect, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getApiDomain } from "@/utils/domain";
 import {
@@ -165,6 +165,8 @@ export default function GamePage() {
   const [runResult, setRunResult] = useState<ExecutionResult | null>(null);
   const [submitResult, setSubmitResult] = useState<ExecutionResult | null>(null);
 
+  const lastScoreRef = useRef<number>(0);
+
   const toggleSolution = (id: string) => {
     setExpandedSolutions(prev => {
       const next = new Set(prev);
@@ -254,6 +256,16 @@ export default function GamePage() {
             const incomingSessionId = Number(data.playerSessionId);
 
             if (incomingSessionId === playerSessionId) {
+              const newScore = data.currentScore;
+
+              if (newScore > lastScoreRef.current) {
+                const audio = new Audio("/sounds/PointsSoundEffect.mp3");
+                audio.volume = 0.6;
+                audio.play().catch(console.error);
+              }
+
+              lastScoreRef.current = newScore;
+
               setPlayers(prev => ({
                 ...prev,
                 [String(userId)]: {
