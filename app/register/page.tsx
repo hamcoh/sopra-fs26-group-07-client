@@ -8,6 +8,8 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import Link from "next/link";
+import {useState} from "react";
+import AvatarSelection from "@/components/register/AvatarSelection";
 
 
 interface FormFieldProps {
@@ -23,13 +25,30 @@ export default function RegisterPage() {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
 
-  const handleRegister = async (values: FormFieldProps) => {
+  const [step, setStep] = useState<"details" | "avatar">("details");
+  const [tempFormData, setTempFormData] = useState<FormFieldProps | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleNextStep = (values: FormFieldProps) => {
+    setTempFormData(values);
+    setStep("avatar");
+  };
+
+  const handleRegister = async (avatarId: number) => {
+    if (!tempFormData) return;
+
+    setIsSubmitting(true);
     try {
-      await apiService.post<User>("/users/register", values);
+      const finalData = {
+        ...tempFormData,
+        avatarId: avatarId
+      };
+
+      await apiService.post<User>("/users/register", finalData);
 
       const loginRes = await apiService.post<User>("/users/login", {
-        username: values.username,
-        password: values.password,
+        username: tempFormData.username,
+        password: tempFormData.password,
       });
 
       if (loginRes.token) {
@@ -42,6 +61,7 @@ export default function RegisterPage() {
 
       router.push("/menu");
     } catch (err) {
+      setIsSubmitting(false);
       if (err instanceof Error) {
         messageApi.error("Register was not successful. Username is already taken.");
       } else {
@@ -54,7 +74,7 @@ export default function RegisterPage() {
   <>
     {contextHolder}
     <div className={styles.pageBackground}>
-      {/* Logo */}
+
       <div className={styles.logoArea}>
       <CodosseumLogo size={100} />
         <div className={styles.logoTexts}>
@@ -63,13 +83,17 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* Card */}
-      <div className={styles.card}>
+      <div
+          className={styles.card}
+          style={step === "avatar" ? { paddingTop: '40px', paddingBottom: '20px' } : {}}
+      >
+        {step === "details" ? (
+            <>
         <h2 className={styles.cardTitle}>Create Account</h2>
         <Form
           form={form}
           name="register"
-          onFinish={handleRegister}
+          onFinish={handleNextStep}
           layout="vertical"
           requiredMark={false}
         >
@@ -125,7 +149,7 @@ export default function RegisterPage() {
               size="large"
               className={styles.signInButton}
             >
-              Create Account
+              Next: Choose Avatar
             </Button>
           </Form.Item>
         </Form>
@@ -135,8 +159,15 @@ export default function RegisterPage() {
           <Link href="/" className={styles.signUpLink}>
             Sign in
           </Link>
-
         </p>
+        </>
+        ) : (
+            <AvatarSelection
+                onSelect={handleRegister}
+                onBack={() => setStep("details")}
+                isLoading={isSubmitting}
+            />
+            )}
       </div>
     </div>
     </>

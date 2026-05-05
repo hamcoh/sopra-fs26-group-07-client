@@ -44,6 +44,7 @@ export default function LobbyPage() {
   const [hostUsername, setHostUsername] = useState<string | null>(null);
   const [player2Username, setPlayer2Username] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
+  const [hostLeft, setHostLeft] = useState(false);
 
   const [hostAvatarId, setHostAvatarId] = useState<number | null>(null);
   const hostAvatarIdRef = useRef<number | null>(null);
@@ -53,6 +54,7 @@ export default function LobbyPage() {
   const hostUsernameRef = useRef<string | null>(null);
   const player2UsernameRef = useRef<string | null>(null);
   const isHostRef = useRef(false);
+  const isLeavingRef = useRef(false);
 
   useEffect(() => {
     hostUsernameRef.current = hostUsername;
@@ -130,6 +132,9 @@ export default function LobbyPage() {
           setPlayer2Username(p2.username);
           setPlayer2AvatarId(p2.avatarId);
         }
+      } else {
+        setPlayer2Username(null);
+        setPlayer2AvatarId(null);
       }
     } catch (err) {
       console.error(err);
@@ -149,11 +154,27 @@ export default function LobbyPage() {
         },
       });
       if (!res.ok) throw new Error("Failed to start game");
-
     } catch (err) {
       console.error(err);
       alert("Failed to start game");
     }
+  };
+
+  const handleLeaveRoom = async () => {
+    isLeavingRef.current = true;
+    try {
+      await fetch(`${getApiDomain()}/rooms/${roomId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "token": token,
+          "userId": String(userId),
+        },
+      });
+    } catch (err) {
+      console.error("Failed to leave room:", err);
+    }
+    router.push("/rooms");
   };
 
   // 1. Initial room fetch
@@ -175,10 +196,21 @@ export default function LobbyPage() {
 
         client.subscribe(`/topic/room/${roomId}`, async (message: IMessage) => {
           console.log("Room update received:", message.body);
-          await fetchRoom();
+
+          if (isLeavingRef.current) return;
+
+          const parsed = JSON.parse(message.body);
+
+          if (parsed.type === "ROOM_CLOSED") {
+            setHostLeft(true);
+            setTimeout(() => router.push("/menu"), 3000);
+          } else if (parsed.type === "PLAYER_LEFT") {
+            await fetchRoom();
+          } else {
+            await fetchRoom();
+          }
         });
 
-        //listens for the game start. Is personalized so each player receives his own message
         client.subscribe(`/user/queue/game-start`, (message: IMessage) => {
           setIsStarting(true);
           const gameData = JSON.parse(message.body);
@@ -186,8 +218,8 @@ export default function LobbyPage() {
           const isHost = isHostRef.current;
 
           const opponentName = isHost
-                  ? player2UsernameRef.current
-                  : hostUsernameRef.current;
+              ? player2UsernameRef.current
+              : hostUsernameRef.current;
 
           const opponentAvatarId = isHost
               ? player2AvatarIdRef.current
@@ -203,14 +235,19 @@ export default function LobbyPage() {
               : "python";
           localStorage.setItem(
             "gameRoundData",
-            JSON.stringify({ ...gameData, gameLanguage, opponentName: opponentName ?? "Opponent", opponentAvatarId: opponentAvatarId ?? 1, playerAvatarId: playerAvatarId ?? 1, })
+            JSON.stringify({
+              ...gameData,
+              gameLanguage,
+              opponentName: opponentName ?? "Opponent",
+              opponentAvatarId: opponentAvatarId ?? 1,
+              playerAvatarId: playerAvatarId ?? 1,
+            })
           );
           setTimeout(() => {
             router.push(`/games/${gameData.gameSessionId}`);
           }, 3000);
         });
       },
-      
 
       onStompError: (frame: IFrame) => {
         console.error("WebSocket error:", frame);
@@ -229,9 +266,31 @@ export default function LobbyPage() {
   };
 
   if (isStarting) {
+    return <LoadingScreen />;
+  }
+
+  if (hostLeft) {
     return (
-        <LoadingScreen/>
-    )
+      <div className={styles.pageBackground}>
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          gap: "16px",
+          textAlign: "center",
+        }}>
+          <div style={{ fontSize: 48 }}>🚪</div>
+          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#1a1a2e", margin: 0 }}>
+            The host has left the arena
+          </h2>
+          <p style={{ color: "#6b7280", margin: 0 }}>
+            The room has been closed. Redirecting you to the menu...
+          </p>
+        </div>
+      </div>
+    );
   }
 
   if (!room) {
@@ -251,7 +310,7 @@ export default function LobbyPage() {
     <div className={styles.pageBackground}>
       <div className={styles.content}>
 
-        <button className={styles.backButton} onClick={() => router.push("/menu")}>
+        <button className={styles.backButton} onClick={handleLeaveRoom}>
           <ArrowLeftOutlined /> Leave Arena
         </button>
 
@@ -374,13 +433,13 @@ export default function LobbyPage() {
           </div>
 
           <button
-  className={styles.enterArenaButton}
-  disabled={!bothReady || !isCurrentUserHost}
-  onClick={handleStartGame}
->
-  <ThunderboltFilled style={{ fontSize: 28 }} />
-  <span>Enter Arena</span>
-</button>
+            className={styles.enterArenaButton}
+            disabled={!bothReady || !isCurrentUserHost}
+            onClick={handleStartGame}
+          >
+            <ThunderboltFilled style={{ fontSize: 28 }} />
+            <span>Enter Arena</span>
+          </button>
         </div>
 
       </div>
