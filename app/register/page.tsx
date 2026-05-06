@@ -168,7 +168,7 @@ export default function RegisterPage() {
           >
             <Input.Password
                 prefix={<LockOutlined style={{ color: "#BDBDBD" }} />}
-                placeholder="Minimum 8 characters"
+                placeholder="········"
                 size="large"
                 maxLength={101}
                 className={styles.input}

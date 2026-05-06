@@ -36,15 +36,14 @@ export default function ChangeAvatarPage() {
                     "Content-Type": "application/json",
                     token: token || "",
                 },
-                body: JSON.stringify({
-                    avatarId: newAvatarId,
-                }),
+                body: JSON.stringify(newAvatarId)
             });
 
             if (!res.ok) {
                 throw new Error("Failed to update avatar");
             }
 
+            localStorage.setItem("avatarId", JSON.stringify(newAvatarId));
             messageApi.success("Avatar updated successfully!");
 
             setTimeout(() => {
