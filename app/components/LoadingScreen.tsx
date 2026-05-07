@@ -24,6 +24,7 @@ export default function LoadingScreen() {
         <div className={loadingStyles.fullPageLoader}>
             <div className={loadingStyles.loaderContent}>
                 <div className={loadingStyles.spinnerWrapper}>
+                <div className={loadingStyles.vsGlow}></div>
                     <div className={loadingStyles.ringBackground} />
                     <div className={loadingStyles.ringSpinner}>
                         <svg viewBox="0 0 120 120" width="100%" height="100%">
@@ -55,7 +56,7 @@ export default function LoadingScreen() {
                     )}
                 </div>
 
-                <div className={loadingStyles.vsGlow}></div>
+                
             </div>
         </div>
     );

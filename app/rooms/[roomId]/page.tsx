@@ -27,6 +27,12 @@ interface RoomData {
   maxNumPlayers: number;
 }
 
+interface ChatMessage {
+  senderUsername: string;
+  content: string;
+  timestamp: string;
+}
+
 const formatEnum = (value: string) =>
   value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 
@@ -56,6 +62,11 @@ export default function LobbyPage() {
   const isHostRef = useRef(false);
   const isLeavingRef = useRef(false);
 
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const stompClientRef = useRef<Client | null>(null);
+
   useEffect(() => {
     hostUsernameRef.current = hostUsername;
   }, [hostUsername]);
@@ -75,6 +86,10 @@ export default function LobbyPage() {
   useEffect(() => {
     player2AvatarIdRef.current = player2AvatarId;
   }, [player2AvatarId]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
 
   const fetchUsername = async (
       id: number
@@ -177,6 +192,15 @@ export default function LobbyPage() {
     router.push("/rooms");
   };
 
+  const handleSendMessage = () => {
+    if (!chatInput.trim() || !stompClientRef.current?.active) return;
+    stompClientRef.current.publish({
+      destination: `/app/room/${roomId}/send`,
+      body: JSON.stringify({ senderUsername: username, content: chatInput.trim() }),
+    });
+    setChatInput("");
+  };
+
   // 1. Initial room fetch
   useEffect(() => {
     if (!token || !roomId) return;
@@ -247,13 +271,20 @@ export default function LobbyPage() {
             router.push(`/games/${gameData.gameSessionId}`);
           }, 3000);
         });
+
+        client.subscribe(`/topic/chat/room/${roomId}`, (message: IMessage) => {
+          const msg: ChatMessage = JSON.parse(message.body);
+          setChatMessages(prev => [...prev, msg]);
+        });
       },
+      
 
       onStompError: (frame: IFrame) => {
         console.error("WebSocket error:", frame);
       },
     });
 
+    stompClientRef.current = client;
     client.activate();
     return () => { client.deactivate(); };
   }, [token, roomId]);
@@ -441,6 +472,60 @@ export default function LobbyPage() {
             <span>Enter Arena</span>
           </button>
         </div>
+        {/* CHAT */}
+        <div className={styles.chatCard}>
+          <h3 className={styles.configTitle}>
+            <span className={styles.configDot} style={{ background: "#22c55e" }} />
+            Arena Chat
+          </h3>
+
+          <div className={styles.chatMessages}>
+            {chatMessages.length === 0 && (
+              <p style={{ color: "#9ca3af", fontSize: 13, textAlign: "center", margin: "auto 0" }}>
+                No messages yet. Say hello! 👋
+              </p>
+            )}
+            {chatMessages.map((msg, i) => {
+              const isMe = msg.senderUsername === username;
+              const avatarId = msg.senderUsername === hostUsername ? hostAvatarId : player2AvatarId;
+              return (
+                <div key={i} className={`${styles.chatMessage} ${isMe ? styles.chatMessageMe : ""}`}>
+                  {!isMe && (
+                    <div className={styles.chatAvatar}>
+                      <CodosseumAvatar id={avatarId ?? 1} size={32} variant="room" />
+                    </div>
+                  )}
+                  <div className={styles.chatBubbleGroup}>
+                    {!isMe && <span className={styles.chatSenderName}>{msg.senderUsername}</span>}
+                    <div className={`${styles.chatBubble} ${isMe ? styles.chatBubbleMe : styles.chatBubbleOther}`}>
+                      {msg.content}
+                    </div>
+                  </div>
+                  {isMe && (
+                    <div className={styles.chatAvatar}>
+                      <CodosseumAvatar id={avatarId ?? 1} size={32} variant="room" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            <div ref={chatEndRef} />
+          </div>
+
+  <div className={styles.chatInputRow}>
+    <input
+      className={styles.chatInput}
+      value={chatInput}
+      onChange={e => setChatInput(e.target.value)}
+      onKeyDown={e => e.key === "Enter" && handleSendMessage()}
+      placeholder="Type a message..."
+      maxLength={255}
+    />
+    <button className={styles.chatSendButton} onClick={handleSendMessage}>
+      Send
+    </button>
+  </div>
+</div>
 
       </div>
     </div>
