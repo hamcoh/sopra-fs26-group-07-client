@@ -6,7 +6,7 @@ import CodosseumLogo from "@/components/CodosseumLogo";
 import styles from "@/styles/game.module.css";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getApiDomain } from "@/utils/domain";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import {CheckCircleOutlined, ClockCircleOutlined} from "@ant-design/icons";
 import { useGameWebSocket } from "./_hooks/useGameWebSocket";
 import { useGameTimer } from "./_hooks/useGameTimer";
 import { useScoreAnimation } from "./_hooks/useScoreAnimation";
@@ -123,6 +123,8 @@ export default function GamePage() {
         inputFormat: data.inputFormat ?? "",
         outputFormat: data.outputFormat ?? "",
         constraints: data.constraints ?? "",
+        hint: data.hint ?? undefined,
+        difficulty: localStorage.getItem("roomDifficulty") ?? undefined,
       });
       setPlayerAvatarId(data.playerAvatarId ?? 1);
       setOpponentAvatarId(data.opponentAvatarId ?? 2);
@@ -206,6 +208,8 @@ export default function GamePage() {
         inputFormat: nextRound.inputFormat,
         outputFormat: nextRound.outputFormat,
         constraints: nextRound.constraints,
+        hint: nextRound.hint ?? undefined,
+        difficulty: localStorage.getItem("roomDifficulty") ?? undefined,
       });
 
       setCurrentRound((prev) => prev + 1);
@@ -237,6 +241,8 @@ export default function GamePage() {
           inputFormat: updatedGameRound.inputFormat,
           outputFormat: updatedGameRound.outputFormat,
           constraints: updatedGameRound.constraints,
+          hint: updatedGameRound.hint ?? undefined,
+          difficulty: localStorage.getItem("roomDifficulty") ?? undefined,
         });
         setSubmitResult(null);
         setRunResult(null);
@@ -391,10 +397,12 @@ export default function GamePage() {
 
           <div className={styles.verticalDivider} />
 
+
           <div className={styles.sessionArea}>
             <p className={styles.sessionLabel}>Round</p>
             <h2 className={`${styles.sessionValue} ${styles.blueValue}`}>{currentRound}</h2>
           </div>
+
 
           <div style={{ display: "flex", gap: "20px", alignItems: "center", justifyContent: "flex-end", width: "100%", paddingRight: "30px" }}>
             <ScoreBox
@@ -446,6 +454,7 @@ export default function GamePage() {
           onSubmit={handleSubmit}
           runResult={runResult}
           submitResult={submitResult}
+          hint={problem?.hint ?? null}
         />
       </div>
     </div>

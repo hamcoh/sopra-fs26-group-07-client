@@ -118,19 +118,32 @@ export default function Home() {
               >
                 <Form.Item
                     name="password"
+                    hasFeedback
+                    validateTrigger="onChange"
                     label={<span className={styles.fieldLabel}><span className={styles.requiredStar}>*</span> New Password</span>}
-                    rules={[{ required: true, message: "Please input your new password!" }]}
+                    rules={[
+                      { required: true, message: "Please input your new password!" },
+                      { min: 8, message: "Password must be at least 8 characters long" },
+                      { max: 100, message: "Password cannot exceed 100 characters" },
+                      {
+                        pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&+\-._#])/,
+                        message: "Must contain uppercase, lowercase, a number and a symbol",
+                      },
+                    ]}
                 >
                   <Input.Password
                       prefix={<LockOutlined style={{ color: "#BDBDBD" }} />}
                       placeholder="Enter new password"
                       size="large"
+                      maxLength={101}
                       className={styles.input}
                   />
                 </Form.Item>
                 <Form.Item
                     name="confirm"
                     label="Confirm Password"
+                    hasFeedback
+                    validateTrigger="onChange"
                     dependencies={['password'] as NamePath<PasswordFormValues>[]}
                     rules={[
                       { required: true, message: "Please confirm your password!" },
