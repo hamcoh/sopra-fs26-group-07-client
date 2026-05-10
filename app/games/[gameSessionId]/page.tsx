@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import { useParams } from "next/navigation";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import styles from "@/styles/game.module.css";
@@ -49,6 +49,14 @@ export default function GamePage() {
   const [opponentAvatarId, setOpponentAvatarId] = useState<number>(2);
   const [problem, setProblem] = useState<Problem | null>(null);
   const [currentRound, setCurrentRound] = useState(1);
+
+  //For The Skip Button, can be removed if not needed!
+  const [skipState, setSkipState] = useState({
+    used: 0,
+    max: null as number | null,
+  });
+  const [isSkipping, setIsSkipping] = useState(false);
+
   const [gameEndTime, setGameEndTime] = useState<number | null>(null);
   const [showSubmitToast, setShowSubmitToast] = useState(false);
   const [code, setCode] = useState(pythonStarter);
@@ -63,6 +71,7 @@ export default function GamePage() {
   const opponentEntry = userId ? allPlayers.find(([id]) => id !== String(userId)) : null;
   const opponent = opponentEntry ? opponentEntry[1] : null;
   const myScore = me?.score ?? 0;
+  const lastScoreRef = useRef<number>(0);
 
   const { isGameOver, gameEndData, gameSummary, activeEffects, sabotageNotification } = useGameWebSocket(
     gameSessionId, token, userId, playerSessionId, setPlayers,
@@ -99,6 +108,11 @@ export default function GamePage() {
       };
       if (data.opponentName) initialPlayers["opponent"] = { username: data.opponentName, score: 0 };
       setPlayers(initialPlayers);
+
+      setSkipState({
+        used: data.numOfSkippedProblems ?? 0,
+        max: data.maxSkips ?? null,
+      });
       const lang = (data.gameLanguage ?? "python").toLowerCase();
       setLanguage(lang);
       setCode(lang === "java" ? javaStarter : pythonStarter);
@@ -152,6 +166,59 @@ export default function GamePage() {
     }
   };
 
+  // ONLY FOR THE SKIP BUTTON, CAN BE REMOVED IF NOT NEEDED
+  const handleSkip = async () => {
+    if (!token || !gameSessionId || !problem || !playerSessionId || isSkipping) return;
+
+    setIsSkipping(true);
+
+    try {
+      const res = await fetch(
+          `${getApiDomain()}/games/${gameSessionId}/problems/${problem.id}/skips`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              token: token,
+            },
+            body: JSON.stringify({ playerSessionId }),
+          }
+      );
+
+      if (res.status === 204) return;
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? "Skip failed");
+      }
+
+      const nextRound = await res.json();
+
+      setSkipState((prev) => ({
+        ...prev,
+        used: nextRound.numOfSkippedProblems,
+      }));
+
+      setProblem({
+        id: nextRound.problemId,
+        title: nextRound.title,
+        description: nextRound.description,
+        inputFormat: nextRound.inputFormat,
+        outputFormat: nextRound.outputFormat,
+        constraints: nextRound.constraints,
+      });
+
+      setCurrentRound((prev) => prev + 1);
+
+      setCode(language === "java" ? javaStarter : pythonStarter);
+
+    } catch (err) {
+      console.error("Skip error:", err);
+    } finally {
+      setIsSkipping(false);
+    }
+  };
+
   const refreshGameState = async () => {
     if (!problem || playerSessionId == null) return;
     try {
@@ -174,10 +241,19 @@ export default function GamePage() {
         setSubmitResult(null);
         setRunResult(null);
         setCurrentRound(prev => prev + 1);
-        setPlayers(prev => ({
-          ...prev,
-          [String(userId)]: { ...prev[String(userId)], score: updatedGameRound.currentScore },
-        }));
+        setPlayers(prev => {
+          const newScore = updatedGameRound.currentScore;
+          if (newScore > lastScoreRef.current) {
+            const audio = new Audio("/sounds/PointsSoundEffect.mp3");
+            audio.volume = 0.6;
+            audio.play().catch(console.error);
+          }
+          lastScoreRef.current = newScore;
+          return {
+            ...prev,
+            [String(userId)]: { ...prev[String(userId)], score: newScore },
+          };
+        });
         const lang = (updatedGameRound.gameLanguage ?? language).toLowerCase();
         setCode(lang === "java" ? javaStarter : pythonStarter);
         await fetchCoinBalance();

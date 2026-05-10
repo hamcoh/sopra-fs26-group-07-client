@@ -16,6 +16,7 @@ export interface GameRoundData {
     opponentAvatarId?: number;
     endsAt?: string;
     serverTime?: string;
+    maxSkips?: number;
   }
   
   export interface RunTestCase {
