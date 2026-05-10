@@ -17,7 +17,8 @@ export interface GameRoundData {
     endsAt?: string;
     serverTime?: string;
     maxSkips?: number;
-  }
+    hint?: string;
+}
   
   export interface RunTestCase {
     testCaseId: number;
@@ -80,4 +81,6 @@ export interface GameRoundData {
     inputFormat: string;
     outputFormat: string;
     constraints: string;
+    hint?: string;
+    difficulty?: string;
   }

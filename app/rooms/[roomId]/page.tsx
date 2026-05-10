@@ -169,6 +169,7 @@ export default function LobbyPage() {
       setRoom(data);
       if (typeof window !== "undefined") {
         localStorage.setItem("roomLanguage", (data.gameLanguage ?? "PYTHON").toLowerCase());
+        localStorage.setItem("roomDifficulty", (data.gameDifficulty ?? "EASY"));
       }
 
       const host = await fetchUsername(data.hostUserId);

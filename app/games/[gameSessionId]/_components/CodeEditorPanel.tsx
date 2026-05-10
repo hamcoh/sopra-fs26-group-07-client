@@ -5,8 +5,9 @@ import CodeMirror from "@uiw/react-codemirror";
 import { indentUnit } from "@codemirror/language";
 import { python } from "@codemirror/lang-python";
 import { java } from "@codemirror/lang-java";
-import { SendOutlined, PlayCircleOutlined, LoadingOutlined } from "@ant-design/icons";
+import {SendOutlined, PlayCircleOutlined, LoadingOutlined, BulbOutlined} from "@ant-design/icons";
 import { ExecutionResult } from "../_types";
+import {useState} from "react";
 
 interface CodeEditorPanelProps {
   code: string;
@@ -18,6 +19,7 @@ interface CodeEditorPanelProps {
   onSubmit: () => void;
   runResult: ExecutionResult | null;
   submitResult: ExecutionResult | null;
+  hint?: string | null;
 }
 
 export default function CodeEditorPanel({
@@ -30,9 +32,11 @@ export default function CodeEditorPanel({
   onSubmit,
   runResult,
   submitResult,
+  hint,
 }: CodeEditorPanelProps) {
   const currentResult = runResult ?? submitResult;
   const testCases = currentResult && "testCases" in currentResult ? currentResult.testCases : null;
+  const [showHint, setShowHint] = useState(false);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px", flex: 1 }}>
@@ -59,11 +63,14 @@ export default function CodeEditorPanel({
           />
         </div>
         <div className={styles.actionRow}>
-          <button className={styles.runButton} onClick={onRun} disabled={isRunning || isSubmitting}>
+          <button className={styles.runButton} onClick={() => { setShowHint(false); onRun(); }} disabled={isRunning || isSubmitting}>
             {isRunning ? <LoadingOutlined spin /> : <><PlayCircleOutlined /> Run</>}
           </button>
-          <button className={styles.submitButton} onClick={onSubmit} disabled={isRunning || isSubmitting}>
+          <button className={styles.submitButton} onClick={() => { setShowHint(false); onSubmit(); }} disabled={isRunning || isSubmitting}>
             {isSubmitting ? <LoadingOutlined spin /> : <><SendOutlined /> Submit</>}
+          </button>
+          <button className={styles.hintButton} onClick={() => setShowHint(true)} disabled={!hint}>
+            <BulbOutlined /> Hint
           </button>
         </div>
       </div>
@@ -81,7 +88,21 @@ export default function CodeEditorPanel({
         </section>
         <hr className={styles.divider} />
         <div className={styles.outputContent}>
-          {testCases ? (
+          {showHint && hint ? (
+              <div style={{ padding: "16px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                  <span style={{ fontSize: "18px" }}>💡</span>
+                  <span style={{ fontWeight: 700, fontSize: "15px", color: "#ea580c" }}>Hint</span>
+                </div>
+                <div style={{
+                  border: "1px solid #fed7aa", borderRadius: "8px",
+                  padding: "14px 16px", background: "#fff7ed",
+                  fontSize: "14px", lineHeight: "1.6", color: "#374151"
+                }}>
+                  {hint}
+                </div>
+              </div>
+          ) : testCases ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "0 8px 20px 8px" }}>
               {currentResult?.summary && (
                 <div style={{ fontWeight: 600, fontSize: "16px", color: currentResult.status === "success" ? "#16a34a" : "#dc2626" }}>

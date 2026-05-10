@@ -10,6 +10,7 @@ import UserIdentity from "@/components/profile/blocks/UserIdentity";
 import ActionGroup from "@/components/profile/blocks/ActionGroup";
 import {useUserProfile} from "@/hooks/useUserProfile";
 import {useAuth} from "@/hooks/useAuth";
+import {getApiDomain} from "@/utils/domain";
 
 export default function OwnProfilePage() {
   const router = useRouter();
@@ -57,7 +58,22 @@ export default function OwnProfilePage() {
 
           <ProfileHeader onBack={() => router.push("/menu")} />
 
-          <UserIdentity username={username} joinedDate={joinedDate} bio={bio} avatarId={avatarId} isEditable={true} />
+          <UserIdentity username={username} joinedDate={joinedDate} bio={bio} avatarId={avatarId} isEditable={true} onBioSave={async (newBio) => {
+              try {
+                  const res = await fetch(`${getApiDomain()}/users/${userId}/bio`, {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json", token },
+                      body: JSON.stringify({ newBio: newBio }),
+                  });
+                  if (!res.ok) {
+                      const err = await res.json().catch(() => ({}));
+                      messageApi.error(err.message ?? "Failed to update bio");
+                  }
+              } catch (e) {
+                  messageApi.error("Connection error");
+              }
+          }}
+          />
 
           <StatGroup stats={stats} losses={losses} />
 
