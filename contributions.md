@@ -131,7 +131,7 @@ As some work was done in parallel on related features, there may be merge confli
 
 
 
-## Contributions Week 6 - 03.05.26 to 10.05.26
+## Contributions Week 6 - 04.05.26 to 10.05.26
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
@@ -140,8 +140,9 @@ As some work was done in parallel on related features, there may be merge confli
 | [@menthoos](https://github.com/menthoos)       | 06.05.2025   | https://github.com/hamcoh/sopra-fs26-group-07-client/commit/3d524e12c7a169822283f7aa5bbac72202d4ed88 | Refactored and split the game page.tsx into different parts to make it more modular and added the Itemshop UI, all the coins and item effects logic and the effects themselves. (#98, #99) | This commit is relevant because it implements the UI and all the logic for the ingame item shop. The game is more fun to play since players can now buy items / effects with coins during a game to sabotage their opponent in real-time. Also collecting points now becomes more meaningful because they also get turned into coins which can be used to buy items. |
 | [@menthoos](https://github.com/menthoos)       | 06.05.2025   | https://github.com/hamcoh/sopra-fs26-group-07-client/commit/3d524e12c7a169822283f7aa5bbac72202d4ed88 | Added the room chat UI, websocket connection + logic (#104, #105) and also fixed a small bug in the loading screen page when starting the game | This commit is relevant because it makes the game rooms even more interactive and therefore enhances the user experience. Users in the same room can now communicate in real-time via the room chat, which is a nice feature especially for players who dont know eachother or are playing the game from remote places. |
 | **[@aldigi27](https://github.com/aldigi27)** | 07.05.26 | https://github.com/hamcoh/sopra-fs26-group-07-server/commit/c862020cc1246563a9b2f084bde6608159f9b9f2 | [Issue 221](https://github.com/hamcoh/sopra-fs26-group-07-server/issues/221): Implemented the WebSocket functionalities for the in-room chat including message validation and personalized client-side error handling to provide feedback whenever messaging issues occur. | Allowing players to chat inside game rooms creates a more interactive and fun user experience. Players can now communicate with each other before the game starts, which allows them coordinate, socialize or clarify details such as who they are even playing with. |
+| **[@aldigi27](https://github.com/aldigi27)** | 10.05.26 | https://github.com/hamcoh/sopra-fs26-group-07-server/commit/02c67a48e1afc2e54298478fc6c03ff196dad62b | [Issue 178](https://github.com/hamcoh/sopra-fs26-group-07-server/issues/178): Implemented endpoint that computes and returns the 5 most difficult problems (i.e. the least successfully solved), including basic solving statistics and the requesting user’s performance on each problem (if the user solved them). (For more info, please consult: [PR description](https://github.com/hamcoh/sopra-fs26-group-07-server/pull/234))| Seeing some stats regarding the hardest problems could motivate players to improve their scores on those problems, while also giving high-performing players recognition for solving problems better than most others. Also, general game statistics may provide interesting insights into overall player performance and problem difficulty trends. |
 ---
 
-## Contributions Week X - [Begin Date] to [End Date]
+## Contributions Week 7 - 11.05.26 to 17.05.26
 
 _Continue with the same table format as above._
