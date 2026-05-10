@@ -27,24 +27,14 @@ interface RoomData {
   maxNumPlayers: number;
 }
 
+interface ChatMessage {
+  senderUsername: string;
+  content: string;
+  timestamp: string;
+}
+
 const formatEnum = (value: string) =>
   value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-
-const fadeOutAudio = (audio: HTMLAudioElement, durationMs: number, onComplete?: () => void) => {
-  const steps = 30;
-  const stepTime = durationMs / steps;
-  const volumeStep = audio.volume / steps;
-  const interval = setInterval(() => {
-    if (audio.volume > volumeStep) {
-      audio.volume = Math.max(0, audio.volume - volumeStep);
-    } else {
-      audio.volume = 0;
-      audio.pause();
-      clearInterval(interval);
-      onComplete?.();
-    }
-  }, stepTime);
-};
 
 export default function LobbyPage() {
   const router = useRouter();
@@ -60,6 +50,7 @@ export default function LobbyPage() {
   const [hostUsername, setHostUsername] = useState<string | null>(null);
   const [player2Username, setPlayer2Username] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
+  const [hostLeft, setHostLeft] = useState(false);
 
   const [hostAvatarId, setHostAvatarId] = useState<number | null>(null);
   const hostAvatarIdRef = useRef<number | null>(null);
@@ -69,7 +60,12 @@ export default function LobbyPage() {
   const hostUsernameRef = useRef<string | null>(null);
   const player2UsernameRef = useRef<string | null>(null);
   const isHostRef = useRef(false);
-  const lobbyAudioRef = useRef<HTMLAudioElement | null>(null);
+  const isLeavingRef = useRef(false);
+
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const stompClientRef = useRef<Client | null>(null);
 
   useEffect(() => {
     hostUsernameRef.current = hostUsername;
@@ -92,23 +88,8 @@ export default function LobbyPage() {
   }, [player2AvatarId]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const audio = new Audio("/sounds/LobbyTheme.mp3");
-    audio.loop = true;
-    audio.volume = 0.4;
-    lobbyAudioRef.current = audio;
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        const unlock = () => { audio.play(); };
-        document.addEventListener("click", unlock, { once: true });
-      });
-    }
-    return () => {
-      audio.pause();
-      audio.src = "";
-    };
-  }, []);
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
 
   const fetchUsername = async (
       id: number
@@ -166,6 +147,9 @@ export default function LobbyPage() {
           setPlayer2Username(p2.username);
           setPlayer2AvatarId(p2.avatarId);
         }
+      } else {
+        setPlayer2Username(null);
+        setPlayer2AvatarId(null);
       }
     } catch (err) {
       console.error(err);
@@ -185,11 +169,36 @@ export default function LobbyPage() {
         },
       });
       if (!res.ok) throw new Error("Failed to start game");
-
     } catch (err) {
       console.error(err);
       alert("Failed to start game");
     }
+  };
+
+  const handleLeaveRoom = async () => {
+    isLeavingRef.current = true;
+    try {
+      await fetch(`${getApiDomain()}/rooms/${roomId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "token": token,
+          "userId": String(userId),
+        },
+      });
+    } catch (err) {
+      console.error("Failed to leave room:", err);
+    }
+    router.push("/rooms");
+  };
+
+  const handleSendMessage = () => {
+    if (!chatInput.trim() || !stompClientRef.current?.active) return;
+    stompClientRef.current.publish({
+      destination: `/app/room/${roomId}/send`,
+      body: JSON.stringify({ senderUsername: username, content: chatInput.trim() }),
+    });
+    setChatInput("");
   };
 
   // 1. Initial room fetch
@@ -211,27 +220,30 @@ export default function LobbyPage() {
 
         client.subscribe(`/topic/room/${roomId}`, async (message: IMessage) => {
           console.log("Room update received:", message.body);
-          await fetchRoom();
+
+          if (isLeavingRef.current) return;
+
+          const parsed = JSON.parse(message.body);
+
+          if (parsed.type === "ROOM_CLOSED") {
+            setHostLeft(true);
+            setTimeout(() => router.push("/menu"), 3000);
+          } else if (parsed.type === "PLAYER_LEFT") {
+            await fetchRoom();
+          } else {
+            await fetchRoom();
+          }
         });
 
-        //listens for the game start. Is personalized so each player receives his own message
         client.subscribe(`/user/queue/game-start`, (message: IMessage) => {
           setIsStarting(true);
           const gameData = JSON.parse(message.body);
-
-          if (lobbyAudioRef.current) {
-            fadeOutAudio(lobbyAudioRef.current, 200, () => {
-              const drums = new Audio("/sounds/DrumGameStart.mp3");
-              drums.volume = 0.8;
-              drums.play().catch(console.error);
-            });
-          }
           console.log("Game started:", gameData);
           const isHost = isHostRef.current;
 
           const opponentName = isHost
-                  ? player2UsernameRef.current
-                  : hostUsernameRef.current;
+              ? player2UsernameRef.current
+              : hostUsernameRef.current;
 
           const opponentAvatarId = isHost
               ? player2AvatarIdRef.current
@@ -247,11 +259,22 @@ export default function LobbyPage() {
               : "python";
           localStorage.setItem(
             "gameRoundData",
-            JSON.stringify({ ...gameData, gameLanguage, opponentName: opponentName ?? "Opponent", opponentAvatarId: opponentAvatarId ?? 1, playerAvatarId: playerAvatarId ?? 1, })
+            JSON.stringify({
+              ...gameData,
+              gameLanguage,
+              opponentName: opponentName ?? "Opponent",
+              opponentAvatarId: opponentAvatarId ?? 1,
+              playerAvatarId: playerAvatarId ?? 1,
+            })
           );
           setTimeout(() => {
             router.push(`/games/${gameData.gameSessionId}`);
           }, 3000);
+        });
+
+        client.subscribe(`/topic/chat/room/${roomId}`, (message: IMessage) => {
+          const msg: ChatMessage = JSON.parse(message.body);
+          setChatMessages(prev => [...prev, msg]);
         });
       },
       
@@ -261,6 +284,7 @@ export default function LobbyPage() {
       },
     });
 
+    stompClientRef.current = client;
     client.activate();
     return () => { client.deactivate(); };
   }, [token, roomId]);
@@ -273,9 +297,31 @@ export default function LobbyPage() {
   };
 
   if (isStarting) {
+    return <LoadingScreen />;
+  }
+
+  if (hostLeft) {
     return (
-        <LoadingScreen/>
-    )
+      <div className={styles.pageBackground}>
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          gap: "16px",
+          textAlign: "center",
+        }}>
+          <div style={{ fontSize: 48 }}>🚪</div>
+          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#1a1a2e", margin: 0 }}>
+            The host has left the arena
+          </h2>
+          <p style={{ color: "#6b7280", margin: 0 }}>
+            The room has been closed. Redirecting you to the menu...
+          </p>
+        </div>
+      </div>
+    );
   }
 
   if (!room) {
@@ -295,7 +341,7 @@ export default function LobbyPage() {
     <div className={styles.pageBackground}>
       <div className={styles.content}>
 
-        <button className={styles.backButton} onClick={() => router.push("/menu")}>
+        <button className={styles.backButton} onClick={handleLeaveRoom}>
           <ArrowLeftOutlined /> Leave Arena
         </button>
 
@@ -418,14 +464,68 @@ export default function LobbyPage() {
           </div>
 
           <button
-  className={styles.enterArenaButton}
-  disabled={!bothReady || !isCurrentUserHost}
-  onClick={handleStartGame}
->
-  <ThunderboltFilled style={{ fontSize: 28 }} />
-  <span>Enter Arena</span>
-</button>
+            className={styles.enterArenaButton}
+            disabled={!bothReady || !isCurrentUserHost}
+            onClick={handleStartGame}
+          >
+            <ThunderboltFilled style={{ fontSize: 28 }} />
+            <span>Enter Arena</span>
+          </button>
         </div>
+        {/* CHAT */}
+        <div className={styles.chatCard}>
+          <h3 className={styles.configTitle}>
+            <span className={styles.configDot} style={{ background: "#22c55e" }} />
+            Arena Chat
+          </h3>
+
+          <div className={styles.chatMessages}>
+            {chatMessages.length === 0 && (
+              <p style={{ color: "#9ca3af", fontSize: 13, textAlign: "center", margin: "auto 0" }}>
+                No messages yet. Say hello! 👋
+              </p>
+            )}
+            {chatMessages.map((msg, i) => {
+              const isMe = msg.senderUsername === username;
+              const avatarId = msg.senderUsername === hostUsername ? hostAvatarId : player2AvatarId;
+              return (
+                <div key={i} className={`${styles.chatMessage} ${isMe ? styles.chatMessageMe : ""}`}>
+                  {!isMe && (
+                    <div className={styles.chatAvatar}>
+                      <CodosseumAvatar id={avatarId ?? 1} size={32} variant="room" />
+                    </div>
+                  )}
+                  <div className={styles.chatBubbleGroup}>
+                    {!isMe && <span className={styles.chatSenderName}>{msg.senderUsername}</span>}
+                    <div className={`${styles.chatBubble} ${isMe ? styles.chatBubbleMe : styles.chatBubbleOther}`}>
+                      {msg.content}
+                    </div>
+                  </div>
+                  {isMe && (
+                    <div className={styles.chatAvatar}>
+                      <CodosseumAvatar id={avatarId ?? 1} size={32} variant="room" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            <div ref={chatEndRef} />
+          </div>
+
+  <div className={styles.chatInputRow}>
+    <input
+      className={styles.chatInput}
+      value={chatInput}
+      onChange={e => setChatInput(e.target.value)}
+      onKeyDown={e => e.key === "Enter" && handleSendMessage()}
+      placeholder="Type a message..."
+      maxLength={255}
+    />
+    <button className={styles.chatSendButton} onClick={handleSendMessage}>
+      Send
+    </button>
+  </div>
+</div>
 
       </div>
     </div>

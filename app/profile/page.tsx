@@ -57,7 +57,7 @@ export default function OwnProfilePage() {
 
           <ProfileHeader onBack={() => router.push("/menu")} />
 
-          <UserIdentity username={username} joinedDate={joinedDate} bio={bio} avatarId={avatarId} />
+          <UserIdentity username={username} joinedDate={joinedDate} bio={bio} avatarId={avatarId} isEditable={true} />
 
           <StatGroup stats={stats} losses={losses} />
 
