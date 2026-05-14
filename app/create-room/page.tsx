@@ -5,6 +5,7 @@ import {
   ArrowLeftOutlined,
   TrophyOutlined,
   ThunderboltFilled,
+  ThunderboltOutlined,
   CodeFilled,
   TrophyFilled,
   OrderedListOutlined,
@@ -46,7 +47,7 @@ export default function CreateRoomPage() {
 
   const [language, setLanguage] = useState("PYTHON");
   const [difficulty, setDifficulty] = useState("EASY");
-  const [mode, setMode] = useState("RACE");
+  const [mode, setMode] = useState("SPRINT_ARCADE");
   const [numProblems, setNumProblems] = useState(3);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -201,15 +202,25 @@ export default function CreateRoomPage() {
             </h3>
             <div className={styles.optionsRow}>
               <div
-                className={`${styles.optionCard} ${styles.orangeHover} ${
-                  mode === "RACE" ? styles.selectedOrange : ""
-                }`}
-                onClick={() => setMode("RACE")}
+                className={`${styles.optionCard} ${styles.orangeHover} ${mode === "SPRINT_ARCADE" ? styles.selectedOrange : ""
+                  }`}
+                onClick={() => setMode("SPRINT_ARCADE")}
               >
                 <TrophyOutlined className={styles.gameModeIcon} />
                 <div>
-                  <p className={styles.optionName}>Race</p>
-                  <p className={styles.optionDesc}>First to solve all of the problems wins the game</p>
+                  <p className={styles.optionName}>Sprint Arcade</p>
+                  <p className={styles.optionDesc}>Race with coins, items, and sabotage</p>
+                </div>
+              </div>
+              <div
+                className={`${styles.optionCard} ${styles.orangeHover} ${mode === "SPRINT_CLASSIC" ? styles.selectedOrange : ""
+                  }`}
+                onClick={() => setMode("SPRINT_CLASSIC")}
+              >
+                <ThunderboltOutlined className={styles.gameModeIcon} />
+                <div>
+                  <p className={styles.optionName}>Sprint Classic</p>
+                  <p className={styles.optionDesc}>Pure 1v1 coding race. No items, no distractions</p>
                 </div>
               </div>
             </div>

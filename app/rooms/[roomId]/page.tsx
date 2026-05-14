@@ -34,7 +34,7 @@ interface ChatMessage {
 }
 
 const formatEnum = (value: string) =>
-  value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+  value.split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
 
 const fadeOutAudio = (audio: HTMLAudioElement, durationMs: number, onComplete?: () => void) => {
   const steps = 30;
@@ -170,6 +170,7 @@ export default function LobbyPage() {
       if (typeof window !== "undefined") {
         localStorage.setItem("roomLanguage", (data.gameLanguage ?? "PYTHON").toLowerCase());
         localStorage.setItem("roomDifficulty", (data.gameDifficulty ?? "EASY"));
+        localStorage.setItem("roomMode", (data.gameMode ?? "SPRINT_ARCADE"));
       }
 
       const host = await fetchUsername(data.hostUserId);

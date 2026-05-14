@@ -27,7 +27,7 @@ interface RoomData {
 }
 
 const formatEnum = (value: string) =>
-  value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+  value.split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
 
 export default function RoomsPage() {
   const router = useRouter();

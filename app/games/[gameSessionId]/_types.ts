@@ -11,6 +11,7 @@ export interface GameRoundData {
     outputFormat: string;
     constraints: string;
     gameLanguage: string;
+    gameMode?: string;  
     opponentName?: string;
     playerAvatarId?: number;
     opponentAvatarId?: number;
