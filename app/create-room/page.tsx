@@ -34,6 +34,7 @@ const PythonIcon = () => (
     <path fill="url(#pyYellow)" d="M128.757 254.126c64.832 0 60.784-28.115 60.784-28.115l-.072-29.127H127.6v-8.745h86.441s41.486 4.705 41.486-60.712c0-65.416-36.21-63.096-36.21-63.096h-21.61v30.355s1.165 36.21-35.632 36.21h-61.362s-34.475-.557-34.475 33.32v56.013s-5.235 33.897 62.518 33.897zm34.114-19.586a11.12 11.12 0 0 1-11.13-11.13 11.12 11.12 0 0 1 11.13-11.13 11.12 11.12 0 0 1 11.13 11.13 11.12 11.12 0 0 1-11.13 11.13z"/>
   </svg>
 );
+
 const JavaIcon = () => (
     <svg
         width="60" height="60" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
@@ -151,6 +152,18 @@ export default function CreateRoomPage() {
                 <div>
                   <p className={styles.optionName}>Python</p>
                   <p className={styles.optionDesc}>Problems will have to be solved in Python</p>
+                </div>
+              </div>
+              <div
+                className={`${styles.optionCard} ${styles.blueHover} ${
+                  language === "JAVA" ? styles.selectedBlue : ""
+                }`}
+                onClick={() => setLanguage("JAVA")}
+              >
+                <JavaIcon />
+                <div>
+                  <p className={styles.optionName}>Java</p>
+                  <p className={styles.optionDesc}>Problems will have to be solved in Java</p>
                 </div>
               </div>
             </div>

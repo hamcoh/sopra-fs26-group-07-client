@@ -22,9 +22,11 @@ const GAME_DURATION_MS = 15 * 60 * 1000;
 const pythonStarter = `def solve(x):
     # Write your solution here
     return None`;
-
-const javaStarter = `public class Main {
-    public static void main(String[] args) {
+    
+const javaStarter = `class Solution {
+    public static Object solve(String x) {
+        // Write your solution here
+        return null;
     }
 }`;
 
