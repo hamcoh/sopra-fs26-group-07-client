@@ -673,3 +673,87 @@
 .hintButton :global(.anticon) {
     font-size: 16px;
 }
+
+/* ─── SQUID INK EFFECT ─── */
+
+.squidFlyWrapper {
+    position: fixed;
+    top: 28%;
+    left: 71%;  
+    width: 160px;
+    transform: translate(-50%, -50%);
+    z-index: 9500;
+    pointer-events: none;
+    animation: squidFly 2.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes squidFly {
+    0% {
+        transform: translate(calc(-50% + 700px), calc(-50% - 450px)) rotate(-50deg);
+        opacity: 0;
+    }
+    14% { opacity: 1; }
+    52% {
+        transform: translate(-50%, -50%) rotate(6deg);
+        opacity: 1;
+    }
+    60% {
+        transform: translate(-50%, -50%) rotate(-4deg) scale(0.88);
+    }
+    70% {
+        transform: translate(-50%, -50%) rotate(2deg) scale(1.08);
+    }
+    78% { opacity: 1; }
+    100% {
+        transform: translate(calc(-50% - 600px), calc(-50% + 500px)) rotate(45deg);
+        opacity: 0;
+    }
+}
+
+
+.squidWobble {
+    width: 100%;
+    height: auto;
+    animation: squidWobble 0.22s ease-in-out infinite;
+    user-select: none;
+}
+
+@keyframes squidWobble {
+    0%, 100% { transform: rotate(-5deg) scaleY(1) scaleX(1); }
+    50%       { transform: rotate(5deg)  scaleY(0.9); }
+}
+
+
+/* Splatter — centered on the Monaco code editor area */
+.splatterOverlay {
+    position: fixed;
+    top: 28%;
+    left: 71%;
+    transform: translate(-50%, -50%);
+    width: 58vw;
+    z-index: 8900;
+    pointer-events: none;
+    animation: splatterPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.splatterImg {
+    width: 100%;
+    height: auto;
+    display: block;
+    opacity: 0.96;
+    user-select: none;
+}
+
+.splatterExit {
+    animation: splatterFade 0.55s ease forwards !important;
+}
+
+@keyframes splatterPop {
+    0%   { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+}
+
+@keyframes splatterFade {
+    from { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
+    to   { transform: translate(-50%, -50%) scale(1.04); opacity: 0; }
+}

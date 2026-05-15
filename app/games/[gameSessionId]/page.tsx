@@ -16,6 +16,7 @@ import ProblemPanel from "./_components/ProblemPanel";
 import CodeEditorPanel from "./_components/CodeEditorPanel";
 import ItemShop from "./_components/ItemShop";
 import { ExecutionResult, GameEndDTO, GameRoundData, PlayerGameSummaryDTO, Problem } from "./_types";
+import SquidInkEffect from "./_components/SquidInkEffect";
 
 const GAME_DURATION_MS = 15 * 60 * 1000;
 
@@ -476,7 +477,7 @@ export default function GamePage() {
       <div
         className={`${styles.content} ${activeEffects.has("jitter") ? styles.jitterActive : ""} ${activeEffects.has("rotate") ? styles.rotateActive : ""}`}
       >
-        {activeEffects.has("ink") && <div className={styles.inkOverlay} />}
+        <SquidInkEffect active={activeEffects.has("ink")} />
 
         {/* LEFT COLUMN */}
         <div style={{ display: "flex", flexDirection: "column", gap: "16px", flex: 1, minWidth: 0 }}>
