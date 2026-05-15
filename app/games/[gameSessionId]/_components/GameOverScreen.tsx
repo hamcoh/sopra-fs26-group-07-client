@@ -1,12 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import CodosseumLogo from "@/components/CodosseumLogo";
+import CodosseumAvatar from "@/components/CodosseumAvatar";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { getApiDomain } from "@/utils/domain";
 import styles from "@/styles/game.module.css";
 import resultStyles from "@/styles/results.module.css";
-import { TrophyOutlined } from "@ant-design/icons";
 import { GameEndDTO, PlayerGameSummaryDTO } from "../_types";
+
+const SPARKLE_POSITIONS = [
+  { left: "4%",  top: "18%", size: 7,  delay: "0.0s" },
+  { left: "11%", top: "62%", size: 5,  delay: "0.5s" },
+  { left: "19%", top: "28%", size: 8,  delay: "0.9s" },
+  { left: "28%", top: "72%", size: 4,  delay: "0.3s" },
+  { left: "37%", top: "14%", size: 6,  delay: "1.2s" },
+  { left: "47%", top: "52%", size: 5,  delay: "0.7s" },
+  { left: "56%", top: "22%", size: 9,  delay: "1.5s" },
+  { left: "64%", top: "78%", size: 4,  delay: "0.2s" },
+  { left: "72%", top: "38%", size: 6,  delay: "1.0s" },
+  { left: "80%", top: "66%", size: 7,  delay: "0.4s" },
+  { left: "89%", top: "24%", size: 5,  delay: "1.3s" },
+  { left: "95%", top: "58%", size: 4,  delay: "0.8s" },
+];
+
+interface UserStats {
+  totalPoints: number;
+  wins: number;
+  losses: number;
+  gamesPlayed: number;
+  winRate: number;
+}
 
 interface GameOverScreenProps {
   storedUsername: string;
@@ -15,6 +40,8 @@ interface GameOverScreenProps {
   gameEndData: GameEndDTO | null;
   gameSummary: PlayerGameSummaryDTO | null;
   gameSessionId: string | string[];
+  storedAvatarId: number;
+  opponentAvatarId: number;
 }
 
 export default function GameOverScreen({
@@ -24,9 +51,46 @@ export default function GameOverScreen({
   gameEndData,
   gameSummary,
   gameSessionId,
+  storedAvatarId,
+  opponentAvatarId,
 }: GameOverScreenProps) {
   const router = useRouter();
+  const { value: userId } = useLocalStorage("userid", "");
+  const { value: token } = useLocalStorage("token", "");
   const [expandedSolutions, setExpandedSolutions] = useState<Set<string>>(new Set());
+  const [myStats, setMyStats] = useState<UserStats | null>(null);
+  const [opponentStats, setOpponentStats] = useState<UserStats | null>(null);
+
+  const myUserIdNum = userId ? Number(userId) : null;
+  const opponentUserId = gameEndData?.playerScores?.find(p => p.userId !== myUserIdNum)?.userId ?? null;
+
+  const parseStats = (data: Record<string, number>): UserStats => {
+    const wins = data.winCount ?? 0;
+    const gamesPlayed = data.totalGamesPlayed ?? 0;
+    return {
+      totalPoints: data.totalPoints ?? 0,
+      wins,
+      losses: gamesPlayed - wins,
+      gamesPlayed,
+      winRate: data.winRatePercentage != null ? Math.round(data.winRatePercentage) : 0,
+    };
+  };
+
+  useEffect(() => {
+    if (!token) return;
+    if (myUserIdNum) {
+      fetch(`${getApiDomain()}/users/${myUserIdNum}`, { headers: { token } })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => { if (data) setMyStats(parseStats(data)); })
+        .catch(() => {});
+    }
+    if (opponentUserId) {
+      fetch(`${getApiDomain()}/users/${opponentUserId}`, { headers: { token } })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => { if (data) setOpponentStats(parseStats(data)); })
+        .catch(() => {});
+    }
+  }, [myUserIdNum, opponentUserId, token]);
 
   const toggleSolution = (id: string) => {
     setExpandedSolutions(prev => {
@@ -40,8 +104,43 @@ export default function GameOverScreen({
   const solvedCorrectly = gameSummary?.problemResults?.solvedCorrectly ?? [];
   const notSolved = gameSummary?.problemResults?.notSolvedFullyCorrectly ?? [];
 
+  const isWin  = myScore > (opponent?.score ?? 0);
+  const isDraw = myScore === (opponent?.score ?? 0);
+
+  const caesarSrc = isWin ? "/caesar_win.png" : isDraw ? "/caesar_draw.png" : "/caesar_lose.png";
+
+  const heroGradient = isWin
+    ? "linear-gradient(135deg, #d97706 0%, #b45309 55%, #78350f 100%)"
+    : isDraw
+    ? "linear-gradient(135deg, #4361ee 0%, #6366f1 55%, #4338ca 100%)"
+    : "linear-gradient(135deg, #dc2626 0%, #b91c1c 55%, #7f1d1d 100%)";
+
+  const myAvatarColor  = isWin ? "#d97706" : isDraw ? "#6366f1" : "#dc2626";
+  const oppAvatarColor = !isWin && !isDraw ? "#d97706" : isDraw ? "#6366f1" : "#dc2626";
+  const myScoreColor   = isWin ? "#d97706" : isDraw ? "#6366f1" : "#dc2626";
+  const oppScoreColor  = !isWin && !isDraw ? "#d97706" : isDraw ? "#6366f1" : "#dc2626";
+
+  const renderStats = (stats: UserStats | null) => (
+    <div className={resultStyles.statsGrid}>
+      {[
+        { label: "Win Rate", value: stats ? `${stats.winRate}%` : "—" },
+        { label: "Wins",     value: stats != null ? stats.wins     : "—" },
+        { label: "Losses",   value: stats != null ? stats.losses   : "—" },
+        { label: "Games",    value: stats != null ? stats.gamesPlayed : "—" },
+        { label: "Pts",      value: stats != null ? stats.totalPoints : "—" },
+      ].map(({ label, value }) => (
+        <div key={label} className={resultStyles.statItem}>
+          <div className={resultStyles.statValue}>{String(value)}</div>
+          <div className={resultStyles.statLabel}>{label}</div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
-    <div className={resultStyles.pageBackground}>
+    <div className={`${resultStyles.pageBackground} ${isWin ? resultStyles.winBg : isDraw ? resultStyles.drawBg : resultStyles.loseBg}`}>
+
+      {/* HEADER */}
       <div className={styles.topRow}>
         <div className={styles.logoArea}>
           <CodosseumLogo size={100} />
@@ -50,60 +149,102 @@ export default function GameOverScreen({
             <p className={styles.logoSubtitle}>Game Results</p>
           </div>
         </div>
-        <div className={resultStyles.headerButtons} style={{ display: "flex", gap: "12px", flexShrink: 0, whiteSpace: "nowrap" }}>
-          <button className={resultStyles.secondaryButton} onClick={() => router.push("/menu")} style={{ minWidth: "fit-content" }}>
+        <div className={resultStyles.headerButtons}>
+          <button className={resultStyles.secondaryButton} onClick={() => router.push("/menu")}>
             Back to Menu
           </button>
-          <button className={resultStyles.primaryButton} onClick={() => router.push("/leaderboard")} style={{ minWidth: "fit-content" }}>
+          <button className={resultStyles.primaryButton} onClick={() => router.push("/leaderboard")}>
             View Leaderboard
           </button>
         </div>
       </div>
 
+      {/* SCROLLABLE CONTENT */}
       <div className={resultStyles.resultsContent}>
-        <div className={resultStyles.victoryBanner}>
-          <TrophyOutlined className={resultStyles.trophyIcon} style={{ fontSize: "48px", marginBottom: "10px" }} />
-          <h1 className={resultStyles.victoryTitle}>
-            {myScore > (opponent?.score ?? 0) ? "Victory!" : myScore === opponent?.score ? "It's a Tie!" : "Defeat!"}
-          </h1>
-          <p>
-            {myScore > (opponent?.score ?? 0)
-              ? `${storedUsername} wins the battle!`
-              : myScore === opponent?.score
-              ? "Great minds think alike!"
-              : `${opponent?.username} takes the win!`}
-          </p>
-          <span className={resultStyles.sessionText}>Session {gameSessionId}</span>
+
+        {/* HERO BANNER */}
+        <div className={resultStyles.heroWrapper}>
+          <div className={resultStyles.heroBanner} style={{ background: heroGradient }}>
+            <div className={resultStyles.heroCircle1} />
+            <div className={resultStyles.heroCircle2} />
+
+            {isWin && SPARKLE_POSITIONS.map((s, i) => (
+              <div
+                key={i}
+                className={resultStyles.sparkle}
+                style={{ left: s.left, top: s.top, width: `${s.size}px`, height: `${s.size}px`, animationDelay: s.delay }}
+              />
+            ))}
+
+            <div className={resultStyles.heroBannerLeft}>
+              <div className={resultStyles.outcomePill}>
+                {isWin ? "🏆 Victory" : isDraw ? "🤝 Draw" : "💀 Defeat"}
+              </div>
+              <h1 className={resultStyles.outcomeText}>
+                {isWin ? "VICTORY!" : isDraw ? "DRAW!" : "DEFEAT!"}
+              </h1>
+              <p className={resultStyles.outcomeSubtext}>
+                {isWin
+                  ? `${storedUsername} conquers the arena!`
+                  : isDraw
+                  ? "Two gladiators, equal might!"
+                  : `${opponent?.username ?? "Opponent"} claims the glory!`}
+              </p>
+              <span className={resultStyles.sessionBadge}>Session #{gameSessionId}</span>
+            </div>
+          </div>
+
+          <img
+            src={caesarSrc}
+            alt={isWin ? "Caesar victorious" : isDraw ? "Caesar neutral" : "Caesar defeated"}
+            className={resultStyles.caesarHero}
+          />
         </div>
 
-        <div className={resultStyles.playerScoreBox} style={{ display: "flex", gap: "20px", justifyContent: "center" }}>
-          <div className={`${resultStyles.playerCard} ${myScore >= (opponent?.score ?? 0) ? resultStyles.winnerCard : ""}`}>
-            <div className={resultStyles.cardHeader}>
-              <strong>{storedUsername} (You)</strong>
-              {myScore >= (opponent?.score ?? 0) && <TrophyOutlined style={{ color: "#eab308", fontSize: "24px" }} />}
+        {/* PLAYER DUEL ROW */}
+        <div className={resultStyles.duelRow}>
+
+          {/* My card */}
+          <div className={`${resultStyles.duelCard} ${isWin ? resultStyles.cardWin : isDraw ? resultStyles.cardDraw : resultStyles.cardLose}`}>
+            {isWin && <span className={resultStyles.crownEmoji}>👑</span>}
+            <div className={resultStyles.avatarWrapper}>
+              <CodosseumAvatar id={storedAvatarId} size={80} backgroundColor={myAvatarColor} />
             </div>
-            <div className={resultStyles.pointsText}>
-              {myScore} <span className={resultStyles.pointsLabel}>points</span>
+            <div className={resultStyles.nameRow}>
+              <div className={resultStyles.playerName}>{storedUsername}</div>
+              <div className={resultStyles.youBadge}>YOU</div>
             </div>
+            <div className={resultStyles.playerScore} style={{ color: myScoreColor }}>{myScore}</div>
+            <div className={resultStyles.playerPts}>pts this game</div>
+            {renderStats(myStats)}
           </div>
-          <div className={`${resultStyles.playerCard} ${opponent && opponent.score >= myScore ? resultStyles.winnerCard : ""}`}>
-            <div className={resultStyles.cardHeader}>
-              <strong>{opponent ? opponent.username : "Opponent"}</strong>
-              {opponent && opponent.score >= myScore && <TrophyOutlined style={{ color: "#eab308", fontSize: "24px" }} />}
-            </div>
-            <div className={resultStyles.pointsText}>
-              {opponent ? opponent.score : 0} <span className={resultStyles.pointsLabel}>points</span>
-            </div>
+
+          {/* VS separator */}
+          <div className={resultStyles.vsColumn}>
+            <div className={resultStyles.vsDividerLine} />
+            <span className={resultStyles.vsText}>VS</span>
+            <div className={resultStyles.vsDividerLine} />
           </div>
+
+          {/* Opponent card */}
+          <div className={`${resultStyles.duelCard} ${!isWin && !isDraw ? resultStyles.cardWin : isDraw ? resultStyles.cardDraw : resultStyles.cardLose}`}>
+            {!isWin && !isDraw && <span className={resultStyles.crownEmoji}>👑</span>}
+            <div className={resultStyles.avatarWrapper}>
+              <CodosseumAvatar id={opponentAvatarId} size={80} backgroundColor={oppAvatarColor} />
+            </div>
+            <div className={resultStyles.playerName}>{opponent?.username ?? "Opponent"}</div>
+            <div className={resultStyles.playerScore} style={{ color: oppScoreColor }}>{opponent?.score ?? 0}</div>
+            <div className={resultStyles.playerPts}>pts this game</div>
+            {renderStats(opponentStats)}
+          </div>
+
         </div>
 
         {/* SAMPLE SOLUTIONS */}
         {gameEndData?.gameSessionSampleSolutions &&
           Object.keys(gameEndData.gameSessionSampleSolutions).length > 0 && (
           <div className={resultStyles.problemsSection}>
-            <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1a1a2e", margin: "0 0 20px 0" }}>
-              Sample Solutions
-            </h2>
+            <h2 className={resultStyles.solutionsTitle}>📋 Sample Solutions</h2>
             {Object.entries(gameEndData.gameSessionSampleSolutions).map(([problemId, solution], index) => {
               const isExpanded = expandedSolutions.has(problemId);
               const pid = Number(problemId);
@@ -143,6 +284,7 @@ export default function GameOverScreen({
             })}
           </div>
         )}
+
       </div>
     </div>
   );

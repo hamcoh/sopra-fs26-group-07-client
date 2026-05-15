@@ -15,7 +15,8 @@ import ScoreBox from "./_components/ScoreBox";
 import ProblemPanel from "./_components/ProblemPanel";
 import CodeEditorPanel from "./_components/CodeEditorPanel";
 import ItemShop from "./_components/ItemShop";
-import { ExecutionResult, GameRoundData, Problem } from "./_types";
+import { ExecutionResult, GameEndDTO, GameRoundData, PlayerGameSummaryDTO, Problem } from "./_types";
+import SquidInkEffect from "./_components/SquidInkEffect";
 
 const GAME_DURATION_MS = 15 * 60 * 1000;
 
@@ -69,6 +70,14 @@ export default function GamePage() {
   const [coinBalance, setCoinBalance] = useState<number>(0);
   const [gameMode, setGameMode] = useState<string>("SPRINT_ARCADE");
 
+  const [savedResult, setSavedResult] = useState<{
+    myScore: number;
+    opponentScore: number;
+    opponentUsername: string;
+    gameEndData: GameEndDTO | null;
+    gameSummary: PlayerGameSummaryDTO | null;
+  } | null>(null);
+
   const me = players[String(userId)];
   const allPlayers = Object.entries(players);
   const opponentEntry = userId ? allPlayers.find(([id]) => id !== String(userId)) : null;
@@ -99,6 +108,24 @@ export default function GamePage() {
   useEffect(() => {
     fetchCoinBalance();
   }, [userId, token]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`gameResult_${gameSessionId}`);
+    if (saved) {
+      try { setSavedResult(JSON.parse(saved)); } catch {}
+    }
+  }, [gameSessionId]);
+
+  useEffect(() => {
+    if (!isGameOver) return;
+    localStorage.setItem(`gameResult_${gameSessionId}`, JSON.stringify({
+      myScore,
+      opponentScore: opponent?.score ?? 0,
+      opponentUsername: opponent?.username ?? "Opponent",
+      gameEndData,
+      gameSummary,
+    }));
+  }, [isGameOver]);
 
   // Load problem data from localStorage (saved by lobby page on game-start WS)
   useEffect(() => {
@@ -331,15 +358,22 @@ export default function GamePage() {
   };
 
   // GAME OVER screen
-  if (isGameOver) {
+  if (isGameOver || savedResult) {
+    const effectiveScore    = isGameOver ? myScore : (savedResult?.myScore ?? 0);
+    const effectiveOpponent = isGameOver
+      ? opponent
+      : { username: savedResult?.opponentUsername ?? "Opponent", score: savedResult?.opponentScore ?? 0 };
+
     return (
       <GameOverScreen
         storedUsername={storedUsername}
-        myScore={myScore}
-        opponent={opponent}
-        gameEndData={gameEndData}
-        gameSummary={gameSummary}
+        myScore={effectiveScore}
+        opponent={effectiveOpponent}
+        gameEndData={isGameOver ? gameEndData : (savedResult?.gameEndData ?? null)}
+        gameSummary={isGameOver ? gameSummary : (savedResult?.gameSummary ?? null)}
         gameSessionId={gameSessionId}
+        storedAvatarId={playerAvatarId}
+        opponentAvatarId={opponentAvatarId}
       />
     );
   }
@@ -443,7 +477,7 @@ export default function GamePage() {
       <div
         className={`${styles.content} ${activeEffects.has("jitter") ? styles.jitterActive : ""} ${activeEffects.has("rotate") ? styles.rotateActive : ""}`}
       >
-        {activeEffects.has("ink") && <div className={styles.inkOverlay} />}
+        <SquidInkEffect active={activeEffects.has("ink")} />
 
         {/* LEFT COLUMN */}
         <div style={{ display: "flex", flexDirection: "column", gap: "16px", flex: 1, minWidth: 0 }}>
