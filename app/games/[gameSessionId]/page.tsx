@@ -65,6 +65,7 @@ export default function GamePage() {
   const [runResult, setRunResult] = useState<ExecutionResult | null>(null);
   const [submitResult, setSubmitResult] = useState<ExecutionResult | null>(null);
   const [coinBalance, setCoinBalance] = useState<number>(0);
+  const [gameMode, setGameMode] = useState<string>("SPRINT_ARCADE");
 
   const me = players[String(userId)];
   const allPlayers = Object.entries(players);
@@ -82,6 +83,8 @@ export default function GamePage() {
 
   const fetchCoinBalance = async () => {
     if (!userId || !token) return;
+    const currentMode = localStorage.getItem("roomMode") ?? "SPRINT_ARCADE";
+    if (currentMode !== "SPRINT_ARCADE") return;
     try {
       const res = await fetch(`${getApiDomain()}/users/${userId}`, { headers: { token } });
       const data = await res.json();
@@ -115,6 +118,8 @@ export default function GamePage() {
       });
       const lang = (data.gameLanguage ?? "python").toLowerCase();
       setLanguage(lang);
+      const storedMode = localStorage.getItem("roomMode") ?? "SPRINT_ARCADE";
+      setGameMode(storedMode);
       setCode(lang === "java" ? javaStarter : pythonStarter);
       setProblem({
         id: data.problemId,
@@ -303,7 +308,7 @@ export default function GamePage() {
 
   // BUY ITEM
   const handleBuyItem = async (itemId: string, enumValue: string): Promise<boolean> => {
-    if (!token || playerSessionId == null) return false;
+    if (!token || playerSessionId == null || gameMode !== "SPRINT_ARCADE") return false;
     try {
       const response = await fetch(`${getApiDomain()}/games/${gameSessionId}/sabotage`, {
         method: "POST",
@@ -358,7 +363,7 @@ export default function GamePage() {
       )}
 
       {/* SABOTAGE NOTIFICATION */}
-      {sabotageNotification && (() => {
+      {gameMode === "SPRINT_ARCADE" && sabotageNotification && (() => {
         const effect = EFFECT_DISPLAY[sabotageNotification];
         return (
           <div style={{
@@ -441,7 +446,9 @@ export default function GamePage() {
         {/* LEFT COLUMN */}
         <div style={{ display: "flex", flexDirection: "column", gap: "16px", flex: 1, minWidth: 0 }}>
           <ProblemPanel problem={problem} language={language} timeLeft={timeLeft} />
-          <ItemShop coinBalance={coinBalance} onBuyItem={handleBuyItem} />
+          {gameMode === "SPRINT_ARCADE" && (
+            <ItemShop coinBalance={coinBalance} onBuyItem={handleBuyItem} />
+          )}
         </div>
 
         <CodeEditorPanel
