@@ -4,7 +4,7 @@ import {useState, useEffect, useRef} from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
   ArrowLeftOutlined, UserOutlined, CrownFilled,
-  CopyOutlined, TrophyOutlined, ThunderboltFilled,
+  CopyOutlined, TrophyOutlined, ThunderboltFilled, InfoCircleOutlined,
 } from "@ant-design/icons";
 import { Client, IMessage, IFrame } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
@@ -25,6 +25,7 @@ interface RoomData {
   gameMode: string;
   currentNumPlayers: number;
   maxNumPlayers: number;
+  numOfProblems: number | null;
 }
 
 interface ChatMessage {
@@ -67,6 +68,7 @@ export default function LobbyPage() {
   const [player2Username, setPlayer2Username] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
   const [hostLeft, setHostLeft] = useState(false);
+  const [showArcadeInfo, setShowArcadeInfo] = useState(false);
 
   const [hostAvatarId, setHostAvatarId] = useState<number | null>(null);
   const hostAvatarIdRef = useRef<number | null>(null);
@@ -240,13 +242,11 @@ export default function LobbyPage() {
     setChatInput("");
   };
 
-  // 1. Initial room fetch
   useEffect(() => {
     if (!token || !roomId) return;
     fetchRoom();
   }, [token, roomId, userId]);
 
-  // 2. WebSocket for live updates
   useEffect(() => {
     if (!token || !roomId) return;
 
@@ -325,7 +325,6 @@ export default function LobbyPage() {
           setChatMessages(prev => [...prev, msg]);
         });
       },
-      
 
       onStompError: (frame: IFrame) => {
         console.error("WebSocket error:", frame);
@@ -411,7 +410,6 @@ export default function LobbyPage() {
         <div className={styles.playersCard}>
           <div className={styles.playersRow}>
 
-            {/* Gladiator 1 — always the HOST */}
             <div className={styles.playerSection}>
               <div className={styles.avatarWrapper}>
                 <div className={`${styles.avatar} ${styles.avatarBlue}`}>
@@ -434,7 +432,6 @@ export default function LobbyPage() {
               <p className={styles.playerRole}>Gladiator 1</p>
             </div>
 
-            {/* VS */}
             <div className={styles.vsSection}>
               <div className={styles.vsCircle}>
                 <ThunderboltFilled style={{ fontSize: 28, color: "white" }} />
@@ -442,7 +439,6 @@ export default function LobbyPage() {
               <span className={styles.vsText}>VS</span>
             </div>
 
-            {/* Gladiator 2 — the joining player */}
             <div className={styles.playerSection}>
               {bothReady ? (
                 <>
@@ -491,9 +487,32 @@ export default function LobbyPage() {
 
         <div className={styles.bottomRow}>
           <div className={styles.configCard}>
-            <h3 className={styles.configTitle}>
+            <h3 className={styles.configTitle} style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <span className={styles.configDot} />
               Battle Configuration
+              {room.gameMode.includes("ARCADE") && (
+                <button
+                  onClick={() => setShowArcadeInfo(true)}
+                  style={{
+                    background: "#ede9fe",
+                    border: "1.5px solid #c4b5fd",
+                    borderRadius: 20,
+                    padding: "3px 10px 3px 8px",
+                    cursor: "pointer",
+                    color: "#7c3aed",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
+                    flexShrink: 0,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <InfoCircleOutlined style={{ fontSize: 13 }} />
+                  How does Arcade work?
+                </button>
+              )}
             </h3>
             <div className={styles.configItems}>
               <div className={styles.configItem}>
@@ -508,6 +527,12 @@ export default function LobbyPage() {
                 <span className={styles.configLabel}>Game Mode</span>
                 <div className={styles.configValue}>{formatEnum(room.gameMode)}</div>
               </div>
+              {room.numOfProblems != null && (
+                <div className={styles.configItem}>
+                  <span className={styles.configLabel}>Number of Problems</span>
+                  <div className={styles.configValue}>{room.numOfProblems}</div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -520,6 +545,7 @@ export default function LobbyPage() {
             <span>Enter Arena</span>
           </button>
         </div>
+
         {/* CHAT */}
         <div className={styles.chatCard}>
           <h3 className={styles.configTitle}>
@@ -560,20 +586,169 @@ export default function LobbyPage() {
             <div ref={chatEndRef} />
           </div>
 
-  <div className={styles.chatInputRow}>
-    <input
-      className={styles.chatInput}
-      value={chatInput}
-      onChange={e => setChatInput(e.target.value)}
-      onKeyDown={e => e.key === "Enter" && handleSendMessage()}
-      placeholder="Type a message..."
-      maxLength={255}
-    />
-    <button className={styles.chatSendButton} onClick={handleSendMessage}>
-      Send
-    </button>
-  </div>
-</div>
+          <div className={styles.chatInputRow}>
+            <input
+              className={styles.chatInput}
+              value={chatInput}
+              onChange={e => setChatInput(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && handleSendMessage()}
+              placeholder="Type a message..."
+              maxLength={255}
+            />
+            <button className={styles.chatSendButton} onClick={handleSendMessage}>
+              Send
+            </button>
+          </div>
+        </div>
+
+        {/* ARCADE GAME MODE INFORMATION */}
+        {showArcadeInfo && (
+          <div
+            onClick={() => setShowArcadeInfo(false)}
+            style={{
+              position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)",
+              zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center",
+              padding: 24,
+            }}
+          >
+            <style>{`
+              @keyframes inkSplat { 0%{transform:scale(0);opacity:0} 60%{transform:scale(1.1);opacity:1} 100%{transform:scale(1);opacity:1} }
+              @keyframes quakeDemo { 0%,100%{transform:translate(0,0)} 20%{transform:translate(-5px,3px)} 40%{transform:translate(5px,-4px)} 60%{transform:translate(-4px,5px)} 80%{transform:translate(4px,-3px)} }
+              @keyframes flipDemo { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(180deg)} }
+            `}</style>
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{
+                background: "#fff", borderRadius: 20, padding: 32, maxWidth: 500, width: "100%",
+                boxShadow: "0 8px 40px rgba(0,0,0,0.18)", maxHeight: "85vh", overflowY: "auto",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#1a1a2e" }}>🎮 Arcade Mode</h2>
+                  <p style={{ margin: "6px 0 0", fontSize: 13, color: "#6b7280" }}>Solve problems, earn coins, sabotage your opponent</p>
+                </div>
+                <button
+                  onClick={() => setShowArcadeInfo(false)}
+                  style={{
+                    background: "#f1f5f9", border: "none", borderRadius: 8,
+                    width: 32, height: 32, cursor: "pointer", fontSize: 16,
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                  }}
+                >✕</button>
+              </div>
+
+              <div style={{
+                background: "#f8fafc", border: "1.5px solid #e2e8f0",
+                borderRadius: 12, padding: "14px 16px", marginBottom: 24,
+              }}>
+                <p style={{ margin: 0, fontSize: 14, color: "#374151", lineHeight: 1.6 }}>
+                  Every point you score earns you <strong>1 coin</strong>. Spend your coins in the
+                  <strong> Item Shop</strong> during the game to buy sabotage items that disrupt your opponent!
+                </p>
+              </div>
+
+              <h3 style={{ margin: "0 0 14px", fontSize: 15, fontWeight: 700, color: "#1a1a2e" }}>Item Shop</h3>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+
+                <div style={{
+                  border: "1.5px solid #ede9fe", borderRadius: 14, padding: 16,
+                  display: "flex", alignItems: "center", gap: 16,
+                }}>
+                  <div style={{
+                    width: 72, height: 52, borderRadius: 10, background: "#1a1a2e",
+                    flexShrink: 0, overflow: "hidden", position: "relative", display: "flex",
+                    alignItems: "center", justifyContent: "center",
+                  }}>
+                    <div style={{
+                      position: "absolute", inset: 0, background: "rgba(8,2,25,0.97)",
+                      animation: "inkSplat 1.5s ease-in-out infinite",
+                    }} />
+                    <span style={{ position: "relative", fontSize: 22, zIndex: 1 }}>🦑</span>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontWeight: 700, fontSize: 14, color: "#1a1a2e" }}>Squid Ink</span>
+                      <span style={{
+                        background: "#fef9c3", color: "#854d0e", fontSize: 12,
+                        fontWeight: 700, padding: "2px 8px", borderRadius: 6,
+                      }}>🪙 5 coins</span>
+                      <span style={{
+                        background: "#f1f5f9", color: "#64748b", fontSize: 11,
+                        fontWeight: 600, padding: "2px 8px", borderRadius: 6,
+                      }}>10s</span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: 13, color: "#6b7280", lineHeight: 1.5 }}>
+                      Blacks out your opponent&apos;s entire screen with ink. They can&apos;t see a thing!
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{
+                  border: "1.5px solid #fef3c7", borderRadius: 14, padding: 16,
+                  display: "flex", alignItems: "center", gap: 16,
+                }}>
+                  <div style={{
+                    width: 72, height: 52, borderRadius: 10, background: "#fffbeb",
+                    border: "1.5px solid #fde68a", flexShrink: 0, display: "flex",
+                    alignItems: "center", justifyContent: "center",
+                    animation: "quakeDemo 0.15s linear infinite",
+                  }}>
+                    <span style={{ fontSize: 26 }}>⚡</span>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontWeight: 700, fontSize: 14, color: "#1a1a2e" }}>Earthquake</span>
+                      <span style={{
+                        background: "#fef9c3", color: "#854d0e", fontSize: 12,
+                        fontWeight: 700, padding: "2px 8px", borderRadius: 6,
+                      }}>🪙 5 coins</span>
+                      <span style={{
+                        background: "#f1f5f9", color: "#64748b", fontSize: 11,
+                        fontWeight: 600, padding: "2px 8px", borderRadius: 6,
+                      }}>10s</span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: 13, color: "#6b7280", lineHeight: 1.5 }}>
+                      Makes your opponent&apos;s game area shake violently. Good luck typing like that!
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{
+                  border: "1.5px solid #cffafe", borderRadius: 14, padding: 16,
+                  display: "flex", alignItems: "center", gap: 16,
+                }}>
+                  <div style={{
+                    width: 72, height: 52, borderRadius: 10, background: "#ecfeff",
+                    border: "1.5px solid #a5f3fc", flexShrink: 0, display: "flex",
+                    alignItems: "center", justifyContent: "center",
+                    animation: "flipDemo 3s ease-in-out infinite",
+                  }}>
+                    <span style={{ fontSize: 26 }}>🌀</span>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontWeight: 700, fontSize: 14, color: "#1a1a2e" }}>Flip Screen</span>
+                      <span style={{
+                        background: "#fef9c3", color: "#854d0e", fontSize: 12,
+                        fontWeight: 700, padding: "2px 8px", borderRadius: 6,
+                      }}>🪙 5 coins</span>
+                      <span style={{
+                        background: "#f1f5f9", color: "#64748b", fontSize: 11,
+                        fontWeight: 600, padding: "2px 8px", borderRadius: 6,
+                      }}>10s</span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: 13, color: "#6b7280", lineHeight: 1.5 }}>
+                      Rotates your opponent&apos;s entire game view 180°. Everything is upside down!
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
