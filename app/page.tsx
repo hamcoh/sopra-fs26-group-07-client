@@ -953,7 +953,7 @@ const team = [
   { name: "Alessio Di Giovanni",   role: "Backend & Database",         avatarSrc: "/avatar2.png" },
   { name: "Hamza Čohadarević", role: "Backend & Judge Engine",  avatarSrc: "/avatar3.png" },
   { name: "Claudia Steiner",  role: "Frontend",         avatarSrc: "/avatar4.png" },
-  { name: "Maxence Delamarche",  role: "Backend",                  avatarSrc: "/avatar5.png" },
+  { name: "Maxence Delamarche",  role: "Backend & Judge Engine",                  avatarSrc: "/avatar5.png" },
 ];
 
 function AboutSection() {
