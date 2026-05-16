@@ -31,6 +31,8 @@ const javaStarter = `class Solution {
     }
 }`;
 
+const sqliteStarter = `SELECT *\nFROM table_name;`;
+
 const EFFECT_DISPLAY: Record<string, { label: string; emoji: string }> = {
   SQUID_INK_SABOTAGE: { label: "Squid Ink", emoji: "🦑" },
   JITTER_SABOTAGE:    { label: "Earthquake", emoji: "⚡" },
@@ -149,12 +151,18 @@ export default function GamePage() {
       setLanguage(lang);
       const storedMode = localStorage.getItem("roomMode") ?? "SPRINT_ARCADE";
       setGameMode(storedMode);
-      setCode(lang === "java" ? javaStarter : pythonStarter);
+      setCode(lang === "java" ? javaStarter : lang === "sqlite" ? sqliteStarter : pythonStarter);
+      // LOCAL TESTING FALLBACK: if backend sends no inputFormat for a SQLite problem, show a placeholder schema
+      const inputFormatFallback =
+        lang === "sqlite" && !data.inputFormat
+          ? "Table: players(id INTEGER, name TEXT, score INTEGER)"
+          : (data.inputFormat ?? "");
+
       setProblem({
         id: data.problemId,
         title: data.title ?? "Unknown Problem",
         description: data.description ?? "",
-        inputFormat: data.inputFormat ?? "",
+        inputFormat: inputFormatFallback,
         outputFormat: data.outputFormat ?? "",
         constraints: data.constraints ?? "",
         hint: data.hint ?? undefined,
@@ -248,7 +256,7 @@ export default function GamePage() {
 
       setCurrentRound((prev) => prev + 1);
 
-      setCode(language === "java" ? javaStarter : pythonStarter);
+      setCode(language === "java" ? javaStarter : language === "sqlite" ? sqliteStarter : pythonStarter);
 
     } catch (err) {
       console.error("Skip error:", err);
@@ -295,7 +303,7 @@ export default function GamePage() {
           };
         });
         const lang = (updatedGameRound.gameLanguage ?? language).toLowerCase();
-        setCode(lang === "java" ? javaStarter : pythonStarter);
+        setCode(lang === "java" ? javaStarter : lang === "sqlite" ? sqliteStarter : pythonStarter);
         await fetchCoinBalance();
       } else if (response.status === 204) {
         console.log("Game over or no new content.");

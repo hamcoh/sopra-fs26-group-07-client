@@ -909,6 +909,7 @@ function DemoSection() {
 const langs = [
   { name: "Python",    live: true  },
   { name: "Java",     live: true  },
+  { name: "SQLite", live: true  },
 ];
 
 function Languages() {
@@ -919,7 +920,7 @@ function Languages() {
             <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.68rem", letterSpacing: "0.3em", color: C.blue, textTransform: "uppercase", display: "block", marginBottom: "0.6rem" }}>Choose Your Weapon</span>
             <h2 style={{ fontSize: "clamp(1.8rem, 4vw, 2.6rem)", fontWeight: 800, color: C.dark, letterSpacing: "-0.02em", marginBottom: "0.6rem" }}>Supported Languages</h2>
             <p style={{ fontSize: "0.92rem", color: C.muted, lineHeight: 1.7, maxWidth: 480, margin: "0 auto 2.5rem" }}>
-              Pick your gladiator language. Two are battle-ready today.
+              Pick your gladiator language. Three are battle-ready today.
             </p>
             {/* Each language in a box*/}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem", justifyContent: "center", marginBottom: "3rem" }}>
@@ -951,7 +952,7 @@ function Languages() {
 const team = [
   { name: "Manuel Menth",   role: "Frontend",   avatarSrc: "/avatar1.png" },
   { name: "Alessio Di Giovanni",   role: "Backend & Database",         avatarSrc: "/avatar2.png" },
-  { name: "Hamza Čohadarević", role: "Backend & Judge Engine",  avatarSrc: "/avatar3.png" },
+  { name: "Hamza Čohadarević", role: "Backend",  avatarSrc: "/avatar3.png" },
   { name: "Claudia Steiner",  role: "Frontend",         avatarSrc: "/avatar4.png" },
   { name: "Maxence Delamarche",  role: "Backend & Judge Engine",                  avatarSrc: "/avatar5.png" },
 ];

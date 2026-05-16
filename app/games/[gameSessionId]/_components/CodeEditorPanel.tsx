@@ -5,6 +5,7 @@ import CodeMirror from "@uiw/react-codemirror";
 import { indentUnit } from "@codemirror/language";
 import { python } from "@codemirror/lang-python";
 import { java } from "@codemirror/lang-java";
+import { sql } from "@codemirror/lang-sql";
 import {SendOutlined, PlayCircleOutlined, LoadingOutlined, BulbOutlined} from "@ant-design/icons";
 import { ExecutionResult } from "../_types";
 import {useState} from "react";
@@ -47,7 +48,7 @@ export default function CodeEditorPanel({
           <div className={styles.problemHeader}>
             <h3 className={styles.sectionTitle}>Code Editor</h3>
             <span className={styles.languageIndicator}>
-              {language.charAt(0).toUpperCase() + language.slice(1)}
+              {language === "sqlite" ? "SQLite" : language.charAt(0).toUpperCase() + language.slice(1)}
             </span>
           </div>
         </section>
@@ -57,7 +58,7 @@ export default function CodeEditorPanel({
             value={code}
             height="100%"
             style={{ height: "100%" }}
-            extensions={[language === "java" ? java() : python(), indentUnit.of("    ")]}
+            extensions={[language === "java" ? java() : language === "sqlite" ? sql() : python(), indentUnit.of("    ")]}
             onChange={(value) => setCode(value)}
             basicSetup={{ lineNumbers: true, foldGutter: false, dropCursor: true, allowMultipleSelections: true, indentOnInput: true }}
           />

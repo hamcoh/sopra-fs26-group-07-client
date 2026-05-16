@@ -35,6 +35,18 @@ const PythonIcon = () => (
   </svg>
 );
 
+const SQLiteIcon = () => (
+  <svg width="45" height="45" viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+    {/* cylinder body */}
+    <rect x="5" y="22" width="90" height="75" rx="4" fill="#1a86d8"/>
+    {/* cylinder bottom ellipse */}
+    <ellipse cx="50" cy="97" rx="45" ry="12" fill="#1572b8"/>
+    {/* cylinder top ellipse */}
+    <ellipse cx="50" cy="22" rx="45" ry="12" fill="#4bb3f0"/>
+    {/* SQL text */}
+    <text x="50" y="72" textAnchor="middle" fill="white" fontSize="28" fontWeight="bold" fontFamily="Arial, sans-serif">SQL</text>
+  </svg>
+);
 const JavaIcon = () => (
     <svg
         width="60" height="60" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
@@ -164,6 +176,18 @@ export default function CreateRoomPage() {
                 <div>
                   <p className={styles.optionName}>Java</p>
                   <p className={styles.optionDesc}>Problems will have to be solved in Java</p>
+                </div>
+              </div>
+              <div
+                className={`${styles.optionCard} ${styles.blueHover} ${
+                  language === "SQLITE" ? styles.selectedBlue : ""
+                }`}
+                onClick={() => setLanguage("SQLITE")}
+              >
+                <SQLiteIcon />
+                <div>
+                  <p className={styles.optionName}>SQLite</p>
+                  <p className={styles.optionDesc}>Write SQL SELECT queries against provided tables</p>
                 </div>
               </div>
             </div>

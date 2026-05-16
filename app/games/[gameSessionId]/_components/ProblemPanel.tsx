@@ -21,6 +21,46 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+function renderSchema(text: string) {
+  const lines = text.split("\n").filter((l) => l.trim());
+  const tableRegex = /^(\w+)\(([^)]+)\)$/;
+  const isSchema = lines.some((l) => tableRegex.test(l.trim()));
+
+  if (!isSchema) {
+    return <p style={{ margin: 0, fontSize: "13px", color: "#374151" }}>{text}</p>;
+  }
+
+  return (
+    <div style={{ fontFamily: "monospace", fontSize: "13px", lineHeight: "1.9" }}>
+      {lines.map((line, idx) => {
+        const match = line.trim().match(tableRegex);
+        if (!match) {
+          return <div key={idx} style={{ color: "#374151" }}>{line}</div>;
+        }
+        const [, tableName, colsPart] = match;
+        const cols = colsPart.split(",").map((c) => c.trim());
+        return (
+          <div key={idx} style={{ color: "#374151" }}>
+            <span style={{ color: "#1d4ed8", fontWeight: 600 }}>{tableName}</span>
+            <span>(</span>
+            {cols.map((col, colIdx) => {
+              const colName = col.split(/\s+/)[0];
+              const isKey = colName === "id" || colName.endsWith("_id");
+              return (
+                <span key={colIdx}>
+                  {colIdx > 0 && <span style={{ color: "#6b7280" }}>, </span>}
+                  {isKey ? <u style={{ textDecorationColor: "#9ca3af" }}>{col}</u> : col}
+                </span>
+              );
+            })}
+            <span>)</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function ProblemPanel({ problem, language, timeLeft }: ProblemPanelProps) {
   const timerColor =
       timeLeft !== null && timeLeft <= 60 ? "#dc2626"
@@ -41,7 +81,7 @@ export default function ProblemPanel({ problem, language, timeLeft }: ProblemPan
                     </span>
                     )}
                 <span className={styles.languageIndicator}>
-                  {language.charAt(0).toUpperCase() + language.slice(1)}
+                  {language === "sqlite" ? "SQLite" : language.charAt(0).toUpperCase() + language.slice(1)}
                 </span>
                 <span
                     className={styles.timerBadge}
@@ -62,9 +102,11 @@ export default function ProblemPanel({ problem, language, timeLeft }: ProblemPan
               <p className={styles.problemDescription}>{problem.description}</p>
             </section>
             <section className={styles.section}>
-              <h3 className={styles.sectionTitle}>Input Format</h3>
+              <h3 className={styles.sectionTitle}>{language === "sqlite" ? "Schema / Tables" : "Input Format"}</h3>
               <div className={styles.exampleCard}>
-                <p className={styles.exampleText}>{problem.inputFormat}</p>
+                {language === "sqlite"
+                  ? renderSchema(problem.inputFormat)
+                  : <p className={styles.exampleText}>{problem.inputFormat}</p>}
               </div>
             </section>
             <section className={styles.section}>
