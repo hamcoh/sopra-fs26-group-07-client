@@ -65,6 +65,8 @@ export function useGameWebSocket(
           setIsGameOver(true);
           localStorage.removeItem("gameRoundData");
           localStorage.removeItem("roomLanguage");
+          localStorage.removeItem("roomMode");
+          localStorage.removeItem("roomDifficulty");
 
           if (!endData.winnerPlayerId) {
             audioDraw.current?.play().catch(() => {});
