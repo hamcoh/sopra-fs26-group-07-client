@@ -82,6 +82,7 @@ export default function OwnProfilePage() {
           <ActionGroup
               onChangePassword={() => router.push("/changepassword")}
               onViewUsers={() => router.push("/leaderboard")}
+              onViewWrapped={() => router.push("/wrapped")}
               onLogout={handleLogOut}
           />
         </div>

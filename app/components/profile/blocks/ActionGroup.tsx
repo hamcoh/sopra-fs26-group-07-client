@@ -1,4 +1,4 @@
-import { LockOutlined, TeamOutlined, LogoutOutlined } from "@ant-design/icons";
+import {LockOutlined, TeamOutlined, LogoutOutlined, FireOutlined} from "@ant-design/icons";
 import ActionCard from "../base/ActionCard";
 import styles from "@/styles/profile.module.css";
 
@@ -6,12 +6,21 @@ interface ActionGroupProps {
     onChangePassword: () => void;
     onViewUsers: () => void;
     onLogout: () => void;
+    onViewWrapped: () => void;
 }
 
-export default function ActionGroup({ onChangePassword, onViewUsers, onLogout }: ActionGroupProps) {
+export default function ActionGroup({ onChangePassword, onViewUsers, onLogout, onViewWrapped }: ActionGroupProps) {
     return (
         <div className={styles.card}>
             <h3 className={styles.sectionTitle}>Account Actions</h3>
+                <ActionCard
+                    title="Gameplay Summary"
+                    description="View your all-time gameplay stats"
+                    icon={<FireOutlined />}
+                    onClick={onViewWrapped}
+                    hoverClass={styles.orangeHover}
+                    iconClass={styles.iconWrapped}
+                />
 
                 <ActionCard
                     title="Change password"
