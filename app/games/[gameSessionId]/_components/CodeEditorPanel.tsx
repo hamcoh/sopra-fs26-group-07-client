@@ -126,8 +126,16 @@ export default function CodeEditorPanel({
               </div>
           ) : testCases ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "0 8px 20px 8px" }}>
-              {currentResult?.summary && (
-                  currentResult.summary === "Runtime Error" ? (
+              {currentResult?.summary && (() => {
+                  const isTopLevelError =
+                      currentResult.summary === "Runtime Error" ||
+                      currentResult.summary === "Compilation Error" ||
+                      testCases.every(t => t.result === "ERROR");
+                  const errorTitle =
+                      currentResult.summary === "Runtime Error" ? "Runtime Error" :
+                          currentResult.summary === "Compilation Error" ? "Compilation Error" :
+                              "Error";
+                  return isTopLevelError ? (
                       <div style={{
                           background: "#fffbeb", border: "1px solid #d97706",
                           borderRadius: "8px", padding: "12px 16px",
@@ -135,7 +143,7 @@ export default function CodeEditorPanel({
                       }}>
                           <span style={{ fontSize: "16px" }}>⚠️</span>
                           <div>
-                              <div style={{ fontWeight: 700, fontSize: "14px", color: "#b45309", marginBottom: "4px" }}>Runtime Error</div>
+                              <div style={{ fontWeight: 700, fontSize: "14px", color: "#b45309", marginBottom: "4px" }}> {errorTitle} </div>
                               <div style={{ fontSize: "13px", color: "#92400e", lineHeight: 1.6, fontFamily: "monospace", whiteSpace: "pre-wrap" }}>
                               {testCases?.[0]?.errorMessage ?? testCases?.[0]?.actualOutput ?? "An internal error occurred."}
                           </div>
@@ -145,10 +153,10 @@ export default function CodeEditorPanel({
                       <div style={{ fontWeight: 600, fontSize: "16px", color: currentResult.status === "success" ? "#16a34a" : "#dc2626" }}>
                           {currentResult.summary}
                       </div>
-                  )
-              )}
-                {currentResult?.summary !== "Runtime Error" && testCases.map((t, index) => {
-                    return (
+                  );
+              })()}
+
+                {!testCases.every(t => t.result === "ERROR") && testCases.map((t, index) => (
                     <div key={t.testCaseId} style={{
                         border: `1px solid ${t.result === "PASS" ? "#16a34a" : t.result === "ERROR" ? "#d97706" : "#dc2626"}`,
                         borderRadius: "8px", padding: "10px",
@@ -174,8 +182,7 @@ export default function CodeEditorPanel({
                             )}
                         </div>
                     </div>
-                );
-              })}
+              ))}
             </div>
           ) : currentResult?.message ? (
               currentResult.status === "error" ? (
