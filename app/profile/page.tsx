@@ -48,13 +48,15 @@ export default function OwnProfilePage() {
     );
   }
 
-  const losses = Math.max(0, stats.totalGamesPlayed - stats.winCount);
+  const losses = Math.max(0, stats.totalGamesPlayed - stats.winCount - stats.drawCount);
 
   return (
     <>
       {contextHolder}
       <div className={styles.pageBackground}>
             <div className={styles.content}>
+
+            <div className={`${styles.content} ${styles.animHeader}`}>
 
           <ProfileHeader onBack={() => router.push("/menu")} />
 
@@ -82,6 +84,7 @@ export default function OwnProfilePage() {
               onViewUsers={() => router.push("/leaderboard")}
               onLogout={handleLogOut}
           />
+        </div>
         </div>
       </div>
     </>

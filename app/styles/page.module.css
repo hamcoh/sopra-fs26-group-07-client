@@ -170,7 +170,7 @@
   padding: 0px 10px;
   border-radius: 8px;
   transition: background 0.15s, color 0.15s;
-  transform: translateY(-50px);
+  margin-bottom: 16px;
 }
 
 .backButton:hover {
@@ -186,3 +186,138 @@
   max-width: 450px;
 }
 
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+@keyframes titleShimmer {
+  0%   { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
+
+@keyframes cardGlowIn {
+  0%   { box-shadow: 0 2px 24px rgba(0,0,0,0.07); }
+  60%  {
+    box-shadow:
+            0 0 28px rgba(123, 79, 240, 0.14),
+            0 0 48px rgba(194, 56, 190, 0.07),
+            0 8px 32px rgba(67, 97, 238, 0.10),
+            0 2px 24px rgba(0,0,0,0.05);
+  }
+  100% { box-shadow: 0 2px 24px rgba(0,0,0,0.07); }
+}
+
+@keyframes orb1Move {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33%       { transform: translate(18px, -22px) scale(1.04); }
+  66%       { transform: translate(-12px, -10px) scale(0.97); }
+}
+
+@keyframes orb2Move {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  40%       { transform: translate(-20px, 16px) scale(0.96); }
+  70%       { transform: translate(10px, -14px) scale(1.03); }
+}
+
+@keyframes orb3Move {
+  0%, 100% { transform: translate(0px, 0px); }
+  50%       { transform: translate(14px, 20px); }
+}
+
+@keyframes backFadein {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.logoTitleShimmer {
+  font-size: 34px;
+  font-weight: 800;
+  color: #1A1A2E;
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+
+.animLogo {
+  animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+}
+
+.animCard {
+  animation:
+          fadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both,
+          cardGlowIn 1.8s ease-out 0s both;
+}
+
+.orb1 {
+  position: fixed;
+  width: 450px; height: 450px;
+  border-radius: 50%;
+  background: rgba(67,97,238,0.32);
+  filter: blur(70px);
+  top: -60px; right: -60px;
+  animation: orb1Move 9s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orb2 {
+  position: fixed;
+  width: 360px; height: 360px;
+  border-radius: 50%;
+  background: rgba(194,56,190,0.26);
+  filter: blur(60px);
+  bottom: -60px; left: -60px;
+  animation: orb2Move 12s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orb3 {
+  position: fixed;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: rgba(123,79,240,0.22);
+  filter: blur(45px);
+  top: 55%; right: 8%;
+  animation: orb3Move 7s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.backToLanding {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #6B7280;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+  animation: backFadein 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  white-space: nowrap;
+}
+
+.backToLanding:hover {
+  background: rgba(0,0,0,0.06);
+  color: #1A1A2E;
+}
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .animContent {
+    animation: fadeSlideUp 0.6s ease both;
+  }

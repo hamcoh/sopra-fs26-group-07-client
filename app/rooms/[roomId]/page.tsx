@@ -386,7 +386,7 @@ export default function LobbyPage() {
 
   return (
     <div className={styles.pageBackground}>
-      <div className={styles.content}>
+      <div className={`${styles.content} ${styles.animContent}`}>
 
         <button className={styles.backButton} onClick={handleLeaveRoom}>
           <ArrowLeftOutlined /> Leave Arena
@@ -600,6 +600,7 @@ export default function LobbyPage() {
             </button>
           </div>
         </div>
+      </div>
 
         {/* ARCADE GAME MODE INFORMATION */}
         {showArcadeInfo && (
@@ -749,8 +750,6 @@ export default function LobbyPage() {
             </div>
           </div>
         )}
-
-      </div>
     </div>
   );
 }

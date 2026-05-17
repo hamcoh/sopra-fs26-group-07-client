@@ -189,18 +189,26 @@ export default function GamePage() {
       });
       const result = await response.json();
       if (!response.ok) {
-        setRunResult({
-          message: response.status === 429
-            ? "Too many requests. Please wait a moment before trying again."
-            : `Error: ${result.message ?? "Run failed"}`,
-          status: "error",
-        });
+        if (response.status === 429) {
+          setRunResult({
+            message: "Too many requests. Please wait a moment before trying again.",
+            status: "error",
+          });
+        } else {
+          console.log(result);
+          setRunResult({
+            message: result.message ?? result.error ?? result.detail ?? "Run failed",
+            status: "error",
+          });
+        }
         return;
       }
       setRunResult({
         status: result.passedTestCases === result.totalTestCases ? "success" : "error",
         testCases: result.testCases,
-        summary: `${result.passedTestCases}/${result.totalTestCases} tests passed`,
+        summary: result.verdict === "INTERNAL_ERROR"
+            ? "Runtime Error"
+            : `${result.passedTestCases}/${result.totalTestCases} tests passed`,
       });
     } catch (error) {
       console.error("Run error:", error);

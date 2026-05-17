@@ -25,7 +25,7 @@ export interface GameRoundData {
     testCaseId: number;
     expectedOutput: string;
     actualOutput: string;
-    result: "PASS" | "FAIL";
+    result: "PASS" | "FAIL" | "ERROR";
     errorMessage: string | null;
   }
   

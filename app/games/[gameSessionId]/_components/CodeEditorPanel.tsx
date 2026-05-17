@@ -9,6 +9,11 @@ import { sql } from "@codemirror/lang-sql";
 import {SendOutlined, PlayCircleOutlined, LoadingOutlined, BulbOutlined} from "@ant-design/icons";
 import { ExecutionResult } from "../_types";
 import {useState} from "react";
+import { bracketMatching} from "@codemirror/language";
+import { highlightSelectionMatches } from "@codemirror/search";
+import { autocompletion } from "@codemirror/autocomplete";
+import { closeBrackets } from "@codemirror/autocomplete";
+
 
 interface CodeEditorPanelProps {
   code: string;
@@ -58,9 +63,25 @@ export default function CodeEditorPanel({
             value={code}
             height="100%"
             style={{ height: "100%" }}
-            extensions={[language === "java" ? java() : language === "sqlite" ? sql() : python(), indentUnit.of("    ")]}
+            extensions={[language === "java" ? java() : language === "sqlite" ? sql() : python(),
+              indentUnit.of("    "),
+              bracketMatching(),
+              closeBrackets(),
+              highlightSelectionMatches(),
+              autocompletion()     ]}
             onChange={(value) => setCode(value)}
-            basicSetup={{ lineNumbers: true, foldGutter: false, dropCursor: true, allowMultipleSelections: true, indentOnInput: true }}
+            basicSetup={{
+              lineNumbers: true,
+              foldGutter: false,
+              dropCursor: true,
+              allowMultipleSelections: true,
+              indentOnInput: true,
+              highlightActiveLine: false,
+              highlightActiveLineGutter: false,
+              closeBrackets: true,
+              autocompletion: true,
+              highlightSelectionMatches: true,
+            }}
           />
         </div>
         <div className={styles.actionRow}>
@@ -91,42 +112,98 @@ export default function CodeEditorPanel({
         <div className={styles.outputContent}>
           {showHint && hint ? (
               <div style={{ padding: "16px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-                  <span style={{ fontSize: "18px" }}>💡</span>
-                  <span style={{ fontWeight: 700, fontSize: "15px", color: "#ea580c" }}>Hint</span>
-                </div>
-                <div style={{
-                  border: "1px solid #fed7aa", borderRadius: "8px",
-                  padding: "14px 16px", background: "#fff7ed",
-                  fontSize: "14px", lineHeight: "1.6", color: "#374151"
-                }}>
+                  <div style={{
+                      border: "1px solid #fed7aa", borderRadius: "8px",
+                      padding: "14px 16px", background: "#fff7ed",
+                      fontSize: "14px", lineHeight: "1.6", color: "#374151"
+                  }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "18px" }}>💡</span>
+                      <span style={{ fontWeight: 700, fontSize: "15px", color: "#ea580c" }}>Hint</span>
+                  </div>
                   {hint}
                 </div>
               </div>
           ) : testCases ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "0 8px 20px 8px" }}>
-              {currentResult?.summary && (
-                <div style={{ fontWeight: 600, fontSize: "16px", color: currentResult.status === "success" ? "#16a34a" : "#dc2626" }}>
-                  {currentResult.summary}
-                </div>
-              )}
-              {testCases.map((t, index) => {
-                const isPass = t.result === "PASS";
-                return (
-                  <div key={t.testCaseId} style={{ border: `1px solid ${isPass ? "#16a34a" : "#dc2626"}`, borderRadius: "8px", padding: "10px", background: isPass ? "#f0fdf4" : "#fef2f2" }}>
-                    <div style={{ fontWeight: 600 }}>{isPass ? "✅ PASS" : "❌ FAIL"} — Test {index + 1}</div>
-                    <div style={{ marginTop: "6px", fontSize: "13px" }}>
-                      <div><strong>Expected:</strong> {t.expectedOutput}</div>
-                      <div><strong>Actual:</strong> {t.actualOutput}</div>
+              {currentResult?.summary && (() => {
+                  const isTopLevelError =
+                      currentResult.summary === "Runtime Error" ||
+                      currentResult.summary === "Compilation Error" ||
+                      testCases.every(t => t.result === "ERROR");
+                  const errorTitle =
+                      currentResult.summary === "Runtime Error" ? "Runtime Error" :
+                          currentResult.summary === "Compilation Error" ? "Compilation Error" :
+                              "Error";
+                  return isTopLevelError ? (
+                      <div style={{
+                          background: "#fffbeb", border: "1px solid #d97706",
+                          borderRadius: "8px", padding: "12px 16px",
+                          display: "flex", alignItems: "flex-start", gap: "8px",
+                      }}>
+                          <span style={{ fontSize: "16px" }}>⚠️</span>
+                          <div>
+                              <div style={{ fontWeight: 700, fontSize: "14px", color: "#b45309", marginBottom: "4px" }}> {errorTitle} </div>
+                              <div style={{ fontSize: "13px", color: "#92400e", lineHeight: 1.6, fontFamily: "monospace", whiteSpace: "pre-wrap" }}>
+                              {testCases?.[0]?.errorMessage ?? testCases?.[0]?.actualOutput ?? "An internal error occurred."}
+                          </div>
+                          </div>
+                      </div>
+                  ) : (
+                      <div style={{ fontWeight: 600, fontSize: "16px", color: currentResult.status === "success" ? "#16a34a" : "#dc2626" }}>
+                          {currentResult.summary}
+                      </div>
+                  );
+              })()}
+
+                {!testCases.every(t => t.result === "ERROR") && testCases.map((t, index) => (
+                    <div key={t.testCaseId} style={{
+                        border: `1px solid ${t.result === "PASS" ? "#16a34a" : t.result === "ERROR" ? "#d97706" : "#dc2626"}`,
+                        borderRadius: "8px", padding: "10px",
+                        background: t.result === "PASS" ? "#f0fdf4" : t.result === "ERROR" ? "#fffbeb" : "#fef2f2"
+                    }}>
+                        <div style={{ fontWeight: 600 }}>
+                            {t.result === "PASS" ? "✅ PASS" : t.result === "ERROR" ? "⚠️ ERROR" : "❌ FAIL"} — Test {index + 1}
+                        </div>
+                        <div style={{ marginTop: "6px", fontSize: "13px" }}>
+                            {t.result === "ERROR" ? (
+                                <pre style={{
+                                    marginTop: "6px", background: "#fef3c7", borderRadius: "4px",
+                                    padding: "8px", fontSize: "12px", whiteSpace: "pre-wrap",
+                                    color: "#92400e", fontFamily: "monospace",
+                                }}>
+                                    {t.errorMessage ?? t.actualOutput}
+                                  </pre>
+                            ) : (
+                                <>
+                                    <div><strong>Expected:</strong> {t.expectedOutput}</div>
+                                    <div><strong>Actual:</strong> {t.actualOutput ?? "—"}</div>
+                                </>
+                            )}
+                        </div>
                     </div>
-                  </div>
-                );
-              })}
+              ))}
             </div>
           ) : currentResult?.message ? (
-            <pre className={styles.exampleText} style={{ padding: "20px", whiteSpace: "pre-wrap" }}>
-              {currentResult.message}
-            </pre>
+              currentResult.status === "error" ? (
+                  <div style={{ padding: "16px" }}>
+                      <div style={{
+                          background: "#fffbeb", border: "1px solid #d97706",
+                          borderRadius: "8px", padding: "14px 16px",
+                          display: "flex", alignItems: "flex-start", gap: "10px",
+                      }}>
+                          <span style={{ fontSize: "18px", lineHeight: 1.4 }}>⚠️</span>
+                          <div>
+                              <div style={{ fontWeight: 700, fontSize: "14px", color: "#b45309", marginBottom: "4px" }}>Error</div>
+                              <div style={{ fontSize: "13px", color: "#92400e", lineHeight: 1.6 }}>{currentResult.message}</div>
+                          </div>
+                      </div>
+                  </div>
+              ) : (
+                  <pre className={styles.exampleText} style={{ padding: "20px", whiteSpace: "pre-wrap" }}>
+                    {currentResult.message}
+                  </pre>
+              )
           ) : (
             <div className={styles.placeholderContainer}>
               <svg className={styles.terminalIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

@@ -57,12 +57,14 @@ export default function Home() {
         throw new Error("Failed to update password");
       }
 
-      messageApi.success("Password updated! Please log in again.", 3);
+      messageApi.success("Password changed successfully!", 3);
 
-      clearToken()
-      clearUsername();
-      clearUserId();
-      router.push("/");
+      setTimeout(() => {
+        clearToken();
+        clearUsername();
+        clearUserId();
+        router.push("/");
+      }, 1500);
     } catch (error) {
       if (error instanceof Error) {
         messageApi.error(error.message);
@@ -96,7 +98,7 @@ export default function Home() {
       <>
         {contextHolder}
         <div className={styles.pageBackground}>
-          <div className={styles.contentWrapper}>
+          <div className={`${styles.contentWrapper} ${styles.animContent}`}>
             <button className={styles.backButton} onClick={() => router.push("/profile")}>
               <ArrowLeftOutlined/> Back to Profile
             </button>
@@ -122,12 +124,24 @@ export default function Home() {
                     validateTrigger="onChange"
                     label={<span className={styles.fieldLabel}><span className={styles.requiredStar}>*</span> New Password</span>}
                     rules={[
-                      { required: true, message: "Please input your new password!" },
-                      { min: 8, message: "Password must be at least 8 characters long" },
-                      { max: 100, message: "Password cannot exceed 100 characters" },
                       {
-                        pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&+\-._#])/,
-                        message: "Must contain uppercase, lowercase, a number and a symbol",
+                        validator: async (_, value) => {
+                          if (!value || value.trim() === "")
+                            return Promise.reject(new Error("Please input your new password!"));
+                          if (value.length < 8)
+                            return Promise.reject(new Error("Password must be at least 8 characters long"));
+                          if (value.length > 100)
+                            return Promise.reject(new Error("Password cannot exceed 100 characters"));
+                          if (!/(?=.*[a-z])/.test(value))
+                            return Promise.reject(new Error("Password must contain at least one lowercase letter"));
+                          if (!/(?=.*[A-Z])/.test(value))
+                            return Promise.reject(new Error("Password must contain at least one uppercase letter"));
+                          if (!/(?=.*\d)/.test(value))
+                            return Promise.reject(new Error("Password must contain at least one number"));
+                          if (!/(?=.*[@$!%*?&+\-._#])/.test(value))
+                            return Promise.reject(new Error("Password must contain at least one symbol"));
+                          return Promise.resolve();
+                        },
                       },
                     ]}
                 >

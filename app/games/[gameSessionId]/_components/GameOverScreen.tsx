@@ -26,9 +26,9 @@ const SPARKLE_POSITIONS = [
 ];
 
 interface UserStats {
-  totalPoints: number;
   wins: number;
   losses: number;
+  draws: number;
   gamesPlayed: number;
   winRate: number;
 }
@@ -66,11 +66,12 @@ export default function GameOverScreen({
 
   const parseStats = (data: Record<string, number>): UserStats => {
     const wins = data.winCount ?? 0;
+    const draws = data.drawCount ?? 0;
     const gamesPlayed = data.totalGamesPlayed ?? 0;
     return {
-      totalPoints: data.totalPoints ?? 0,
       wins,
-      losses: gamesPlayed - wins,
+      losses: gamesPlayed - wins - draws,
+      draws,
       gamesPlayed,
       winRate: data.winRatePercentage != null ? Math.round(data.winRatePercentage) : 0,
     };
@@ -126,8 +127,8 @@ export default function GameOverScreen({
         { label: "Win Rate", value: stats ? `${stats.winRate}%` : "—" },
         { label: "Wins",     value: stats != null ? stats.wins     : "—" },
         { label: "Losses",   value: stats != null ? stats.losses   : "—" },
+        { label: "Draw",   value: stats != null ? stats.draws   : "—" },
         { label: "Games",    value: stats != null ? stats.gamesPlayed : "—" },
-        { label: "Pts",      value: stats != null ? stats.totalPoints : "—" },
       ].map(({ label, value }) => (
         <div key={label} className={resultStyles.statItem}>
           <div className={resultStyles.statValue}>{String(value)}</div>
@@ -150,10 +151,16 @@ export default function GameOverScreen({
           </div>
         </div>
         <div className={resultStyles.headerButtons}>
-          <button className={resultStyles.secondaryButton} onClick={() => router.push("/menu")}>
+          <button className={resultStyles.secondaryButton} onClick={() => {
+              localStorage.removeItem(`gameResult_${gameSessionId}`);
+              router.push("/menu");
+          }}>
             Back to Menu
           </button>
-          <button className={resultStyles.primaryButton} onClick={() => router.push("/leaderboard")}>
+          <button className={resultStyles.primaryButton} onClick={() => {
+            localStorage.removeItem(`gameResult_${gameSessionId}`);
+            router.push("/leaderboard");
+            }}>
             View Leaderboard
           </button>
         </div>

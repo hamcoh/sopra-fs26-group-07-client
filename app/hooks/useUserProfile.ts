@@ -8,6 +8,7 @@ export function useUserProfile() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [stats, setStats] = useState({
         winCount: 0,
+        drawCount:0,
         winRatePercentage: 0,
         totalGamesPlayed: 0,
         totalPoints: 0,
@@ -46,6 +47,7 @@ export function useUserProfile() {
             }));
             setStats({
                 winCount: data.winCount ?? 0,
+                drawCount: data.drawCount ?? 0,
                 winRatePercentage: Math.round(data.winRatePercentage ?? 0),
                 totalGamesPlayed: data.totalGamesPlayed ?? 0,
                 totalPoints: data.totalPoints ?? 0,

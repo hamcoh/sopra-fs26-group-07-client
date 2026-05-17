@@ -6,6 +6,7 @@ export interface User {
   token: string | null;
   status: string | null;
   winCount: number;
+  drawCount: number;
   winRatePercentage: number;
   totalGamesPlayed: number;
   totalPoints: number;
