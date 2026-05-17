@@ -173,8 +173,8 @@ export default function RoomsPage() {
       {contextHolder}
       {notificationContextHolder}
       <div className={styles.pageBackground}>
-        <div className={styles.content}>
-          <ProfileButton />
+        <ProfileButton />
+        <div className={`${styles.content} ${styles.animContent}`}>
 
           <button className={styles.backButton} onClick={() => router.push("/menu")}>
             <ArrowLeftOutlined /> Back

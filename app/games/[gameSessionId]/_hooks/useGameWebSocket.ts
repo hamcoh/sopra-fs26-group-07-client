@@ -26,6 +26,9 @@ export function useGameWebSocket(
   const [gameSummary, setGameSummary] = useState<PlayerGameSummaryDTO | null>(null);
   const [activeEffects, setActiveEffects] = useState<Set<string>>(new Set());
   const [sabotageNotification, setSabotageNotification] = useState<string | null>(null);
+  const audioWin  = useRef(typeof window !== "undefined" ? new Audio("/sounds/winSound.mp3") : null);
+  const audioDraw = useRef(typeof window !== "undefined" ? new Audio("/sounds/tieSound.mp3") : null);
+  const audioLose = useRef(typeof window !== "undefined" ? new Audio("/sounds/loseSound.mp3"): null);
 
   const playerSessionIdRef = useRef(playerSessionId);
   useEffect(() => { playerSessionIdRef.current = playerSessionId; }, [playerSessionId]);
@@ -62,6 +65,14 @@ export function useGameWebSocket(
           setIsGameOver(true);
           localStorage.removeItem("gameRoundData");
           localStorage.removeItem("roomLanguage");
+
+          if (!endData.winnerPlayerId) {
+            audioDraw.current?.play().catch(() => {});
+          } else if (endData.winnerPlayerId === Number(userId)) {
+            audioWin.current?.play().catch(() => {});
+          } else {
+            audioLose.current?.play().catch(() => {});
+          }
         });
 
         client.subscribe(`/user/queue/game-summary`, (message: IMessage) => {

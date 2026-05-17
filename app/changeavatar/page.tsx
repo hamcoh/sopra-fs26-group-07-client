@@ -69,14 +69,12 @@ export default function ChangeAvatarPage() {
       <>
           {contextHolder}
       <div className={styles.pageBackground}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "450px", position: "relative" }}>
+          <div className={`${styles.contentWrapper} ${styles.animContent}`}
+              style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "450px", position: "relative" }}>
         <button
             className={styles.backButton}
             onClick={() => router.push("/profile")}
-            style={{
-              position: "absolute",
-              top: "20px",
-              left: "0"
+            style={{alignSelf: "flex-start"
             }}>
           <ArrowLeftOutlined /> Back to Profile
         </button>

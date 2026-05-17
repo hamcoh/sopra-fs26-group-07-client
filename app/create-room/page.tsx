@@ -130,8 +130,8 @@ export default function CreateRoomPage() {
    <>
      {contextHolder}
     <div className={styles.pageBackground}>
-      <div className={styles.content}>
-        <ProfileButton />
+      <ProfileButton />
+      <div className={`${styles.content} ${styles.animContent}`}>
         <div className={styles.topRow}>
           <button className={styles.backButton} onClick={() => router.push("/menu")}>
             <ArrowLeftOutlined /> Back

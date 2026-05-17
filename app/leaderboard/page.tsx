@@ -157,12 +157,14 @@ export default function LeaderboardPage() {
       title: "Record",
       key: "record",
       render: (_: unknown, record: User) => {
-        const losses = (record.totalGamesPlayed ?? 0) - (record.winCount ?? 0);
+        const losses = (record.totalGamesPlayed ?? 0) - (record.winCount ?? 0) - (record.drawCount ?? 0);
         return (
           <span style={{ fontWeight: 600 }}>
             <span style={{ color: "#22C55E" }}>{record.winCount}</span>
             <span style={{ color: "#9CA3AF" }}> - </span>
             <span style={{ color: "#EF4444" }}>{losses}</span>
+            <span style={{ color: "#9CA3AF" }}> - </span>
+            <span style={{ color: "#F59E0B" }}>{record.drawCount}</span>
           </span>
         );
       },
@@ -208,8 +210,8 @@ export default function LeaderboardPage() {
   <>
     {contextHolder}
     <div className={styles.pageBackground}>
-      <div className={styles.content}>
-        <ProfileButton />
+      <ProfileButton />
+      <div className={`${styles.content} ${styles.animContent}`}>
 
         <button className={styles.backButton} onClick={() => router.push("/menu")}>
           <ArrowLeftOutlined /> Back to Menu

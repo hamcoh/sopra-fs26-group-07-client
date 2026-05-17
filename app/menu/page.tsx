@@ -9,6 +9,23 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import ProfileButton from "@/components/ProfileButton";
 import { message } from "antd";
 
+function AnimatedUsername({ username }: { username: string }) {
+  const total = username.length;
+  return (
+      <span className={styles.username}>
+      {username.split("").map((char, i) => (
+          <span
+              key={i}
+              className={styles.jumpLetter}
+              style={{ animationDelay: `${((i / total) * 1.4).toFixed(2)}s` }}
+          >
+          {char === " " ? "\u00A0" : char}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export default function MenuPage() {
   const router = useRouter();
   const { value: token, loading: tokenLoading } = useLocalStorage("token", "");
@@ -47,7 +64,7 @@ export default function MenuPage() {
       <div className={styles.pageBackground}>
         <ProfileButton />
 
-        <div className={styles.logoArea}>
+        <div className={`${styles.logoArea} ${styles.animLogo}`}>
           <CodosseumLogo size={100} />
           <div className={styles.logoTexts}>
             <h1 className={styles.logoTitle}>Codosseum</h1>
@@ -55,13 +72,13 @@ export default function MenuPage() {
           </div>
         </div>
 
-        <p className={styles.greeting}>
-          Hello, <span className={styles.username}>{username}</span>!
+        <p className={`${styles.greeting} ${styles.animGreeting}`}>
+          Hello, <AnimatedUsername username={username} />!
         </p>
 
-        <div className={styles.cards}>
+        <div className={`${styles.cards} ${styles.animCards}`}>
 
-          <div className={styles.card} onClick={() => router.push("/create-room")}>
+          <div className={`${styles.card} ${styles.glowBlue}`}   onClick={() => router.push("/create-room")}>
             <div className={`${styles.iconBox} ${styles.iconBlue}`}>
               <PlusOutlined style={{ fontSize: 28, color: "white" }} />
             </div>
@@ -71,7 +88,7 @@ export default function MenuPage() {
             </p>
           </div>
 
-          <div className={styles.card} onClick={() => router.push("/join-room")}>
+          <div className={`${styles.card} ${styles.glowPink}`}   onClick={() => router.push("/join-room")}>
             <div className={`${styles.iconBox} ${styles.iconPink}`}>
               <TeamOutlined style={{ fontSize: 28, color: "white" }} />
             </div>
@@ -81,7 +98,7 @@ export default function MenuPage() {
             </p>
           </div>
 
-          <div className={styles.card} onClick={() => router.push("/rooms")}>
+          <div className={`${styles.card} ${styles.glowGreen}`}  onClick={() => router.push("/rooms")}>
             <div className={`${styles.iconBox} ${styles.iconGreen}`}>
               <SearchOutlined style={{ fontSize: 28, color: "white" }} />
             </div>
@@ -91,7 +108,7 @@ export default function MenuPage() {
             </p>
           </div>
 
-          <div className={styles.card} onClick={() => router.push("/leaderboard")}>
+          <div className={`${styles.card} ${styles.glowOrange}`} onClick={() => router.push("/leaderboard")}>
             <div className={`${styles.iconBox} ${styles.iconOrange}`}>
               <TrophyOutlined style={{ fontSize: 28, color: "white" }} />
             </div>

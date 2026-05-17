@@ -45,14 +45,16 @@ export default function ProfilePage() {
         );
     }
 
-    const losses = Math.max(0, stats.totalGamesPlayed - stats.winCount);
+    const losses = Math.max(0, stats.totalGamesPlayed - stats.winCount - stats.drawCount);
 
     return (
       <>
         {contextHolder}
         <div className={styles.pageBackground}>
             <div className={styles.content}>
+
                 <ProfileButton />
+                <div className={`${styles.content} ${styles.animHeader}`}>
 
                 <ProfileHeader
                     onBack={() => router.push("/leaderboard")}
@@ -65,7 +67,7 @@ export default function ProfilePage() {
                 <UserIdentity username={username} joinedDate={joinedDate} bio={bio} avatarId={avatarId} isEditable={false}  />
 
                 <StatGroup stats={stats} losses={losses} />
-
+                </div>
             </div>
         </div>
         </>
