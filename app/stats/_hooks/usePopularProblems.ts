@@ -1,0 +1,50 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { getApiDomain } from "@/utils/domain";
+import { GameStatsDTO } from "../_types";
+
+export function usePopularProblems() {
+    const { value: token, loading: tokenLoading } = useLocalStorage("token", "");
+    const { value: userId, loading: userIdLoading } = useLocalStorage("userid", "");
+    const [data, setData] = useState<GameStatsDTO[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (tokenLoading || userIdLoading) return;
+        if (!token || !userId) {
+            setError("Not authenticated");
+            setLoading(false);
+            return;
+        }
+
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const res = await fetch(`${getApiDomain()}/stats/popular-problems`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "token": token,
+                        "userId": String(userId),
+                    },
+                });
+
+                if (!res.ok) throw new Error("Failed to fetch popular problems");
+
+                const json = await res.json();
+                setData(json);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : "Failed to fetch popular problems");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [token, userId, tokenLoading, userIdLoading]);
+
+    return { data, loading, error };
+}

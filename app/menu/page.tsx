@@ -3,28 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import CodosseumLogo from "@/components/CodosseumLogo";
-import { PlusOutlined, TeamOutlined, TrophyOutlined, SearchOutlined } from "@ant-design/icons";
+import {PlusOutlined, TeamOutlined, TrophyOutlined, SearchOutlined, BarChartOutlined} from "@ant-design/icons";
 import styles from "@/styles/menu.module.css";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import ProfileButton from "@/components/ProfileButton";
 import { message } from "antd";
-
-function AnimatedUsername({ username }: { username: string }) {
-  const total = username.length;
-  return (
-      <span className={styles.username}>
-      {username.split("").map((char, i) => (
-          <span
-              key={i}
-              className={styles.jumpLetter}
-              style={{ animationDelay: `${((i / total) * 1.4).toFixed(2)}s` }}
-          >
-          {char === " " ? "\u00A0" : char}
-        </span>
-      ))}
-    </span>
-  );
-}
 
 export default function MenuPage() {
   const router = useRouter();
@@ -73,7 +56,7 @@ export default function MenuPage() {
         </div>
 
         <p className={`${styles.greeting} ${styles.animGreeting}`}>
-          Hello, <AnimatedUsername username={username} />!
+          Hello, <span className={styles.username}>{username}</span>!
         </p>
 
         <div className={`${styles.cards} ${styles.animCards}`}>
@@ -115,6 +98,16 @@ export default function MenuPage() {
             <h2 className={styles.cardTitle}>Leaderboard</h2>
             <p className={styles.cardDesc}>
               View top players and see where you rank in the arena
+            </p>
+          </div>
+
+          <div className={`${styles.card} ${styles.glowGreenPure}`} onClick={() => router.push("/stats")}>
+            <div className={`${styles.iconBox} ${styles.iconGreenPure}`}>
+              <BarChartOutlined style={{ fontSize: 28, color: "white" }} />
+            </div>
+            <h2 className={styles.cardTitle}>Statistics</h2>
+            <p className={styles.cardDesc}>
+              Explore the hardest and most popular problems in the arena
             </p>
           </div>
 

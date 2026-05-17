@@ -400,3 +400,22 @@
 .animContent {
     animation: fadeSlideUp 0.6s ease 0.2s both;
 }
+
+.iconWrapped {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 16px;
+    background: #FFE0CC;
+    color: #E85D04;
+}
+
+.orangeHover:hover {
+    border-color: #F97316;
+    background: #FFF7ED;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+    transform: translateY(-3px);
+}

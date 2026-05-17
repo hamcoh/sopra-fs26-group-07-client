@@ -1,0 +1,412 @@
+.pageBackground {
+    min-height: 100vh;
+    background-color: #EEF1F6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 920px;
+    position: relative;
+    z-index: 1;
+    gap: 24px;
+}
+
+.orb1 {
+    position: fixed;
+    width: 450px; height: 450px;
+    border-radius: 50%;
+    background: rgba(67, 97, 238, 0.10);
+    filter: blur(70px);
+    top: -60px; right: -60px;
+    animation: orb1Move 9s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.orb2 {
+    position: fixed;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    background: rgba(194, 56, 190, 0.08);
+    filter: blur(60px);
+    bottom: -60px; left: -60px;
+    animation: orb2Move 12s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.orb3 {
+    position: fixed;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: rgba(123, 79, 240, 0.07);
+    filter: blur(45px);
+    top: 55%; right: 8%;
+    animation: orb3Move 7s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.logoArea {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.logoTexts {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.logoTitle {
+    font-size: 26px;
+    font-weight: 800;
+    color: #1A1A2E;
+    margin: 0;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+}
+
+.logoSubtitle {
+    font-size: 13px;
+    color: #6B7280;
+    margin: 0;
+}
+
+.backButton {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #4b5563;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0px 10px;
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.backButton:hover {
+    background: #e2e6f0;
+    color: #1a1a2e;
+}
+
+.tabsWrapper {
+    width: 100%;
+}
+
+.tabLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+
+.listWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    padding-top: 8px;
+}
+
+.listHeader {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.iconBox {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.iconOrange {
+    background: linear-gradient(135deg, #7B4FF0 0%, #C238BE 100%);
+    box-shadow: 0 4px 16px rgba(123, 79, 240, 0.18);
+}
+
+.iconBlue {
+    background: linear-gradient(135deg, #4361EE 0%, #7B4FF0 100%);
+    box-shadow: 0 4px 16px rgba(67, 97, 238, 0.18);
+}
+
+.listTitle {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1A1A2E;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.listSubtitle {
+    font-size: 13px;
+    color: #6B7280;
+    margin: 0;
+    margin-top: 2px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+}
+
+.centerState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    width: 100%;
+}
+
+.errorText {
+    color: #EF4444;
+    font-size: 14px;
+}
+
+.emptyText {
+    color: #9CA3AF;
+    font-size: 14px;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border: 0.5px solid rgba(0, 0, 0, 0.07);
+    border-top: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+}
+
+.accentOrange {
+    border-top-color: #7B4FF0;
+}
+.accentOrange::before {
+    background: linear-gradient(135deg, #7B4FF0, #C238BE);
+}
+
+.accentBlue {
+    border-top-color: #4361EE;
+}
+.accentBlue::before {
+    background: linear-gradient(135deg, #4361EE, #7B4FF0);
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rankBadge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.4px;
+}
+
+.rankGold {
+    background: #FFF4CC;
+    color: #92600A;
+}
+
+.rankSilver {
+    background: #F0F0F0;
+    color: #555555;
+}
+
+.rankBronze {
+    background: #FDECD9;
+    color: #8B4513;
+}
+
+.rankOrange {
+    background: rgba(123, 79, 240, 0.12);
+    color: #7B4FF0;
+}
+
+.rankBlue {
+    background: rgba(67, 97, 238, 0.12);
+    color: #4361EE;
+}
+
+.languageBadge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #F3F4F6;
+    color: #6B7280;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.cardTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1A1A2E;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.cardDescription {
+    font-size: 13px;
+    color: #4B5563;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.statsSection {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.statRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.statLabel {
+    font-size: 12px;
+    color: #9CA3AF;
+    font-weight: 500;
+}
+
+.statValue {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1A1A2E;
+}
+
+.playerValue {
+    color: #10B981;
+}
+
+.progressTrack {
+    width: 100%;
+    height: 6px;
+    background: #F3F4F6;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.progressTrackPlayer {
+    width: 100%;
+    height: 6px;
+    background: #F3F4F6;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.progressBar {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.barOrange {
+    background: linear-gradient(90deg, #7B4FF0, #C238BE);
+}
+
+.barBlue {
+    background: linear-gradient(90deg, #4361EE, #7B4FF0);
+}
+
+.barPlayer {
+    background: linear-gradient(90deg, #10B981, #3B82F6);
+}
+
+.divider {
+    width: 100%;
+    height: 1px;
+    background: #F3F4F6;
+    margin: 2px 0;
+}
+
+.personalSection {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.personalLabel {
+    font-size: 10px;
+    font-weight: 800;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+}
+
+.notPlayed {
+    font-size: 12px;
+    color: #D1D5DB;
+    font-style: italic;
+}
+
+@keyframes animFadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.animFadeUp {
+    animation: animFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes orb1Move {
+    0%, 100% { transform: translate(0px, 0px) scale(1); }
+    33%       { transform: translate(18px, -22px) scale(1.04); }
+    66%       { transform: translate(-12px, -10px) scale(0.97); }
+}
+
+@keyframes orb2Move {
+    0%, 100% { transform: translate(0px, 0px) scale(1); }
+    40%       { transform: translate(-20px, 16px) scale(0.96); }
+    70%       { transform: translate(10px, -14px) scale(1.03); }
+}
+
+@keyframes orb3Move {
+    0%, 100% { transform: translate(0px, 0px); }
+    50%       { transform: translate(14px, 20px); }
+}
