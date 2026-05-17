@@ -53,7 +53,7 @@
   gap: 20px;
   flex-wrap: wrap;
   justify-content: center;
-  max-width: 920px;
+  max-width: 670px;
 }
 
 .card {
@@ -154,3 +154,10 @@
   5.5%  { transform: translateY(0)     scaleY(1);    }
   100%  { transform: translateY(0)     scaleY(1);    }
 }
+
+.iconGreenPure {
+  background: linear-gradient(135deg, #059669 0%, #22C55E 100%);
+}
+
+.glowGreenPure { --glow-color: 0 0 18px 3px rgba(34, 197, 94, 0.45); }
+
