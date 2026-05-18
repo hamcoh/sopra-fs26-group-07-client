@@ -414,7 +414,7 @@ function ArenaDivider() {
 const stats = [
   { val: "5",    label: "Gladiators" },
   { val: "5",    label: "Total Battles" },
-  { val: "2",    label: "Languages" },
+  { val: "3",    label: "Languages" },
   { val: "99ms", label: "Avg Judge Time" },
 ];
 

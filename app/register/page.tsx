@@ -31,6 +31,13 @@ export default function RegisterPage() {
     const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            router.push("/menu");
+        }
+    }, [router]);
+
+    useEffect(() => {
         return () => {
             if (debounceTimer.current) clearTimeout(debounceTimer.current);
         };
@@ -148,7 +155,6 @@ export default function RegisterPage() {
                                     validateTrigger="onChange"
                                     rules={[
                                         {
-                                            validateTrigger: "onSubmit",
                                             validator: async (_, value) => {
                                                 if (!value || value.trim() === "")
                                                     return Promise.reject(new Error("Please input your username!"));
@@ -156,14 +162,6 @@ export default function RegisterPage() {
                                                     return Promise.reject(new Error("Username must be at least 3 characters!"));
                                                 if (value.length > 20)
                                                     return Promise.reject(new Error("Username cannot exceed 20 characters!"));
-                                                return Promise.resolve();
-                                            },
-                                        },
-                                        {
-                                            validateTrigger: "onChange",
-                                            validator: async (_, value) => {
-                                                if (!value || value.trim() === "" || value.length < 3 || value.length > 20)
-                                                    return Promise.resolve();
 
                                                 return new Promise<void>((resolve, reject) => {
                                                     if (debounceTimer.current) clearTimeout(debounceTimer.current);
@@ -199,6 +197,7 @@ export default function RegisterPage() {
                                 >
                                     <Input
                                         prefix={<UserOutlined style={{ color: "#BDBDBD" }} />}
+                                        maxLength={21}
                                         placeholder="CodeMaster"
                                         size="large"
                                         className={styles.input}
