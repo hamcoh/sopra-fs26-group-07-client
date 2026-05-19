@@ -112,6 +112,18 @@ export default function GamePage() {
   }, [userId, token]);
 
   useEffect(() => {
+    if (isGameOver) return;
+  
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+  
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isGameOver]);
+  
+  useEffect(() => {
     const saved = localStorage.getItem(`gameResult_${gameSessionId}`);
     if (saved) {
       try { setSavedResult(JSON.parse(saved)); } catch {}
