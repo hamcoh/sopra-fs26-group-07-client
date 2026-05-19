@@ -10,7 +10,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { getApiDomain } from "@/utils/domain";
 import { Client, IFrame } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import {message} from "antd";
+import { message, notification } from "antd";
 
 export default function JoinRoomPage() {
   const router = useRouter();
@@ -22,6 +22,7 @@ export default function JoinRoomPage() {
   const [loading, setLoading] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const [notificationApi, notificationContextHolder] = notification.useNotification();
 
   useEffect(() => {
     if (tokenLoading) return;
@@ -39,7 +40,7 @@ export default function JoinRoomPage() {
 
   const handleJoin = async () => {
     if (joinCode.length !== 6) {
-      alert("Please enter a valid 6-character session code.");
+      messageApi.error("Please enter a valid 6-character session code.");
       return;
     }
 
@@ -57,7 +58,22 @@ export default function JoinRoomPage() {
         },
       });
 
-      if (!joinRes.ok) throw new Error("Failed to join room");
+      if (!joinRes.ok) {
+        const status = joinRes.status;
+        notificationApi.error({
+          title: "Could not join room",
+          description: status === 409
+            ? `Room ${joinCode.toUpperCase()} is already full.`
+            : status === 404
+            ? `Room ${joinCode.toUpperCase()} no longer exists.`
+            : `Failed to join room ${joinCode.toUpperCase()}. Please try again.`,
+          duration: 4,
+          placement: "top",
+        });
+        setJoinCode("");
+        setLoading(false);
+        return;
+      }
 
       const roomId = (await joinRes.json()).roomId;
 
@@ -87,24 +103,24 @@ export default function JoinRoomPage() {
 
     } catch (err) {
       console.error(err);
-      alert("Something went wrong. Please try again.");
+      messageApi.error("Network error. Please try again.");
+      setJoinCode("");
       setLoading(false);
     }
   };
 
-  const isActuallyLoading = tokenLoading || loading;
-
-  if (isActuallyLoading) {
-    return <div className={styles.pageBackground}>{contextHolder}</div>;
+  if (tokenLoading) {
+    return <div className={styles.pageBackground}>{contextHolder}{notificationContextHolder}</div>;
   }
 
   if (!isAuthorized) {
-    return <div className={styles.pageBackground}>{contextHolder}</div>;
+    return <div className={styles.pageBackground}>{contextHolder}{notificationContextHolder}</div>;
   }
 
   return (
     <>
       {contextHolder}
+      {notificationContextHolder}
     <div className={styles.pageBackground}>
       <ProfileButton />
       <div className={`${styles.content} ${styles.animContent}`}>
