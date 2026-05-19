@@ -6,6 +6,7 @@ import {
   ArrowLeftOutlined, UserOutlined, CrownFilled,
   CopyOutlined, TrophyOutlined, ThunderboltFilled, InfoCircleOutlined,
 } from "@ant-design/icons";
+import { notification } from "antd";
 import { Client, IMessage, IFrame } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import CodosseumLogo from "@/components/CodosseumLogo";
@@ -87,6 +88,7 @@ export default function LobbyPage() {
   const [chatInput, setChatInput] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
   const stompClientRef = useRef<Client | null>(null);
+  const [notificationApi, notificationContextHolder] = notification.useNotification();
 
   useEffect(() => { hostUsernameRef.current = hostUsername; }, [hostUsername]);
   useEffect(() => { player2UsernameRef.current = player2Username; }, [player2Username]);
@@ -132,7 +134,11 @@ export default function LobbyPage() {
         method: "GET",
         headers: { "Content-Type": "application/json", "token": token, "userId": String(userId) },
       });
-      if (!res.ok) { alert("Room not found"); router.push("/menu"); return; }
+      if (!res.ok) {
+        notificationApi.error({ title: "Room not found", description: "This room no longer exists.", duration: 4, placement: "top" });
+        router.push("/menu");
+        return;
+      }
       const data: RoomData = await res.json();
       setRoom(data);
       if (typeof window !== "undefined") {
@@ -156,7 +162,7 @@ export default function LobbyPage() {
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to load room");
+      notificationApi.error({ title: "Failed to load room", description: "Could not connect to the room. Returning to menu.", duration: 4, placement: "top" });
       router.push("/menu");
     }
   };
@@ -170,7 +176,7 @@ export default function LobbyPage() {
       if (!res.ok) throw new Error("Failed to start game");
     } catch (err) {
       console.error(err);
-      alert("Failed to start game");
+      notificationApi.error({ title: "Failed to start game", description: "Something went wrong. Please try again.", duration: 4, placement: "top" });
     }
   };
 
@@ -224,6 +230,10 @@ export default function LobbyPage() {
         client.subscribe(`/user/queue/game-start`, (message: IMessage) => {
           setIsStarting(true);
           const gameData = JSON.parse(message.body);
+          // Clear any stale game results from previous sessions
+          Object.keys(localStorage)
+            .filter(k => k.startsWith("gameResult_"))
+            .forEach(k => localStorage.removeItem(k));
           if (lobbyAudioRef.current) {
             fadeOutAudio(lobbyAudioRef.current, 200, () => {
               const drums = new Audio("/sounds/DrumGameStart.mp3");
@@ -270,6 +280,7 @@ export default function LobbyPage() {
   if (hostLeft) {
     return (
       <div className={styles.pageBackground}>
+        {notificationContextHolder}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh", gap: "16px", textAlign: "center" }}>
           <div style={{ fontSize: 48 }}>🚪</div>
           <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#1a1a2e", margin: 0 }}>The host has left the arena</h2>
@@ -282,6 +293,7 @@ export default function LobbyPage() {
   if (!room) {
     return (
       <div className={styles.pageBackground}>
+        {notificationContextHolder}
         <div className={styles.content}>
           <p style={{ color: "#6b7280", marginTop: 80 }}>Loading room...</p>
         </div>
@@ -295,6 +307,7 @@ export default function LobbyPage() {
 
   return (
     <div className={styles.pageBackground}>
+      {notificationContextHolder}
       <div className={`${styles.content} ${styles.animContent}`}>
 
         <button className={styles.backButton} onClick={handleLeaveRoom}>
