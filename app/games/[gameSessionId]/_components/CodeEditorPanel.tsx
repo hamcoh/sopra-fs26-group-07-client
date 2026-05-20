@@ -45,7 +45,7 @@ export default function CodeEditorPanel({
   const [showHint, setShowHint] = useState(false);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px", flex: 1 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px", flex: 1, minWidth: 0, overflow: "hidden" }}>
 
       {/* CODE EDITOR */}
       <div className={styles.card} style={{ flex: 2, paddingBottom: 0, overflow: "hidden" }}>
