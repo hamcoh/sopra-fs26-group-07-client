@@ -129,7 +129,7 @@ export default function WrappedPage() {
                     {isEmpty ? (
                         <div className={`${styles.emptyCard} ${styles.animFadeUp}`} style={{ animationDelay: "0.15s" }}>
                             <AimOutlined style={{ fontSize: 36, color: "#7B4FF0" }} />
-                            <p className={styles.emptyTitle}>No games yet</p>
+                            <p className={styles.emptyTitle}>No code submissions yet</p>
                             <p className={styles.emptyDesc}>Jump into the arena and come back once you&apos;ve played some games!</p>
                             <button className={styles.ctaButton} onClick={() => router.push("/rooms")}>
                                 Find a game
@@ -181,7 +181,7 @@ export default function WrappedPage() {
                             </div>
 
                             <div className={`${styles.favsCard} ${styles.animFadeUp}`} style={{ animationDelay: "0.28s" }}>
-                                <p className={styles.favsTitle}>Your go-to style</p>
+                                <p className={styles.favsTitle}>Your top choices</p>
                                 <div className={styles.favsGrid}>
                                     <FavItem icon={<CodeOutlined />}     label="Language"   value={formatEnum(data.favGameLanguage)} />
                                     <FavItem icon={<BarChartOutlined />} label="Difficulty" value={formatEnum(data.favGameDifficulty)} />

@@ -1,10 +1,11 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Spin } from "antd";
+import { Spin, Tooltip } from "antd";
 import { GameStatsDTO } from "../_types";
 import ProblemStatCard from "./ProblemStatCard";
 import styles from "@/styles/stats.module.css";
+import { InfoCircleOutlined } from '@ant-design/icons';
 
 interface ProblemStatsListProps {
     title: string;
@@ -14,6 +15,7 @@ interface ProblemStatsListProps {
     loading: boolean;
     error: string | null;
     accentColor: "orange" | "blue";
+    tooltip?: string; 
 }
 
 export default function ProblemStatsList({
@@ -24,6 +26,7 @@ export default function ProblemStatsList({
                                              loading,
                                              error,
                                              accentColor,
+                                             tooltip
                                          }: ProblemStatsListProps) {
     if (loading) {
         return (
@@ -59,6 +62,11 @@ export default function ProblemStatsList({
                     <h2 className={styles.listTitle}>{title}</h2>
                     <p className={styles.listSubtitle}>
                         Top {data.length} problems {accentColor === "orange" ? "ranked by difficulty score" : "ranked by total play count"}
+                        {tooltip && (
+                            <Tooltip title={tooltip}>
+                                <InfoCircleOutlined style={{ marginLeft: 6, color: '#8e49e4', cursor: 'pointer', fontSize: 13 }} />
+                            </Tooltip>
+                        )}
                     </p>
                 </div>
             </div>

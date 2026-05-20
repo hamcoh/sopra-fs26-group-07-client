@@ -225,9 +225,9 @@ function Hero() {
           <div className="h2" style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: "clamp(3rem,6vw,5.5rem)", fontWeight: 900, letterSpacing: "-.03em", lineHeight: 1, marginBottom: "1.4rem", whiteSpace: "nowrap" }}>
             <span style={{ color: "#fff" }}>COD</span><span className="grad">OSSEUM</span>
           </div>
-          <p className="h3" style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: ".85rem", color: "rgba(255,255,255,.4)", letterSpacing: ".22em", textTransform: "uppercase", marginBottom: "1.5rem" }}>Code · Fight · Conquer</p>
+          <p className="h3" style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: ".85rem", color: "rgba(255,255,255,.4)", letterSpacing: ".22em", textTransform: "uppercase", marginBottom: "1.5rem" }}>Code · Combat · Conquer</p>
           <p className="h4" style={{ fontSize: "1.05rem", color: "rgba(255,255,255,.55)", lineHeight: 1.75, maxWidth: 460, marginBottom: "2.4rem" }}>
-            Two gladiators. One challenge. The fastest, most elegant code wins. Compete in real-time 1v1 duels, climb the ranks, and etch your name into the arena&apos;s history.
+            Two gladiators. One challenge. Every point counts. Compete in real-time 1v1 coding duels, climb the ranks and earn your place in the arena&apos;s history.
           </p>
           <div className="h5" style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: "2.5rem" }}>
             <button className="btn-hero" style={{ fontSize: "1rem", padding: "1.05rem 2.6rem" }} onClick={() => router.push("/register")}>Enter the Arena ⚔️</button>
@@ -324,9 +324,9 @@ interface LandingStats {
 
     const STATS = [
       { val: liveStats?.amountUsers    ?? 0, suffix: "",   icon: <TeamOutlined />,        label: "Gladiators" },
-      { val: liveStats?.amountProblems ?? 0, suffix: "",   icon: <CodeOutlined />,        label: "Problems" },
-      { val: liveStats?.amountLanguages ?? 0, suffix: "",  icon: <GlobalOutlined />,      label: "Languages" },
-      { val: 99,                              suffix: "ms", icon: <ThunderboltOutlined />, label: "Avg Judge Time" },
+      { val: liveStats?.amountProblems ?? 0, suffix: "",   icon: <CodeOutlined />,        label: "Coding Challenges" },
+      { val: liveStats?.amountLanguages ?? 0, suffix: "",  icon: <GlobalOutlined />,      label: "Programming Languages" },
+      { val: 99,                              suffix: "ms", icon: <ThunderboltOutlined />, label: "Avg Code Runtime" },
     ];
 
     return (
@@ -444,7 +444,7 @@ function PythonIcon({ size = 46 }: { size?: number }) {
 ══════════════════════════════════════════════ */
 const TEAM = [
   { name: "@menthoos",        role: "Frontend",               src: "/avatar1.png", github: "https://github.com/menthoos" },
-  { name: "@aldigi27", role: "Backend & Database",     src: "/avatar2.png", github: "https://github.com/aldigi27" },
+  { name: "@aldigi27", role: "Backend",     src: "/avatar6.png", github: "https://github.com/aldigi27" },
   { name: "@hamcoh",   role: "Backend",                src: "/avatar3.png", github: "https://github.com/hamcoh" },
   { name: "@clstein",     role: "Frontend",               src: "/avatar4.png", github: "https://github.com/clstein" },
   { name: "@supermqx",  role: "Backend & Judge Engine", src: "/avatar5.png", github: "https://github.com/supermqx" },
@@ -464,7 +464,7 @@ function AboutSection() {
             <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: ".72rem", color: C.blue, letterSpacing: ".15em" }}>Group #07</span>
           </div>
           <p style={{ fontSize: "1rem", color: C.muted, lineHeight: 1.75, maxWidth: 620, margin: "0 auto" }}>
-            We are a team of passionate developers who built Codosseum as part of our university project. Our goal: make competitive programming fun, fast, and accessible to everyone.
+            We are a team of passionate developers who built Codosseum as part of our university project. Our goal: turn programming practice into a fun, social and competitive experience.
           </p>
         </Reveal>
         <div className="team-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: "1.25rem" }}>
