@@ -1,4 +1,4 @@
-<p align="center"><img src="public/banner.png" alt="Codosseum Banner" width="52%" /></p>
+<p align="center"><img src="public/readme/banner.png" alt="Codosseum Banner" width="52%" /></p>
 
 <div align="center">
   <h1>
@@ -32,6 +32,8 @@
 
 ## ⚔️ About the Project
 
+<img src="public/readme/gladiator_fighting.png" align="right" width="242" />
+
 **Codosseum** is a real-time 1v1 competitive coding platform where two players go head-to-head solving programming challenges against the clock. Choose your language, enter the arena, and may the best coder win.
 
 The platform supports two game modes:
@@ -39,11 +41,13 @@ The platform supports two game modes:
 - **⚡ Sprint Classic** — Race to solve all problems within 15 minutes. Most points wins.
 - **🎮 Sprint Arcade** — Everything in Sprint Classic, plus an item shop. Earn coins by solving problems and spend them on sabotage items to disrupt your opponent.
 
+<br clear="all" />
+
 ---
 
 ## ✨ Features
-
-<img src="public/gladiators_impressed.png" align="right" width="221" />
+<p align="center"><img src="public/readme/gladiator_coding.png" width="35%" /></p>
+<div align="center">
 
 | Feature | Description |
 |---|---|
@@ -57,7 +61,7 @@ The platform supports two game modes:
 | 👤 **Profiles** | Avatar selection, bio, password change, career statistics |
 | 🎨 **Landing Page** | Live stats from the backend, animated Matrix rain effect |
 
-<br clear="all" />
+</div>
 
 ---
 
@@ -77,7 +81,7 @@ Fonts          Inter (UI) · JetBrains Mono (code / accents)
 
 ## 🚀 Getting Started
 
-<img src="public/gladiator_thinking.png" align="right" width="210" />
+<img src="public/readme/gladiator_thinking.png" align="right" width="210" />
 
 ### Prerequisites
 
@@ -124,8 +128,8 @@ npm run start
 ---
 
 ## 🗺️ Application Routes
-
-<img src="public/gladiator_navigation.png" align="right" width="267" />
+<p align="center"><img src="public/readme/gladiator_navigation.png" width="220" /></p>
+<div align="center">
 
 | Route | Page | Auth Required |
 |---|---|---|
@@ -144,7 +148,7 @@ npm run start
 | `/leaderboard` | Global leaderboard | ✅ Yes |
 | `/wrapped` | Season stats overview | ✅ Yes |
 
-<br clear="all" />
+</div>
 
 ---
 
@@ -201,6 +205,10 @@ app/
 
 Real-time communication is handled via **STOMP over SockJS**.
 
+<p align="center"><img src="public/readme/gladiator_listening.png" width="319" /></p>
+
+<div align="center">
+
 | Destination | Direction | Purpose |
 |---|---|---|
 | `/app/room/{roomId}/join` | Client → Server | Notify host a player joined |
@@ -212,9 +220,13 @@ Real-time communication is handled via **STOMP over SockJS**.
 | `/app/game/{id}/buy-item` | Client → Server | Purchase sabotage item |
 | `/topic/game/{id}/sabotage` | Server → Client | Sabotage event (Arcade mode) |
 
+</div>
+
 ---
 
 ## 👥 Team — Group #07
+
+<div align="center">
 
 | GitHub | Role |
 |---|---|
@@ -223,5 +235,7 @@ Real-time communication is handled via **STOMP over SockJS**.
 | [@hamcoh](https://github.com/hamcoh) | Backend |
 | [@clstein](https://github.com/clstein) | Frontend |
 | [@supermqx](https://github.com/supermqx) | Backend & Judge Engine |
+
+</div>
 
 ---
