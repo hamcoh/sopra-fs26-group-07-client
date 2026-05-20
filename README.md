@@ -1,4 +1,4 @@
-<p align="center"><img src="public/banner.png" alt="Codosseum Banner" width="52%" /></p>
+<p align="center"><img src="public/readme/banner.png" alt="Codosseum Banner" width="52%" /></p>
 
 <div align="center">
   <h1>
@@ -32,6 +32,8 @@
 
 ## ⚔️ About the Project
 
+<img src="public/readme/gladiator_fighting.png" align="right" width="242" />
+
 **Codosseum** is a real-time 1v1 competitive coding platform where two players go head-to-head solving programming challenges against the clock. Choose your language, enter the arena, and may the best coder win.
 
 The platform supports two game modes:
@@ -39,31 +41,27 @@ The platform supports two game modes:
 - **⚡ Sprint Classic** — Race to solve all problems within 15 minutes. Most points wins.
 - **🎮 Sprint Arcade** — Everything in Sprint Classic, plus an item shop. Earn coins by solving problems and spend them on sabotage items to disrupt your opponent.
 
+<br clear="all" />
+
 ---
 
 ## ✨ Features
+<p align="center"><img src="public/readme/gladiator_coding.png" width="35%" /></p>
+<div align="center">
 
-<table border="0" cellspacing="0" cellpadding="6">
-<tr>
-<td valign="middle">
-<table>
-<tr><th>Feature</th><th>Description</th></tr>
-<tr><td>🔴 <strong>Real-Time Battles</strong></td><td>WebSocket-based live 1v1 duels with instant state sync</td></tr>
-<tr><td>🏛️ <strong>Game Lobby</strong></td><td>Lobby with live chat, room codes, and game configuration</td></tr>
-<tr><td>🛒 <strong>Arcade Item Shop</strong></td><td>Buy Squid Ink, Earthquake, and Flip Screen to sabotage opponents</td></tr>
-<tr><td>💻 <strong>Code Editor</strong></td><td>Syntax-highlighted editor with run, hint, and submit actions</td></tr>
-<tr><td>🌍 <strong>Multi-Language</strong></td><td>Python, Java, and SQLite supported</td></tr>
-<tr><td>🏆 <strong>Leaderboard</strong></td><td>Global rankings with win rates and stats</td></tr>
-<tr><td>📊 <strong>Wrapped</strong></td><td>Season stats overview — wins, losses, top language, ranking</td></tr>
-<tr><td>👤 <strong>Profiles</strong></td><td>Avatar selection, bio, password change, career statistics</td></tr>
-<tr><td>🎨 <strong>Landing Page</strong></td><td>Live stats from the backend, animated Matrix rain effect</td></tr>
-</table>
-</td>
-<td valign="middle" align="right" width="221">
-<img src="public/gladiators_impressed.png" width="221" />
-</td>
-</tr>
-</table>
+| Feature | Description |
+|---|---|
+| 🔴 **Real-Time Battles** | WebSocket-based live 1v1 duels with instant state sync |
+| 🏛️ **Game Lobby** | Lobby with live chat, room codes, and game configuration |
+| 🛒 **Arcade Item Shop** | Buy Squid Ink, Earthquake, and Flip Screen to sabotage opponents |
+| 💻 **Code Editor** | Syntax-highlighted editor with run, hint, and submit actions |
+| 🌍 **Multi-Language** | Python, Java, and SQLite supported |
+| 🏆 **Leaderboard** | Global rankings with win rates and stats |
+| 📊 **Wrapped** | Season stats overview — wins, losses, top language, ranking |
+| 👤 **Profiles** | Avatar selection, bio, password change, career statistics |
+| 🎨 **Landing Page** | Live stats from the backend, animated Matrix rain effect |
+
+</div>
 
 ---
 
@@ -83,7 +81,7 @@ Fonts          Inter (UI) · JetBrains Mono (code / accents)
 
 ## 🚀 Getting Started
 
-<img src="public/gladiator_thinking.png" align="right" width="210" />
+<img src="public/readme/gladiator_thinking.png" align="right" width="210" />
 
 ### Prerequisites
 
@@ -130,33 +128,27 @@ npm run start
 ---
 
 ## 🗺️ Application Routes
+<p align="center"><img src="public/readme/gladiator_navigation.png" width="220" /></p>
+<div align="center">
 
-<table border="0" cellspacing="0" cellpadding="6">
-<tr>
-<td valign="middle">
-<table>
-<tr><th>Route</th><th>Page</th><th>Auth Required</th></tr>
-<tr><td><code>/</code></td><td>Landing page with live stats</td><td>No</td></tr>
-<tr><td><code>/login</code></td><td>Login</td><td>No</td></tr>
-<tr><td><code>/register</code></td><td>Registration + avatar selection</td><td>No</td></tr>
-<tr><td><code>/menu</code></td><td>Main menu / dashboard</td><td>✅ Yes</td></tr>
-<tr><td><code>/rooms</code></td><td>Browse open game rooms</td><td>✅ Yes</td></tr>
-<tr><td><code>/create-room</code></td><td>Create a room with custom settings</td><td>✅ Yes</td></tr>
-<tr><td><code>/join-room</code></td><td>Join a room by 6-character code</td><td>✅ Yes</td></tr>
-<tr><td><code>/rooms/[roomId]</code></td><td>Game lobby with live chat</td><td>✅ Yes</td></tr>
-<tr><td><code>/games/[gameSessionId]</code></td><td>Live coding battle</td><td>✅ Yes</td></tr>
-<tr><td><code>/profile</code></td><td>User profile and career stats</td><td>✅ Yes</td></tr>
-<tr><td><code>/changeavatar</code></td><td>Change your gladiator avatar</td><td>✅ Yes</td></tr>
-<tr><td><code>/changepassword</code></td><td>Update your password</td><td>✅ Yes</td></tr>
-<tr><td><code>/leaderboard</code></td><td>Global leaderboard</td><td>✅ Yes</td></tr>
-<tr><td><code>/wrapped</code></td><td>Season stats overview</td><td>✅ Yes</td></tr>
-</table>
-</td>
-<td valign="middle" align="right" width="267">
-<img src="public/gladiator_navigation.png" width="267" />
-</td>
-</tr>
-</table>
+| Route | Page | Auth Required |
+|---|---|---|
+| `/` | Landing page with live stats | No |
+| `/login` | Login | No |
+| `/register` | Registration + avatar selection | No |
+| `/menu` | Main menu / dashboard | ✅ Yes |
+| `/rooms` | Browse open game rooms | ✅ Yes |
+| `/create-room` | Create a room with custom settings | ✅ Yes |
+| `/join-room` | Join a room by 6-character code | ✅ Yes |
+| `/rooms/[roomId]` | Game lobby with live chat | ✅ Yes |
+| `/games/[gameSessionId]` | Live coding battle | ✅ Yes |
+| `/profile` | User profile and career stats | ✅ Yes |
+| `/changeavatar` | Change your gladiator avatar | ✅ Yes |
+| `/changepassword` | Update your password | ✅ Yes |
+| `/leaderboard` | Global leaderboard | ✅ Yes |
+| `/wrapped` | Season stats overview | ✅ Yes |
+
+</div>
 
 ---
 
@@ -213,6 +205,10 @@ app/
 
 Real-time communication is handled via **STOMP over SockJS**.
 
+<p align="center"><img src="public/readme/gladiator_listening.png" width="319" /></p>
+
+<div align="center">
+
 | Destination | Direction | Purpose |
 |---|---|---|
 | `/app/room/{roomId}/join` | Client → Server | Notify host a player joined |
@@ -224,9 +220,13 @@ Real-time communication is handled via **STOMP over SockJS**.
 | `/app/game/{id}/buy-item` | Client → Server | Purchase sabotage item |
 | `/topic/game/{id}/sabotage` | Server → Client | Sabotage event (Arcade mode) |
 
+</div>
+
 ---
 
 ## 👥 Team — Group #07
+
+<div align="center">
 
 | GitHub | Role |
 |---|---|
@@ -235,5 +235,7 @@ Real-time communication is handled via **STOMP over SockJS**.
 | [@hamcoh](https://github.com/hamcoh) | Backend |
 | [@clstein](https://github.com/clstein) | Frontend |
 | [@supermqx](https://github.com/supermqx) | Backend & Judge Engine |
+
+</div>
 
 ---

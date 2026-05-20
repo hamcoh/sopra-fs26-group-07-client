@@ -16,6 +16,7 @@ interface PlayerWrappedDTO {
     username: string;
     totalGamesPlayed: number;
     winCount: number;
+    drawCount: number;
     playerSumPassedTestCases: number;
     playerSumTotalTestCases: number;
     totalProblemsSolvedFullyCorrect: number;
@@ -102,7 +103,7 @@ export default function WrappedPage() {
     const passRate   = data ? Math.round((data.playerSumPassedTestCases / Math.max(data.playerSumTotalTestCases, 1)) * 100) : 0;
     const topPercent = data ? Math.round(100 - data.percentileRank) : 0;
     const tier       = data ? getRankTier(topPercent) : null;
-    const losses     = data ? Math.max(0, data.totalGamesPlayed - data.winCount) : 0;
+    const losses     = data ? Math.max(0, data.totalGamesPlayed - data.winCount - (data.drawCount ?? 0)) : 0;
 
     return (
         <>

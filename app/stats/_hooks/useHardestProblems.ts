@@ -32,12 +32,16 @@ export function useHardestProblems() {
                     },
                 });
 
-                if (!res.ok) throw new Error("Failed to fetch hardest problems");
+                if (res.status === 204 || res.status === 404) {
+                    setData([]);
+                    return;
+                }
+                if (!res.ok) throw new Error(`Server error (${res.status})`);
 
                 const json = await res.json();
-                setData(json);
+                setData(Array.isArray(json) ? json : []);
             } catch (err) {
-                setError(err instanceof Error ? err.message : "Failed to fetch hardest problems");
+                setError(err instanceof Error ? err.message : "Unexpected error");
             } finally {
                 setLoading(false);
             }

@@ -36,7 +36,7 @@ export default function ProblemStatsList({
     if (error) {
         return (
             <div className={styles.centerState}>
-                <p className={styles.errorText}>Could not load problems: {error}</p>
+                <p className={styles.errorText}>Could not load rankings. Please try again later.</p>
             </div>
         );
     }
@@ -44,7 +44,7 @@ export default function ProblemStatsList({
     if (!data || data.length === 0) {
         return (
             <div className={styles.centerState}>
-                <p className={styles.emptyText}>No problems found yet. Play some games first!</p>
+                <p className={styles.emptyText}>No rankings yet — they will appear once more games have been played!</p>
             </div>
         );
     }
