@@ -382,6 +382,15 @@
   color: #6B7280;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+
+  text-align: center;
+  white-space: normal;
+  line-height: 1.25;
+  min-height: 1.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .language-card {

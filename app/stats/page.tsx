@@ -54,6 +54,7 @@ export default function StatsPage() {
               title="Hardest Problems"
               subtitle="Top 5 problems ranked by difficulty score"
               icon={<FireOutlined style={{ fontSize: 22, color: "white" }} />}
+              tooltip="Problems are ranked by a weighted difficulty score based on overall success rate and total play volume. A problem requires a minimum number of plays to appear in this ranking."
               data={hardest.data}
               loading={hardest.loading}
               error={hardest.error}

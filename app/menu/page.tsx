@@ -51,7 +51,7 @@ export default function MenuPage() {
           <CodosseumLogo size={100} />
           <div className={styles.logoTexts}>
             <h1 className={styles.logoTitle}>Codosseum</h1>
-            <p className={styles.logoSubtitle}>Choose your battle</p>
+            <p className={styles.logoSubtitle}>Where coding meets competition.</p>
           </div>
         </div>
 
