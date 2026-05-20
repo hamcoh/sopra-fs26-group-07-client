@@ -43,6 +43,12 @@ The platform supports two game modes:
 
 ---
 
+## 🎬 GameFlow
+
+<p align="center"><img src="public/readme/gameflow.gif" alt="GameFlow" width="80%" /></p>
+
+---
+
 ## ✨ Features
 <p align="center"><img src="public/readme/gladiator_coding.png" width="35%" /></p>
 <div align="center">
