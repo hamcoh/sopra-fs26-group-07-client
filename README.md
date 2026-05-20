@@ -43,27 +43,21 @@ The platform supports two game modes:
 
 ## ✨ Features
 
-<table border="0" cellspacing="0" cellpadding="6">
-<tr>
-<td valign="middle">
-<table>
-<tr><th>Feature</th><th>Description</th></tr>
-<tr><td>🔴 <strong>Real-Time Battles</strong></td><td>WebSocket-based live 1v1 duels with instant state sync</td></tr>
-<tr><td>🏛️ <strong>Game Lobby</strong></td><td>Lobby with live chat, room codes, and game configuration</td></tr>
-<tr><td>🛒 <strong>Arcade Item Shop</strong></td><td>Buy Squid Ink, Earthquake, and Flip Screen to sabotage opponents</td></tr>
-<tr><td>💻 <strong>Code Editor</strong></td><td>Syntax-highlighted editor with run, hint, and submit actions</td></tr>
-<tr><td>🌍 <strong>Multi-Language</strong></td><td>Python, Java, and SQLite supported</td></tr>
-<tr><td>🏆 <strong>Leaderboard</strong></td><td>Global rankings with win rates and stats</td></tr>
-<tr><td>📊 <strong>Wrapped</strong></td><td>Season stats overview — wins, losses, top language, ranking</td></tr>
-<tr><td>👤 <strong>Profiles</strong></td><td>Avatar selection, bio, password change, career statistics</td></tr>
-<tr><td>🎨 <strong>Landing Page</strong></td><td>Live stats from the backend, animated Matrix rain effect</td></tr>
-</table>
-</td>
-<td valign="middle" align="right" width="221">
-<img src="public/gladiators_impressed.png" width="221" />
-</td>
-</tr>
-</table>
+<img src="public/gladiators_impressed.png" align="right" width="221" />
+
+| Feature | Description |
+|---|---|
+| 🔴 **Real-Time Battles** | WebSocket-based live 1v1 duels with instant state sync |
+| 🏛️ **Game Lobby** | Lobby with live chat, room codes, and game configuration |
+| 🛒 **Arcade Item Shop** | Buy Squid Ink, Earthquake, and Flip Screen to sabotage opponents |
+| 💻 **Code Editor** | Syntax-highlighted editor with run, hint, and submit actions |
+| 🌍 **Multi-Language** | Python, Java, and SQLite supported |
+| 🏆 **Leaderboard** | Global rankings with win rates and stats |
+| 📊 **Wrapped** | Season stats overview — wins, losses, top language, ranking |
+| 👤 **Profiles** | Avatar selection, bio, password change, career statistics |
+| 🎨 **Landing Page** | Live stats from the backend, animated Matrix rain effect |
+
+<br clear="all" />
 
 ---
 
@@ -131,32 +125,26 @@ npm run start
 
 ## 🗺️ Application Routes
 
-<table border="0" cellspacing="0" cellpadding="6">
-<tr>
-<td valign="middle">
-<table>
-<tr><th>Route</th><th>Page</th><th>Auth Required</th></tr>
-<tr><td><code>/</code></td><td>Landing page with live stats</td><td>No</td></tr>
-<tr><td><code>/login</code></td><td>Login</td><td>No</td></tr>
-<tr><td><code>/register</code></td><td>Registration + avatar selection</td><td>No</td></tr>
-<tr><td><code>/menu</code></td><td>Main menu / dashboard</td><td>✅ Yes</td></tr>
-<tr><td><code>/rooms</code></td><td>Browse open game rooms</td><td>✅ Yes</td></tr>
-<tr><td><code>/create-room</code></td><td>Create a room with custom settings</td><td>✅ Yes</td></tr>
-<tr><td><code>/join-room</code></td><td>Join a room by 6-character code</td><td>✅ Yes</td></tr>
-<tr><td><code>/rooms/[roomId]</code></td><td>Game lobby with live chat</td><td>✅ Yes</td></tr>
-<tr><td><code>/games/[gameSessionId]</code></td><td>Live coding battle</td><td>✅ Yes</td></tr>
-<tr><td><code>/profile</code></td><td>User profile and career stats</td><td>✅ Yes</td></tr>
-<tr><td><code>/changeavatar</code></td><td>Change your gladiator avatar</td><td>✅ Yes</td></tr>
-<tr><td><code>/changepassword</code></td><td>Update your password</td><td>✅ Yes</td></tr>
-<tr><td><code>/leaderboard</code></td><td>Global leaderboard</td><td>✅ Yes</td></tr>
-<tr><td><code>/wrapped</code></td><td>Season stats overview</td><td>✅ Yes</td></tr>
-</table>
-</td>
-<td valign="middle" align="right" width="267">
-<img src="public/gladiator_navigation.png" width="267" />
-</td>
-</tr>
-</table>
+<img src="public/gladiator_navigation.png" align="right" width="267" />
+
+| Route | Page | Auth Required |
+|---|---|---|
+| `/` | Landing page with live stats | No |
+| `/login` | Login | No |
+| `/register` | Registration + avatar selection | No |
+| `/menu` | Main menu / dashboard | ✅ Yes |
+| `/rooms` | Browse open game rooms | ✅ Yes |
+| `/create-room` | Create a room with custom settings | ✅ Yes |
+| `/join-room` | Join a room by 6-character code | ✅ Yes |
+| `/rooms/[roomId]` | Game lobby with live chat | ✅ Yes |
+| `/games/[gameSessionId]` | Live coding battle | ✅ Yes |
+| `/profile` | User profile and career stats | ✅ Yes |
+| `/changeavatar` | Change your gladiator avatar | ✅ Yes |
+| `/changepassword` | Update your password | ✅ Yes |
+| `/leaderboard` | Global leaderboard | ✅ Yes |
+| `/wrapped` | Season stats overview | ✅ Yes |
+
+<br clear="all" />
 
 ---
 
