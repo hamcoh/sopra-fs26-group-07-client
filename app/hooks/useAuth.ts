@@ -33,7 +33,7 @@ export function useAuth() {
         clearAvatarId();
 
         setTimeout(() => {
-            router.push("/");
+            window.location.replace("/");
         }, delay);
     }, [router, clearToken, clearUserId, clearUsername, isLoggingOut, token, userId]);
 

@@ -10,6 +10,7 @@ import CodosseumLogo from "@/components/CodosseumLogo";
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 import AvatarSelection from "@/components/register/AvatarSelection";
+import { getApiDomain } from "@/utils/domain";
 
 interface FormFieldProps {
     username: string;
@@ -24,6 +25,8 @@ export default function RegisterPage() {
     const [form] = Form.useForm();
     const [messageApi, contextHolder] = message.useMessage();
 
+    const [ready, setReady]       = useState(false);
+    const [checking, setChecking] = useState(false);
     const [step, setStep] = useState<"details" | "avatar">("details");
     const [tempFormData, setTempFormData] = useState<FormFieldProps | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,10 +34,26 @@ export default function RegisterPage() {
     const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            router.push("/menu");
+        // useLocalStorage stores values via JSON.stringify, so we must parse them back
+        const token  = JSON.parse(localStorage.getItem("token")  ?? "null");
+        const userId = JSON.parse(localStorage.getItem("userid") ?? "null");
+
+        if (!token || !userId) {
+            setReady(true);
+            return;
         }
+
+        setChecking(true);
+        fetch(`${getApiDomain()}/users/${userId}`, { headers: { token } })
+            .then(res => {
+                if (res.ok) {
+                    router.push("/menu");
+                } else {
+                    setChecking(false);
+                    setReady(true);
+                }
+            })
+            .catch(() => { setChecking(false); setReady(true); });
     }, [router]);
 
     useEffect(() => {
@@ -89,6 +108,8 @@ export default function RegisterPage() {
             }
         }
     };
+
+    if (!ready || checking) return null;
 
     return (
         <>

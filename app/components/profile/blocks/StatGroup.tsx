@@ -19,7 +19,7 @@ export default function StatGroup({ stats, losses }: StatGroupProps) {
         { label: "Points", val: stats.totalPoints, icon: <TrophyOutlined />, cls: styles.icon4 },
         { label: "Games Played", val: stats.totalGamesPlayed, icon: <PlayCircleOutlined />, cls: styles.icon },
         { label: "Win Ratio", val: `${stats.winRatePercentage}%`, icon: <RiseOutlined />, cls: styles.icon5 },
-        { label: "Record", val: `${stats.winCount}W-${losses}L-${stats.drawCount}D`, icon: <TrophyOutlined />, cls: styles.icon2 },
+        { label: "Record", val: `${stats.winCount}W-${stats.drawCount}D-${losses}L`, icon: <TrophyOutlined />, cls: styles.icon2 },
     ];
 
     return (

@@ -7,8 +7,9 @@ import { Button, Form, Input, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import CodosseumLogo from "@/components/CodosseumLogo";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { getApiDomain } from "@/utils/domain";
 
 interface FormFieldProps {
   username: string;
@@ -24,12 +25,38 @@ export default function Home() {
   const { set: setUserName } = useLocalStorage<string>("username", "");
   const { set: setAvatar } = useLocalStorage<string>("avatarId", "");
   const [messageApi, contextHolder] = message.useMessage();
+  // Both start false so server and client render identically (no hydration mismatch).
+  // The effect sets them appropriately after mount.
+  const [ready, setReady]       = useState(false); // true once we know we should show the form
+  const [checking, setChecking] = useState(false); // true while validating an existing token
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      router.push("/menu");
+    // useLocalStorage stores values via JSON.stringify, so we must parse them back
+    const token  = JSON.parse(localStorage.getItem("token")  ?? "null");
+    const userId = JSON.parse(localStorage.getItem("userid") ?? "null");
+
+    if (!token || !userId) {
+      // No session — show the form and handle the expiry message if present
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("reason") === "session_expired") {
+        messageApi.warning("Your session has expired. Please log in again.");
+      }
+      setReady(true);
+      return;
     }
+
+    // Has a token — validate before deciding what to show
+    setChecking(true);
+    fetch(`${getApiDomain()}/users/${userId}`, { headers: { token } })
+      .then(res => {
+        if (res.ok) {
+          router.push("/menu"); // valid session → redirect, page unmounts
+        } else {
+          setChecking(false); // stale token — show the form
+          setReady(true);
+        }
+      })
+      .catch(() => { setChecking(false); setReady(true); }); // network error — show the form
   }, [router]);
 
   const handleLogin = async (values: FormFieldProps) => {
@@ -50,6 +77,8 @@ export default function Home() {
       }
     }
   };
+
+  if (!ready || checking) return null;
 
   return (
       <>

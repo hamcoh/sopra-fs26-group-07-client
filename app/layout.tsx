@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { App as AntdApp, ConfigProvider, theme } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
+import SessionValidator from "@/components/SessionValidator";
 import "@/styles/globals.css";
 
 const geistSans = Geist({
@@ -59,7 +60,10 @@ export default function RootLayout({
           }}
         >
           <AntdRegistry>
-            <AntdApp>{children}</AntdApp>
+            <AntdApp>
+              <SessionValidator />
+              {children}
+            </AntdApp>
           </AntdRegistry>
         </ConfigProvider>
       </body>

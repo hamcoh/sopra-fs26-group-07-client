@@ -1,11 +1,9 @@
 <p align="center"><img src="public/readme/banner.png" alt="Codosseum Banner" width="52%" /></p>
 
 <div align="center">
-  <h1>
-    <img src="public/codosseum_icon.svg" alt="Logo" height="52" style="vertical-align: middle;" />
-    &nbsp;CODOSSEUM — Client
-  </h1>
-  <p><em>Two gladiators. One challenge. The fastest, most elegant code wins.</em></p>
+  <img src="public/codosseum_icon.svg" alt="Logo" height="65" />
+  <h1>CODOSSEUM — Client</h1>
+  <p><em>Two gladiators. One challenge.</em></p>
   <p>
     <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js&logoColor=white" />
     <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
@@ -239,3 +237,11 @@ Real-time communication is handled via **STOMP over SockJS**.
 </div>
 
 ---
+
+## 📄 License
+
+<img src="public/readme/gladiator_license.png" align="right" width="210" />
+
+This project is released under the [Apache 2.0 License](LICENSE), which permits free use, distribution, modification, and commercial use. The software is provided as-is, without warranty or liability of any kind.
+
+<br clear="all" />
