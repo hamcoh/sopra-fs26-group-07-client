@@ -59,9 +59,9 @@ export default function LobbyPage() {
   const params = useParams();
   const roomId = params.roomId as string;
 
-  const { value: token } = useLocalStorage("token", "");
+  const { value: token, loading: tokenLoading } = useLocalStorage("token", "");
   const { value: username } = useLocalStorage("username", "Player");
-  const { value: userId } = useLocalStorage("userid", "");
+  const { value: userId, loading: userIdLoading } = useLocalStorage("userid", "");
 
   const [room, setRoom] = useState<RoomData | null>(null);
   const [copied, setCopied] = useState(false);
@@ -95,6 +95,14 @@ export default function LobbyPage() {
   useEffect(() => { isHostRef.current = String(userId) === String(room?.hostUserId); }, [userId, room]);
   useEffect(() => { hostAvatarIdRef.current = hostAvatarId; }, [hostAvatarId]);
   useEffect(() => { player2AvatarIdRef.current = player2AvatarId; }, [player2AvatarId]);
+
+  // Auth guard — redirect unauthenticated users to login
+  useEffect(() => {
+    if (tokenLoading || userIdLoading) return;
+    if (!token || !userId) {
+      router.replace("/login");
+    }
+  }, [token, userId, tokenLoading, userIdLoading, router]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -140,6 +148,11 @@ export default function LobbyPage() {
         return;
       }
       const data: RoomData = await res.json();
+      // Redirect if the current user is not a participant in this room
+      if (userId && !data.playerIds.map(String).includes(String(userId))) {
+        router.push("/menu");
+        return;
+      }
       setRoom(data);
       if (typeof window !== "undefined") {
         localStorage.setItem("roomLanguage", (data.gameLanguage ?? "PYTHON").toLowerCase());
@@ -274,6 +287,8 @@ export default function LobbyPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (tokenLoading || userIdLoading || !token || !userId) return null;
 
   if (isStarting) return <LoadingScreen />;
 
@@ -915,7 +930,10 @@ export default function LobbyPage() {
                   </div>
                 </div>
 
-                <div style={{ fontWeight: 700, fontSize: 13, color: "#1a1a2e", marginBottom: 10 }}>🛒 Item Shop</div>
+                <div style={{ fontWeight: 700, fontSize: 13, color: "#1a1a2e", marginBottom: 6 }}>🛒 Item Shop</div>
+                <p style={{ margin: "0 0 12px", fontSize: 12, color: "#6b7280", lineHeight: 1.6 }}>
+                  Every point you score earns you <strong style={{ color: "#854d0e" }}>🪙 1 coin</strong>. Spend them on sabotage items to disrupt your opponent. Coins are only valid for the current game — any unspent coins vanish when the match ends.
+                </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
                   <div style={{ border: "1.5px solid #ede9fe", borderRadius: 14, padding: 14, display: "flex", alignItems: "center", gap: 14 }}>

@@ -102,8 +102,9 @@ export default function GameOverScreen({
     });
   };
 
-  const solvedCorrectly = gameSummary?.problemResults?.solvedCorrectly ?? [];
-  const notSolved = gameSummary?.problemResults?.notSolvedFullyCorrectly ?? [];
+  const solvedCorrectly  = gameSummary?.problemResults?.solvedCorrectly ?? [];
+  const solvedPartially  = gameSummary?.problemResults?.solvedPartiallyCorrectly ?? [];
+  const solvedWrong      = gameSummary?.problemResults?.solvedWrong ?? [];
 
   const isWin  = myScore > (opponent?.score ?? 0);
   const isDraw = myScore === (opponent?.score ?? 0);
@@ -249,25 +250,32 @@ export default function GameOverScreen({
 
         {/* SAMPLE SOLUTIONS */}
         {gameEndData?.gameSessionSampleSolutions &&
-          Object.keys(gameEndData.gameSessionSampleSolutions).length > 0 && (
+          gameEndData.gameSessionSampleSolutions.length > 0 && (
           <div className={resultStyles.problemsSection}>
             <h2 className={resultStyles.solutionsTitle}>📋 Sample Solutions</h2>
-            {Object.entries(gameEndData.gameSessionSampleSolutions).map(([problemId, solution], index) => {
-              const isExpanded = expandedSolutions.has(problemId);
-              const pid = Number(problemId);
-              const isSolved = solvedCorrectly.includes(pid);
-              const isIncorrect = !isSolved && notSolved.includes(pid);
-              const borderColor = isSolved ? "#16a34a" : isIncorrect ? "#dc2626" : "#d1d5db";
-              const bgColor = isSolved ? "#f0fdf4" : isIncorrect ? "#fef2f2" : "#f9fafb";
-              const badge = isSolved
+            {gameEndData.gameSessionSampleSolutions.map((solution, index) => {
+              const pid        = solution.problemId;
+              const problemKey = String(pid);
+
+              const isExpanded   = expandedSolutions.has(problemKey);
+              const isCorrect    = solvedCorrectly.includes(pid);
+              const isPartial    = !isCorrect && solvedPartially.includes(pid);
+              const isIncorrect  = !isCorrect && !isPartial && solvedWrong.includes(pid);
+              // isNotSolved = never submitted — not in any backend array
+
+              const borderColor  = isCorrect ? "#16a34a" : isPartial ? "#d97706" : isIncorrect ? "#dc2626" : "#d1d5db";
+              const bgColor      = isCorrect ? "#f0fdf4" : isPartial ? "#fffbeb" : isIncorrect ? "#fef2f2" : "#f9fafb";
+              const badge        = isCorrect
                 ? <span style={{ fontSize: 13, fontWeight: 600, color: "#16a34a", background: "#dcfce7", padding: "2px 10px", borderRadius: 6 }}>✓ Correct</span>
+                : isPartial
+                ? <span style={{ fontSize: 13, fontWeight: 600, color: "#d97706", background: "#fef9c3", padding: "2px 10px", borderRadius: 6 }}>◑ Partial</span>
                 : isIncorrect
                 ? <span style={{ fontSize: 13, fontWeight: 600, color: "#dc2626", background: "#fee2e2", padding: "2px 10px", borderRadius: 6 }}>✗ Incorrect</span>
                 : <span style={{ fontSize: 13, fontWeight: 600, color: "#6b7280", background: "#f3f4f6", padding: "2px 10px", borderRadius: 6 }}>— Not solved</span>;
 
               return (
                 <div
-                  key={problemId}
+                  key={problemKey}
                   className={resultStyles.problemItem}
                   style={{ flexDirection: "column", alignItems: "flex-start", gap: "12px", cursor: "default", border: `2px solid ${borderColor}`, background: bgColor }}
                 >
@@ -277,7 +285,7 @@ export default function GameOverScreen({
                       <strong style={{ fontSize: "15px", color: "#1a1a2e" }}>{solution.problemTitle}</strong>
                       {badge}
                     </div>
-                    <button className={resultStyles.solutionToggleBtn} onClick={() => toggleSolution(problemId)}>
+                    <button className={resultStyles.solutionToggleBtn} onClick={() => toggleSolution(problemKey)}>
                       {isExpanded ? "Hide Solution" : "Show Solution"}
                     </button>
                   </div>

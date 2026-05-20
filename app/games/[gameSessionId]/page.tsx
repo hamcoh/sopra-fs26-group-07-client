@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect, useRef, useState} from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import styles from "@/styles/game.module.css";
 import useLocalStorage from "@/hooks/useLocalStorage";
@@ -40,8 +40,9 @@ const EFFECT_DISPLAY: Record<string, { label: string; emoji: string }> = {
 };
 
 export default function GamePage() {
-  const { value: userId } = useLocalStorage("userid", "");
-  const { value: token } = useLocalStorage("token", "");
+  const router = useRouter();
+  const { value: userId, loading: userIdLoading } = useLocalStorage("userid", "");
+  const { value: token,  loading: tokenLoading  } = useLocalStorage("token", "");
   const { value: storedUsername } = useLocalStorage("username", "Player One");
   const { value: storedAvatarId } = useLocalStorage("avatarId", "1");
   const params = useParams();
@@ -112,6 +113,11 @@ export default function GamePage() {
   }, [userId, token]);
 
   useEffect(() => {
+    if (tokenLoading || userIdLoading) return;
+    if (!token || !userId) router.push("/");
+  }, [token, userId, tokenLoading, userIdLoading, router]);
+
+  useEffect(() => {
     if (isGameOver) return;
   
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -139,13 +145,23 @@ export default function GamePage() {
       gameEndData,
       gameSummary,
     }));
+    // No longer needed once the game has ended — clear it so that stale data
+    // can't be mistaken for a valid session when navigating to other game pages.
+    localStorage.removeItem("gameRoundData");
   }, [isGameOver]);
 
-  // Load problem data from localStorage (saved by lobby page on game-start WS)
+  // Load problem data from localStorage (saved by lobby page on game-start WS).
+  // If neither gameRoundData nor a saved result exist, this user has no business
+  // being on this page — redirect them away.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const stored = localStorage.getItem("gameRoundData");
-    if (!stored) return;
+    const saved  = localStorage.getItem(`gameResult_${gameSessionId}`);
+    if (!stored && !saved) {
+      router.push("/menu");
+      return;
+    }
+    if (!stored) return; // has a saved result — GameOverScreen handles it
     try {
       const data: GameRoundData = JSON.parse(stored);
       setPlayerSessionId(data.playerSessionId);
@@ -384,6 +400,10 @@ export default function GamePage() {
       return false;
     }
   };
+
+  // Still reading localStorage — render nothing to avoid flashing the game UI.
+  // Also suppress render when there is no token (auth effect will redirect).
+  if (tokenLoading || userIdLoading || !token || !userId) return null;
 
   // GAME OVER screen
   if (isGameOver || savedResult) {

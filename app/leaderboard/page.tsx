@@ -162,9 +162,9 @@ export default function LeaderboardPage() {
           <span style={{ fontWeight: 600 }}>
             <span style={{ color: "#22C55E" }}>{record.winCount}</span>
             <span style={{ color: "#9CA3AF" }}> - </span>
-            <span style={{ color: "#EF4444" }}>{losses}</span>
-            <span style={{ color: "#9CA3AF" }}> - </span>
             <span style={{ color: "#F59E0B" }}>{record.drawCount}</span>
+            <span style={{ color: "#9CA3AF" }}> - </span>
+            <span style={{ color: "#EF4444" }}>{losses}</span>
           </span>
         );
       },

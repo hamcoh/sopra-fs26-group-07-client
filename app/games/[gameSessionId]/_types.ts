@@ -37,6 +37,7 @@ export interface GameRoundData {
   }
   
   export interface GameSessionSampleSolutionsDTO {
+    problemId: number;
     problemTitle: string;
     problemSampleSolution: string;
   }
@@ -54,7 +55,7 @@ export interface GameRoundData {
     gameEndReason: string;
     winnerPlayerId: number;
     playerScores: PlayerScoreDTO[];
-    gameSessionSampleSolutions: Record<string, GameSessionSampleSolutionsDTO>;
+    gameSessionSampleSolutions: GameSessionSampleSolutionsDTO[];
   }
   
   export interface PlayerGameSummaryDTO {
@@ -62,7 +63,8 @@ export interface GameRoundData {
     playerId: number;
     problemResults: {
       solvedCorrectly: number[];
-      notSolvedFullyCorrectly: number[];
+      solvedPartiallyCorrectly: number[];
+      solvedWrong: number[];
     };
   }
   
