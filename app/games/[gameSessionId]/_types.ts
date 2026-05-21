@@ -47,6 +47,11 @@ export interface GameRoundData {
     userId: number;
     username: string;
     score: number;
+    problemsSolved: number;
+    totalGamesPlayed: number;
+    winCount: number;
+    drawCount: number;
+    winRatePercentage: number;
   }
   
   export interface GameEndDTO {

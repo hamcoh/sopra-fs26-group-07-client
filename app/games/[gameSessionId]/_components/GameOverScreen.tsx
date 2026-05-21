@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import CodosseumLogo from "@/components/CodosseumLogo";
 import CodosseumAvatar from "@/components/CodosseumAvatar";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { getApiDomain } from "@/utils/domain";
 import styles from "@/styles/game.module.css";
 import resultStyles from "@/styles/results.module.css";
 import { GameEndDTO, PlayerGameSummaryDTO } from "../_types";
@@ -56,42 +55,28 @@ export default function GameOverScreen({
 }: GameOverScreenProps) {
   const router = useRouter();
   const { value: userId } = useLocalStorage("userid", "");
-  const { value: token } = useLocalStorage("token", "");
   const [expandedSolutions, setExpandedSolutions] = useState<Set<string>>(new Set());
-  const [myStats, setMyStats] = useState<UserStats | null>(null);
-  const [opponentStats, setOpponentStats] = useState<UserStats | null>(null);
 
   const myUserIdNum = userId ? Number(userId) : null;
-  const opponentUserId = gameEndData?.playerScores?.find(p => p.userId !== myUserIdNum)?.userId ?? null;
 
-  const parseStats = (data: Record<string, number>): UserStats => {
-    const wins = data.winCount ?? 0;
-    const draws = data.drawCount ?? 0;
-    const gamesPlayed = data.totalGamesPlayed ?? 0;
-    return {
-      wins,
-      losses: gamesPlayed - wins - draws,
-      draws,
-      gamesPlayed,
-      winRate: data.winRatePercentage != null ? Math.round(data.winRatePercentage) : 0,
-    };
-  };
+  const myPlayerScore = gameEndData?.playerScores?.find(p => p.userId === myUserIdNum);
+  const opponentPlayerScore = gameEndData?.playerScores?.find(p => p.userId !== myUserIdNum);
 
-  useEffect(() => {
-    if (!token) return;
-    if (myUserIdNum) {
-      fetch(`${getApiDomain()}/users/${myUserIdNum}`, { headers: { token } })
-        .then(r => r.ok ? r.json() : null)
-        .then(data => { if (data) setMyStats(parseStats(data)); })
-        .catch(() => {});
-    }
-    if (opponentUserId) {
-      fetch(`${getApiDomain()}/users/${opponentUserId}`, { headers: { token } })
-        .then(r => r.ok ? r.json() : null)
-        .then(data => { if (data) setOpponentStats(parseStats(data)); })
-        .catch(() => {});
-    }
-  }, [myUserIdNum, opponentUserId, token]);
+  const myStats: UserStats | null = myPlayerScore ? {
+    wins: myPlayerScore.winCount,
+    draws: myPlayerScore.drawCount,
+    gamesPlayed: myPlayerScore.totalGamesPlayed,
+    losses: myPlayerScore.totalGamesPlayed - myPlayerScore.winCount - myPlayerScore.drawCount,
+    winRate: Math.round(myPlayerScore.winRatePercentage),
+  } : null;
+
+  const opponentStats: UserStats | null = opponentPlayerScore ? {
+    wins: opponentPlayerScore.winCount,
+    draws: opponentPlayerScore.drawCount,
+    gamesPlayed: opponentPlayerScore.totalGamesPlayed,
+    losses: opponentPlayerScore.totalGamesPlayed - opponentPlayerScore.winCount - opponentPlayerScore.drawCount,
+    winRate: Math.round(opponentPlayerScore.winRatePercentage),
+  } : null;
 
   const toggleSolution = (id: string) => {
     setExpandedSolutions(prev => {
