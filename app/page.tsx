@@ -447,7 +447,7 @@ const TEAM = [
   { name: "@aldigi27", role: "Backend",     src: "/avatar6.png", github: "https://github.com/aldigi27" },
   { name: "@hamcoh",   role: "Backend",                src: "/avatar3.png", github: "https://github.com/hamcoh" },
   { name: "@clstein",     role: "Frontend",               src: "/avatar4.png", github: "https://github.com/clstein" },
-  { name: "@supermqx",  role: "Backend", src: "/avatar8.png", github: "https://github.com/supermqx" },
+  { name: "@supermqx",  role: "Backend", src: "/avatar8.png", github: "https://github.com/supermqx" }, 
 ];
 
 function AboutSection() {
