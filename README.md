@@ -3,7 +3,7 @@
 <div align="center">
   <img src="public/codosseum_icon.svg" alt="Logo" height="65" />
   <h1>CODOSSEUM — Client</h1>
-  <p><em>Two gladiators. One challenge.</em></p>
+  <p><em>Two gladiators. One challenge. Every point counts. Compete in real-time 1v1 coding duels, climb the ranks and earn your place in the arena's history.</em></p>
   <p>
     <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js&logoColor=white" />
     <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
@@ -26,28 +26,41 @@
   </p>
 </div>
 
----
 
-## ⚔️ About the Project
+
+## ⚔️ About Codosseum
 
 <img src="public/readme/gladiator_fighting.png" align="right" width="242" />
 
-**Codosseum** is a real-time 1v1 competitive coding platform where two players go head-to-head solving programming challenges against the clock. Choose your language, enter the arena, and may the best coder win.
+**Codosseum** is a real-time 1v1 competitive coding game where players battle head-to-head by solving programming challenges. Choose your preferred language (`Python`, `Java` or `SQLite`), select a game mode (either a playful mode or a coding-focused one) and difficulty to enter the coding arena.
 
-The platform supports two game modes:
+Inside the arena, players use an integrated code editor to write and test their solutions against predefined test cases, with code execution and evaluation powered by [Judge0](https://judge0.com/), the external code execution API used by our app. Once ready, players can make one final submission per problem, with victory ultimately going to the player with the most points.
 
-- **⚡ Sprint Classic** — Race to solve all problems within 15 minutes. Most points wins.
-- **🎮 Sprint Arcade** — Everything in Sprint Classic, plus an item shop. Earn coins by solving problems and spend them on sabotage items to disrupt your opponent.
+Beyond the core gameplay, Codosseum also includes features such as game statistics tracking, leaderboards and competitive progression to keep the challenge going.
+
+Ready to step into the arena? [Play now](https://sopra-fs26-group-07-client.vercel.app/), choose your language, prove your skills and may the best coder win.
 
 <br clear="all" />
 
----
+
+
+## 🏛️ Project Motivation
+
+As AI-based coding tools become increasingly powerful, it can be tempting to delegate even basic programming tasks for the sake of efficiency and convenience. While highly useful, overreliance on AI-tools can hinder the development of essential skills such as problem-solving, algorithmic thinking, and coding fundamentals. It may also lead to comprehension debt: producing code without fully understanding it (as discussed in [hasel.dev](https://hasel.dev/author/tarek/) ).
+
+<img src="public/readme/gladiator_newgen.png" align="right" width="210" />
+
+These concerns are especially relevant for beginners, junior developers, and computer science students who are still building their core programming foundations. Hence, with Codosseum, we aim to provide an interactive and playful way to practice coding, fostering algorithmic thinking and problem-solving skills by making learning competitive, rewarding and fun. After all, we believe these skills will continue to matter and deserve to be practiced in ways that inspire people to keep learning.
+
+<br clear="all" />
+
+
 
 ## 🎬 GameFlow
 
 <p align="center"><img src="public/readme/gameflow.gif" alt="GameFlow" width="80%" /></p>
 
----
+
 
 ## ✨ Features
 <p align="center"><img src="public/readme/gladiator_coding.png" width="35%" /></p>
@@ -62,12 +75,13 @@ The platform supports two game modes:
 | 🌍 **Multi-Language** | Python, Java, and SQLite supported |
 | 🏆 **Leaderboard** | Global rankings with win rates and stats |
 | 📊 **Wrapped** | Season stats overview — wins, losses, top language, ranking |
+| 📈 **Stats** | Top problem insights: hardest & most played |
 | 👤 **Profiles** | Avatar selection, bio, password change, career statistics |
 | 🎨 **Landing Page** | Live stats from the backend, animated Matrix rain effect |
 
 </div>
 
----
+
 
 ## 🛠️ Tech Stack
 
@@ -81,7 +95,7 @@ Real-Time      STOMP over SockJS (@stomp/stompjs + sockjs-client)
 Fonts          Inter (UI) · JetBrains Mono (code / accents)
 ```
 
----
+
 
 ## 🚀 Getting Started
 
@@ -129,7 +143,7 @@ npm run start
 
 <br clear="all" />
 
----
+
 
 ## 🗺️ Application Routes
 <p align="center"><img src="public/readme/gladiator_navigation.png" width="220" /></p>
@@ -151,10 +165,11 @@ npm run start
 | `/changepassword` | Update your password | ✅ Yes |
 | `/leaderboard` | Global leaderboard | ✅ Yes |
 | `/wrapped` | Season stats overview | ✅ Yes |
+| `/stats` | Hardest & most-played problem stats| ✅ Yes |
 
 </div>
 
----
+
 
 ## 📁 Project Structure
 
@@ -175,6 +190,7 @@ app/
 │   ├── changeavatar/
 │   ├── changepassword/
 │   ├── leaderboard/
+│   ├── stats/
 │   └── wrapped/
 │
 ├── components/               # Shared UI components
@@ -226,6 +242,20 @@ Real-time communication is handled via **STOMP over SockJS**.
 
 </div>
 
+
+
+## 🗺️ Roadmap
+For developers interested in contributing to Codosseum, the following features would be valuable and exciting areas for further development:
+
+1. **Solo Game Mode**<br>
+Add a mode where players can solve problems independently, allowing them to practice specific problems or programming languages, improve weaker areas, and progress at their own pace. This does not necessarily have to be implemented as a game mode. It could also take the form of a practice mode with a list of coding problems, allowing users to select problems in their preferred programming language and solve them as often as they like, without time limits or competitive pressure.
+
+2. **Private Rooms**<br>
+Extend room configuration by allowing users to create fully private rooms that can only be joined by invited players or users with the correct room code. This could also include a WebSocket-based invitation system, enabling players to send and receive live room invitations.
+
+3. **Additional Multiplayer Game Mode (Synchronous Game Mode)**<br>
+Implement a fully synchronous game mode where all players receive every problem at the same time and have a fixed time limit to solve it. The next problem is served to both players once a player submits a fully correct solution or the timer runs out.
+
 ---
 
 ## 👥 Team — Group #07
@@ -235,14 +265,28 @@ Real-time communication is handled via **STOMP over SockJS**.
 | GitHub | Role |
 |---|---|
 | [@menthoos](https://github.com/menthoos) | Frontend |
-| [@aldigi27](https://github.com/aldigi27) | Backend & Database |
+| [@aldigi27](https://github.com/aldigi27) | Backend |
 | [@hamcoh](https://github.com/hamcoh) | Backend |
 | [@clstein](https://github.com/clstein) | Frontend |
-| [@supermqx](https://github.com/supermqx) | Backend & Judge Engine |
+| [@supermqx](https://github.com/supermqx) | Backend |
 
 </div>
 
----
+
+
+## 🙏🏼 Acknowledgment
+
+We would like to especially thank our TA, [Fina Louise Kossmann](https://github.com/fksm2003), for her outstanding support throughout the semester. Her guidance, support, and dedication helped us greatly and kept us motivated throughout the development of this project.
+
+We also extend our thanks to the entire [Software Engineering Lab](https://hasel.dev/teachings/fs26-sopra/) team for their tutorials and effort throughout the semester.
+
+Also, we acknowledge the inspiration drawn from online coding platforms such as [LeetCode](https://leetcode.com/) and [ACCESS](https://access.ifi.uzh.ch/), the latter of which inspired us through its use in the [Informatics 1 course](https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/2026/003/SM/51110636) at the University of Zurich, which helped shape the vision for this project
+
+Further, we would also like to warmly thank the [Judge0](https://judge0.com/) team for building such a great piece of software and making it available for others to use.
+
+Finally, many thanks to everyone who tested the application during development and provided valuable feedback along the way.
+
+
 
 ## 📄 License
 
