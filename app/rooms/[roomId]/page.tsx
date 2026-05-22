@@ -76,6 +76,7 @@ export default function LobbyPage() {
   const hostAvatarIdRef = useRef<number | null>(null);
   const [player2AvatarId, setPlayer2AvatarId] = useState<number | null>(null);
   const player2AvatarIdRef = useRef<number | null>(null);
+  const [opponentJoinDelay, setOpponentJoinDelay] = useState(false);
 
   const hostUsernameRef = useRef<string | null>(null);
   const player2UsernameRef = useRef<string | null>(null);
@@ -153,6 +154,14 @@ export default function LobbyPage() {
         router.push("/menu");
         return;
       }
+
+      const opponentJustJoined =
+          data.currentNumPlayers >= 2 && player2Username === null;
+      if (opponentJustJoined) {
+        setOpponentJoinDelay(true);
+        setTimeout(() => setOpponentJoinDelay(false), 1000);
+      }
+
       setRoom(data);
       if (typeof window !== "undefined") {
         localStorage.setItem("roomLanguage", (data.gameLanguage ?? "PYTHON").toLowerCase());
@@ -172,6 +181,7 @@ export default function LobbyPage() {
       } else {
         setPlayer2Username(null);
         setPlayer2AvatarId(null);
+        setOpponentJoinDelay(false);
       }
     } catch (err) {
       console.error(err);
@@ -477,7 +487,7 @@ export default function LobbyPage() {
 
           <button
             className={styles.enterArenaButton}
-            disabled={!bothReady || !isCurrentUserHost}
+            disabled={!bothReady || !isCurrentUserHost || opponentJoinDelay}
             onClick={handleStartGame}
           >
             <ThunderboltFilled style={{ fontSize: 28 }} />
