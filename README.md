@@ -273,11 +273,13 @@ Implement a fully synchronous game mode where all players receive every problem 
 
 ## 🙏🏼 Acknowledgment
 
-We would like to especially thank our TA for her outstanding support throughout the semester. Her guidance, support, and dedication helped us greatly and kept us motivated throughout the development of this project.
+We would like to especially thank our TA, [Fina Louise Kossmann](https://github.com/fksm2003), for her outstanding support throughout the semester. Her guidance, support, and dedication helped us greatly and kept us motivated throughout the development of this project.
 
 We also extend our thanks to the entire [Software Engineering Lab](https://hasel.dev/teachings/fs26-sopra/) team for their tutorials and effort throughout the semester.
 
-Fruther, we would also like to warmly thank the [Judge0](https://judge0.com/) team for building such a great piece of software and making it available for others to use.
+Also, we acknowledge the inspiration drawn from online coding platforms such as [LeetCode](https://leetcode.com/) and [ACCESS](https://access.ifi.uzh.ch/), the latter of which inspired us through its use in the [Informatics 1 course](https://studentservices.uzh.ch/uzh/anonym/vvz/index.html#/details/2026/003/SM/51110636) at the University of Zurich, which helped shape the vision for this project
+
+Further, we would also like to warmly thank the [Judge0](https://judge0.com/) team for building such a great piece of software and making it available for others to use.
 
 Finally, many thanks to everyone who tested the application during development and provided valuable feedback along the way.
 
