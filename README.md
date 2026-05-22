@@ -75,6 +75,7 @@ These concerns are especially relevant for beginners, junior developers, and com
 | 🌍 **Multi-Language** | Python, Java, and SQLite supported |
 | 🏆 **Leaderboard** | Global rankings with win rates and stats |
 | 📊 **Wrapped** | Season stats overview — wins, losses, top language, ranking |
+| 📈 **Stats** | Top problem insights: hardest & most played |
 | 👤 **Profiles** | Avatar selection, bio, password change, career statistics |
 | 🎨 **Landing Page** | Live stats from the backend, animated Matrix rain effect |
 
@@ -164,6 +165,7 @@ npm run start
 | `/changepassword` | Update your password | ✅ Yes |
 | `/leaderboard` | Global leaderboard | ✅ Yes |
 | `/wrapped` | Season stats overview | ✅ Yes |
+| `/stats` | Hardest & most-played problem stats| ✅ Yes |
 
 </div>
 
@@ -188,6 +190,7 @@ app/
 │   ├── changeavatar/
 │   ├── changepassword/
 │   ├── leaderboard/
+│   ├── stats/
 │   └── wrapped/
 │
 ├── components/               # Shared UI components
